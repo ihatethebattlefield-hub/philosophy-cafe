@@ -5,7 +5,7 @@
     const container = document.getElementById('particles');
     if (!container) return;
     const symbols = ['Φ', 'Σ', 'Ψ', 'Ω', 'Δ', '∞', '∵', '∴', '⊕', '⊗', '∀', '∃', '◊', '†', '‡', '☯', 'ᛟ', '∁'];
-    for (let i = 0; i < 22; i++) {
+    for (let i = 0; i < 30; i++) {
         const p = document.createElement('span');
         p.className = 'particle';
         p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
@@ -13,7 +13,7 @@
         p.style.top = Math.random() * 100 + '%';
         p.style.animationDelay = (Math.random() * 20) + 's';
         p.style.animationDuration = (15 + Math.random() * 25) + 's';
-        p.style.fontSize = (10 + Math.random() * 22) + 'px';
+        p.style.fontSize = (16 + Math.random() * 28) + 'px';
         container.appendChild(p);
     }
 })();

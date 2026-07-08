@@ -43,10 +43,11 @@ body::before {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background:
-        radial-gradient(ellipse at 20% 50%, rgba(210, 180, 140, 0.08) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(180, 160, 130, 0.06) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 80%, rgba(200, 175, 140, 0.05) 0%, transparent 50%),
-        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(180, 160, 130, 0.015) 2px, rgba(180, 160, 130, 0.015) 4px);
+        radial-gradient(ellipse at 50% 0%, rgba(250, 245, 235, 0.8) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 50%, rgba(210, 180, 140, 0.10) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(180, 160, 130, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(200, 175, 140, 0.07) 0%, transparent 50%),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(180, 160, 130, 0.02) 2px, rgba(180, 160, 130, 0.02) 4px);
     pointer-events: none;
     z-index: 0;
 }
@@ -92,10 +93,10 @@ body::before {
 .nav-logo:hover .nav-logo-icon { background: var(--gold); color: var(--cream); transform: rotate(15deg); box-shadow: 0 0 20px var(--accent-glow); }
 .nav-logo-text { font-family: 'Cinzel', serif; font-size: 22px; font-weight: 600; letter-spacing: 3px; color: var(--ink); }
 .nav-logo-sub { font-family: 'Cormorant Garamond', serif; font-size: 11px; font-style: italic; color: var(--ink-light); letter-spacing: 2px; display: block; margin-top: -2px; }
-.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links { display: flex; gap: 24px; list-style: none; }
 .nav-links a {
     text-decoration: none; color: var(--ink-light);
-    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
     letter-spacing: 1.5px; text-transform: uppercase;
     transition: color 0.3s ease; position: relative; padding: 4px 0;
 }
@@ -217,12 +218,25 @@ body::before {
 
 /* ---- Particles ---- */
 .particles { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
-.particle { position: absolute; font-size: 14px; opacity: 0.07; color: var(--gold); animation: float 20s infinite ease-in-out; }
+.particle {
+    position: absolute;
+    font-size: 14px;
+    opacity: 0.18;
+    color: var(--gold);
+    text-shadow: 0 0 14px rgba(184, 134, 11, 0.22);
+    animation: float 22s infinite ease-in-out;
+    will-change: transform, opacity;
+}
+@media (prefers-reduced-motion: reduce) {
+    .particle { animation: none; opacity: 0.12; }
+}
 @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    25% { transform: translateY(-30px) rotate(3deg); }
-    50% { transform: translateY(-15px) rotate(-2deg); }
-    75% { transform: translateY(-35px) rotate(1deg); }
+    0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.14; }
+    15% { transform: translate(25px, -45px) rotate(7deg); opacity: 0.28; }
+    35% { transform: translate(-20px, -25px) rotate(-5deg); opacity: 0.18; }
+    55% { transform: translate(35px, -60px) rotate(9deg); opacity: 0.28; }
+    75% { transform: translate(-30px, -35px) rotate(-6deg); opacity: 0.18; }
+    90% { transform: translate(15px, -15px) rotate(3deg); opacity: 0.24; }
 }
 
 /* ---- Library / Compose grid ---- */

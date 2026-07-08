@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thought Seeds — Σοφία Philosophy Café</title>
+    <link rel="stylesheet" href="philcafe.css">
+    <style>
+/* ---- Thought Seeds (pre-seeded discussion starters) ---- */
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Tangerine:wght@400;700&family=Caveat:wght@400;500;600;700&family=Alex+Brush&family=Parisienne&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+
+        .thought-seeds {
+            margin-bottom: 30px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 8px 30px var(--shadow);
+        }
+        .thought-seeds-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .thought-seeds-title {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            color: var(--ink);
+            letter-spacing: 0.06em;
+        }
+        .font-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .font-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--ink-light);
+        }
+        .font-picker {
+            appearance: none;
+            -webkit-appearance: none;
+            background: var(--cream);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 8px 32px 8px 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: var(--ink);
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23b8860b'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            transition: all 0.3s ease;
+        }
+        .font-picker:hover { border-color: var(--gold); }
+        .font-picker:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+        .seed-list { list-style: none; }
+        .seed-item {
+            position: relative;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: var(--cream);
+            transition: all 0.35s ease;
+            overflow: hidden;
+        }
+        .seed-item:hover { border-color: var(--gold-pale); box-shadow: 0 4px 20px var(--shadow-md); }
+        .seed-item.removing { opacity: 0; transform: translateX(40px); transition: all 0.5s ease; pointer-events: none; }
+
+        .seed-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.3s ease;
+        }
+        .seed-header:hover { background: var(--gold-pale); }
+        .seed-header::-webkit-details-marker { display: none; }
+        .seed-header::marker { display: none; content: ''; }
+
+        summary.seed-header { list-style: none; }
+        summary.seed-header::-webkit-details-marker { display: none; }
+
+        .seed-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--gold-pale);
+            border-radius: 50%;
+            transition: transform 0.4s ease;
+        }
+        details[open] .seed-icon { transform: rotate(15deg); }
+
+        .seed-meta {
+            flex: 1;
+            min-width: 0;
+        }
+        .seed-title {
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            letter-spacing: 0.04em;
+            color: var(--ink);
+            transition: color 0.3s ease;
+        }
+        .seed-subtitle {
+            font-size: 13px;
+            color: var(--ink-light);
+            font-style: italic;
+            margin-top: 2px;
+        }
+
+        .seed-expand {
+            font-size: 14px;
+            color: var(--gold);
+            transition: transform 0.35s ease;
+            flex-shrink: 0;
+        }
+        details[open] .seed-expand { transform: rotate(180deg); }
+
+        .seed-body-wrapper {
+            display: none;
+            padding: 0 20px 18px 72px;
+        }
+        details[open] .seed-body-wrapper {
+            display: block;
+            animation: fadeSlideIn 0.4s ease;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .seed-body {
+            font-size: 17px;
+            line-height: 1.9;
+            color: var(--ink);
+            padding: 16px 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+        }
+        .seed-body p { margin-bottom: 12px; }
+        .seed-body p:last-child { margin-bottom: 0; }
+        .seed-body .prompt {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 16px;
+            background: var(--gold-pale);
+            border-radius: 16px;
+            font-size: 14px;
+            font-style: italic;
+            color: var(--wine);
+        }
+
+        .seed-delete {
+            display: none;
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            z-index: 2;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid var(--wine-light);
+            background: rgba(114, 47, 55, 0.08);
+            color: var(--wine);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            line-height: 1;
+            padding: 0;
+        }
+        .seed-delete:hover { background: var(--wine); color: white; }
+        .admin-mode .seed-delete { display: flex; align-items: center; justify-content: center; }
+
+        .seed-restore-btn {
+            display: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            background: var(--cream);
+            border: 1px solid var(--border-subtle);
+            padding: 4px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .seed-restore-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .admin-mode .seed-restore-btn { display: inline-block; }
+
+        /* Admin toggle button & modal */
+        .admin-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            background: none;
+            border: 1px solid transparent;
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.5;
+        }
+        .admin-trigger:hover { opacity: 1; border-color: var(--border-subtle); color: var(--gold); }
+        .admin-trigger.active { opacity: 1; border-color: var(--gold); color: var(--gold); background: var(--gold-pale); }
+
+        .admin-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(44, 36, 22, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .admin-modal-overlay.open { display: flex; }
+        .admin-modal {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 32px;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 20px 60px var(--shadow-lg);
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .admin-modal h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            letter-spacing: 0.05em;
+            color: var(--ink);
+            margin-bottom: 6px;
+        }
+        .admin-modal .admin-subtitle {
+            font-size: 14px;
+            color: var(--ink-light);
+            margin-bottom: 18px;
+            font-style: italic;
+        }
+        .admin-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            color: var(--ink);
+            background: var(--cream);
+            transition: border-color 0.3s ease;
+            margin-bottom: 12px;
+        }
+        .admin-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .admin-error { color: var(--wine); font-size: 13px; margin-bottom: 8px; display: none; }
+        .admin-btn-row { display: flex; gap: 10px; }
+        .admin-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        .admin-btn.primary { background: var(--ink); color: var(--cream); }
+        .admin-btn.primary:hover { background: var(--gold); }
+        .admin-btn.secondary { background: var(--cream); color: var(--ink-light); border: 1px solid var(--border-subtle); }
+        .admin-btn.secondary:hover { border-color: var(--ink-light); }
+
+        /* Responsive for seeds */
+        @media (max-width: 600px) {
+            .seed-body-wrapper { padding: 0 12px 12px 12px; }
+            .seed-body { font-size: 15px; padding: 12px 14px; }
+            .seed-header { padding: 12px 14px; }
+            .thought-seeds-header { flex-direction: column; align-items: flex-start; }
+        }
+
+        
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="philosophycafe.html" class="nav-logo">
+                <div class="nav-logo-icon">Φ</div>
+                <div>
+                    <span class="nav-logo-text">SOPHIA</span>
+                    <span class="nav-logo-sub">The Philosophy Café</span>
+                </div>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="philosophycafe.html#feed">Discourse</a></li>
+                <li><a href="compose.html">Compose</a></li>
+                <li><a href="library.html">Library</a></li>
+                <li><a href="thought-seeds.html" class="active">Seeds</a></li>
+                <li><a href="philosophycafe.html#about">About</a></li>
+            </ul>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <header class="page-hero">
+        <a href="philosophycafe.html" class="back-link">← Back to the Café</a>
+        <div class="page-ornament">✦ ◇ ✦</div>
+        <h1>Thought Seeds</h1>
+        <div class="dates">Pre-seeded discussion starters for the wandering mind</div>
+        <div class="school">A garden of philosophical prompts</div>
+        <div class="page-divider"></div>
+    </header>
+
+    <div class="page-container wide">
+        <div class="thought-seeds" id="thoughtSeeds">
+            <div class="thought-seeds-header">
+                <h3 class="thought-seeds-title">✦ Thought Seeds</h3>
+                <div class="font-picker-wrapper">
+                    <span class="font-label">Font</span>
+                    <select class="font-picker" id="fontPicker" onchange="changeSeedFont(this.value)">
+                        <option value="Cormorant Garamond">Cormorant Garamond</option>
+                        <option value="Playfair Display">Playfair Display</option>
+                        <option value="Dancing Script">Dancing Script</option>
+                        <option value="Great Vibes">Great Vibes</option>
+                        <option value="Tangerine">Tangerine</option>
+                        <option value="Caveat">Caveat</option>
+                        <option value="Alex Brush">Alex Brush</option>
+                        <option value="Parisienne">Parisienne</option>
+                    </select>
+                </div>
+            </div>
+            <ul class="seed-list" id="seedList">
+                <!-- Seeds rendered by JavaScript -->
+            </ul>
+            <div style="text-align:right;margin-top:8px;display:flex;align-items:center;gap:8px;justify-content:flex-end;">
+                <button class="seed-restore-btn" id="restoreBtn" onclick="restoreAllSeeds()" title="Restore all deleted seeds">↩ Restore All</button>
+                <button class="admin-trigger" id="adminTrigger" onclick="toggleAdmin()" title="Admin">🔑</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Password Modal -->
+    <div class="admin-modal-overlay" id="adminModal">
+        <div class="admin-modal">
+            <h3>Admin Access</h3>
+            <p class="admin-subtitle">Enter the keeper's key to manage thought seeds.</p>
+            <input type="password" class="admin-input" id="adminPassword" placeholder="Password..." onkeydown="if(event.key==='Enter')attemptLogin()">
+            <p class="admin-error" id="adminError">Incorrect password.</p>
+            <div class="admin-btn-row">
+                <button class="admin-btn secondary" onclick="closeAdmin()">Cancel</button>
+                <button class="admin-btn primary" onclick="attemptLogin()">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p class="footer-text">Σοφία — The Philosophy Café</p>
+        <p class="footer-greek">γνῶθι σεαυτόν · Know Thyself</p>
+    </footer>
+
+    <script src="page-script.js"></script>
+    <script src="seeds.js"></script>
+    <script>
+        function toggleAdmin() {
+            if (localStorage.getItem('adminAuth') === 'true') {
+                localStorage.removeItem('adminAuth');
+                document.getElementById('adminTrigger').classList.remove('active');
+                document.getElementById('adminTrigger').innerHTML = '🔑';
+                document.getElementById('thoughtSeeds').classList.remove('admin-mode');
+            } else {
+                document.getElementById('adminModal').classList.add('open');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminError').style.display = 'none';
+                setTimeout(() => document.getElementById('adminPassword').focus(), 100);
+            }
+        }
+        function attemptLogin() {
+            if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
+                localStorage.setItem('adminAuth', 'true');
+                document.getElementById('adminModal').classList.remove('open');
+                document.getElementById('adminTrigger').classList.add('active');
+                document.getElementById('adminTrigger').innerHTML = '🔒 Exit';
+                document.getElementById('thoughtSeeds').classList.add('admin-mode');
+            } else { document.getElementById('adminError').style.display = 'block'; }
+        }
+        function closeAdmin() { document.getElementById('adminModal').classList.remove('open'); }
+        document.getElementById('adminModal').addEventListener('click', function(e) { if (e.target === this) closeAdmin(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && document.getElementById('adminModal').classList.contains('open')) closeAdmin(); });
+
+        const savedFont = localStorage.getItem('seedFont') || 'Cormorant Garamond';
+        document.getElementById('fontPicker').value = savedFont;
+        renderSeeds(savedFont);
+        if (localStorage.getItem('adminAuth') === 'true') {
+            document.getElementById('adminTrigger').classList.add('active');
+            document.getElementById('adminTrigger').innerHTML = '🔒 Exit';
+            document.getElementById('thoughtSeeds').classList.add('admin-mode');
+        }
+    </script>
+</body>
+</html>
