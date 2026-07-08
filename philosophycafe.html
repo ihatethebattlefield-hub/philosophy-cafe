@@ -1229,6 +1229,682 @@
             .thought-seeds-header { flex-direction: column; align-items: flex-start; }
         }
 
+        /* ============================================================
+           1. DAILY DISCUSSION THREAD — Featured daily prompt
+           ============================================================ */
+        .daily-thread {
+            background: linear-gradient(135deg, var(--gold-pale) 0%, var(--card-bg) 50%, var(--cream) 100%);
+            border: 2px solid var(--gold-pale);
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 30px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        .daily-thread::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 120px; height: 120px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .daily-thread-badge {
+            display: inline-block;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gold);
+            background: var(--cream);
+            border: 1px solid var(--gold-pale);
+            border-radius: 20px;
+            padding: 5px 14px;
+            margin-bottom: 14px;
+        }
+        .daily-thread-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .daily-thread-title {
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            letter-spacing: 0.04em;
+            color: var(--ink);
+            margin-bottom: 6px;
+        }
+        .daily-thread-subtitle {
+            font-size: 15px;
+            font-style: italic;
+            color: var(--ink-light);
+            margin-bottom: 16px;
+        }
+        .daily-thread-body {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--ink);
+            position: relative;
+            z-index: 1;
+        }
+        .daily-thread-body .prompt {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 20px;
+            background: var(--cream);
+            border-radius: 20px;
+            font-size: 14px;
+            font-style: italic;
+            color: var(--wine);
+            border: 1px solid var(--gold-pale);
+        }
+        .daily-thread-jump {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: var(--gold);
+            cursor: pointer;
+            border: none;
+            background: none;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+        .daily-thread-jump:hover { color: var(--ink); }
+        .daily-thread-dismiss {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--ink-light);
+            opacity: 0.4;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+        .daily-thread-dismiss:hover { opacity: 1; color: var(--wine); }
+
+        /* ============================================================
+           2. POLL / QUICK VOTE
+           ============================================================ */
+        .poll-question {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 14px;
+            font-style: italic;
+            color: var(--ink);
+        }
+        .poll-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+        .poll-btn {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 15px;
+            text-align: left;
+            background: var(--cream);
+            color: var(--ink);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .poll-btn:hover { border-color: var(--gold); background: var(--gold-pale); }
+        .poll-btn.voted { border-color: var(--gold); background: var(--gold-pale); font-weight: 600; }
+        .poll-btn .bar {
+            height: 6px;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            flex-shrink: 0;
+        }
+        .poll-btn .bar.agree { background: var(--sage); }
+        .poll-btn .bar.disagree { background: var(--wine); }
+        .poll-btn .bar.undecided { background: var(--gold); }
+        .poll-vote-count { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--ink-light); margin-left: auto; }
+        .poll-reset {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+        .poll-reset:hover { opacity: 1; }
+
+        /* ============================================================
+           3. RANDOM PHILOSOPHER MODAL
+           ============================================================ */
+        .random-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--cream), var(--gold-pale));
+            border: 1px solid var(--gold-pale);
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            letter-spacing: 1px;
+            color: var(--ink);
+            transition: all 0.3s ease;
+        }
+        .random-btn:hover { background: var(--gold-pale); border-color: var(--gold); transform: translateY(-1px); }
+        .thinker-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(44, 36, 22, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .thinker-modal-overlay.open { display: flex; }
+        .thinker-modal {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 36px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px var(--shadow-lg);
+            animation: modalIn 0.35s ease;
+            text-align: center;
+        }
+        .thinker-modal .thinker-emoji { font-size: 56px; margin-bottom: 12px; display: block; }
+        .thinker-modal h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            letter-spacing: 2px;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+        .thinker-modal .thinker-years {
+            font-size: 14px;
+            color: var(--gold);
+            font-style: italic;
+            margin-bottom: 16px;
+        }
+        .thinker-modal .thinker-bio {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--ink-light);
+            margin-bottom: 16px;
+        }
+        .thinker-modal .thinker-quote {
+            font-size: 18px;
+            font-style: italic;
+            line-height: 1.7;
+            color: var(--ink);
+            padding: 16px 20px;
+            background: var(--cream);
+            border-radius: 10px;
+            border-left: 3px solid var(--gold);
+        }
+        .thinker-modal .thinker-quote-author {
+            margin-top: 8px;
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            letter-spacing: 1px;
+            color: var(--gold);
+            text-align: right;
+            font-style: normal;
+        }
+        .thinker-modal .close-btn {
+            margin-top: 20px;
+            padding: 10px 28px;
+            background: var(--ink);
+            color: var(--cream);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        .thinker-modal .close-btn:hover { background: var(--gold); }
+        .thinker-modal .reroll-btn {
+            margin-top: 20px;
+            margin-left: 8px;
+            padding: 10px 20px;
+            background: none;
+            color: var(--ink-light);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        .thinker-modal .reroll-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        /* ============================================================
+           4. GLOSSARY / LEXICON
+           ============================================================ */
+        .glossary-search {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 14px;
+            color: var(--ink);
+            background: var(--cream);
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        .glossary-search:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .glossary-list { max-height: 300px; overflow-y: auto; }
+        .glossary-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .glossary-item:last-child { border-bottom: none; }
+        .glossary-term {
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            color: var(--ink);
+            cursor: pointer;
+        }
+        .glossary-term:hover { color: var(--gold); }
+        .glossary-def { font-size: 12px; color: var(--ink-light); margin-top: 2px; display: none; }
+        .glossary-item.open .glossary-def { display: block; }
+
+        /* ============================================================
+           5. SUBMIT A QUOTE
+           ============================================================ */
+        .quote-submit-form { display: flex; flex-direction: column; gap: 8px; }
+        .quote-submit-form input,
+        .quote-submit-form textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 14px;
+            color: var(--ink);
+            background: var(--cream);
+            transition: all 0.3s ease;
+        }
+        .quote-submit-form textarea { min-height: 60px; resize: vertical; }
+        .quote-submit-form input:focus,
+        .quote-submit-form textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .submitted-quotes { margin-top: 12px; max-height: 200px; overflow-y: auto; }
+        .submitted-quote-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 13px;
+            font-style: italic;
+            line-height: 1.5;
+        }
+        .submitted-quote-item .sq-author {
+            display: block;
+            font-size: 11px;
+            color: var(--gold);
+            font-style: normal;
+            text-align: right;
+            margin-top: 2px;
+        }
+        .admin-mode .quote-delete-btn {
+            display: inline-block;
+            font-size: 10px;
+            color: var(--wine);
+            cursor: pointer;
+            margin-left: 6px;
+            opacity: 0.6;
+        }
+        .admin-mode .quote-delete-btn:hover { opacity: 1; }
+        .quote-delete-btn { display: none; }
+
+        /* ============================================================
+           6. EVENT CALENDAR
+           ============================================================ */
+        .event-list { max-height: 250px; overflow-y: auto; }
+        .event-item {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 13px;
+        }
+        .event-date {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: var(--gold);
+            margin-bottom: 2px;
+        }
+        .event-title { font-size: 14px; color: var(--ink); font-weight: 500; }
+        .event-desc { font-size: 12px; color: var(--ink-light); margin-top: 2px; }
+        .event-link { font-size: 11px; color: var(--sage); cursor: pointer; }
+        .admin-mode .event-delete {
+            font-size: 10px;
+            color: var(--wine);
+            cursor: pointer;
+            margin-left: 6px;
+            opacity: 0.6;
+            display: inline;
+        }
+        .admin-mode .event-delete:hover { opacity: 1; }
+        .event-delete { display: none; }
+        .event-add-form { display: none; margin-top: 10px; }
+        .admin-mode .event-add-form { display: flex; flex-direction: column; gap: 8px; }
+        .event-add-form input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 13px;
+            color: var(--ink);
+            background: var(--cream);
+        }
+        .event-add-form input:focus { outline: none; border-color: var(--gold); }
+
+        /* ============================================================
+           7. DEBATE ARENA
+           ============================================================ */
+        .debate-arena {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 30px var(--shadow);
+        }
+        .debate-header {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            letter-spacing: 0.06em;
+            color: var(--ink);
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        .debate-question {
+            text-align: center;
+            font-size: 17px;
+            font-style: italic;
+            color: var(--ink-light);
+            margin-bottom: 20px;
+        }
+        .debate-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .debate-side {
+            background: var(--cream);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .debate-side:hover { border-color: var(--gold-pale); }
+        .debate-side-name {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            letter-spacing: 1px;
+            color: var(--ink);
+            margin-bottom: 8px;
+        }
+        .debate-side-summary {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--ink-light);
+            margin-bottom: 14px;
+            min-height: 60px;
+        }
+        .debate-vote-btn {
+            padding: 8px 24px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: var(--card-bg);
+            color: var(--ink-light);
+            transition: all 0.3s ease;
+        }
+        .debate-vote-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .debate-vote-btn.voted { background: var(--gold-pale); border-color: var(--gold); color: var(--ink); }
+        .debate-results {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--ink-light);
+            justify-content: center;
+        }
+        .debate-bar-container { display: flex; align-items: center; gap: 6px; }
+        .debate-bar {
+            height: 6px;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            width: 60px;
+            background: var(--gold-pale);
+        }
+        .debate-bar.fill { background: var(--gold); }
+        .debate-new-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            background: none;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            cursor: pointer;
+            padding: 4px 12px;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+        .debate-new-btn:hover { opacity: 1; border-color: var(--gold); color: var(--gold); }
+        .admin-mode .debate-new-btn { opacity: 1; }
+
+        @media (max-width: 600px) {
+            .debate-columns { grid-template-columns: 1fr; }
+        }
+
+        /* ============================================================
+           8. READING GROUP
+           ============================================================ */
+        .reading-group {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 30px var(--shadow);
+        }
+        .reading-group h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            letter-spacing: 1px;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+        .reading-current {
+            font-size: 15px;
+            font-style: italic;
+            color: var(--ink-light);
+            margin-bottom: 16px;
+        }
+        .reading-progress {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .reading-chapter {
+            padding: 6px 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            color: var(--ink-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .reading-chapter.done { background: var(--sage-light); color: #fff; border-color: var(--sage-light); }
+        .reading-chapter.current { background: var(--gold-pale); color: var(--gold); border-color: var(--gold); font-weight: 600; }
+        .reading-question {
+            font-size: 15px;
+            font-style: italic;
+            color: var(--ink);
+            padding: 12px 16px;
+            background: var(--cream);
+            border-radius: 8px;
+            border-left: 3px solid var(--gold);
+            margin-bottom: 8px;
+        }
+        .reading-join {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 24px;
+            background: var(--ink);
+            color: var(--cream);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .reading-join:hover { background: var(--gold); }
+
+        /* ============================================================
+           9. SEED LIKE BUTTON
+           ============================================================ */
+        .seed-like-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            padding: 4px 12px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            color: var(--ink-light);
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+        .seed-like-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .seed-like-btn.liked { background: var(--gold-pale); border-color: var(--gold); color: var(--gold); }
+
+        /* ============================================================
+           10. WEEKLY DIGEST
+           ============================================================ */
+        .weekly-digest { font-size: 13px; line-height: 1.7; }
+        .weekly-digest .digest-section { margin-bottom: 10px; }
+        .weekly-digest .digest-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+        .weekly-digest li { padding: 4px 0; border-bottom: 1px solid var(--border-subtle); list-style: none; }
+        .weekly-digest li:last-child { border-bottom: none; }
+
+        /* ============================================================
+           GENERAL SECTION TABS
+           ============================================================ */
+        .section-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .section-tab {
+            padding: 8px 18px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+        .section-tab:hover { border-color: var(--gold); color: var(--gold); }
+        .section-tab.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+
+        /* ---- extra modals generic overlay ---- */
+        .add-debate-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(44, 36, 22, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .add-debate-overlay.open { display: flex; }
+        .add-debate-modal {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px var(--shadow-lg);
+            animation: modalIn 0.3s ease;
+        }
+        .add-debate-modal h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            letter-spacing: 1px;
+            color: var(--ink);
+            margin-bottom: 16px;
+        }
+        .add-debate-modal input,
+        .add-debate-modal textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 14px;
+            color: var(--ink);
+            background: var(--cream);
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        .add-debate-modal textarea { min-height: 60px; resize: vertical; }
+        .add-debate-modal input:focus,
+        .add-debate-modal textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
+
     </style>
 </head>
 <body>
@@ -1287,6 +1963,17 @@
                     </p>
                 </div>
 
+                <!-- 1. Daily Discussion Thread -->
+                <div class="daily-thread" id="dailyThread">
+                    <button class="daily-thread-dismiss" onclick="dismissDailyThread()" title="Hide for today">✕</button>
+                    <span class="daily-thread-badge">Today's Café Conversation</span>
+                    <div class="daily-thread-icon" id="dailyIcon"></div>
+                    <div class="daily-thread-title" id="dailyTitle"></div>
+                    <div class="daily-thread-subtitle" id="dailySubtitle"></div>
+                    <div class="daily-thread-body" id="dailyBody"></div>
+                    <button class="daily-thread-jump" onclick="document.getElementById('giscusWidget').scrollIntoView({behavior:'smooth'})">Join the Discussion ↓</button>
+                </div>
+
                 <!-- Thought Seeds: pre-seeded philosophical discussion starters -->
                 <div class="thought-seeds" id="thoughtSeeds">
                     <div class="thought-seeds-header">
@@ -1328,7 +2015,59 @@
                     </div>
                 </div>
 
-                <div class="giscus-comments">
+                <!-- 7. Debate Arena -->
+                <div class="debate-arena" id="debateArena">
+                    <div class="debate-header">⚔️ Debate Arena</div>
+                    <div class="debate-question" id="debateQuestion"></div>
+                    <div class="debate-columns">
+                        <div class="debate-side" id="debateSideA">
+                            <div class="debate-side-name" id="debateNameA"></div>
+                            <div class="debate-side-summary" id="debateSummaryA"></div>
+                            <button class="debate-vote-btn" onclick="voteDebate('A')">Vote ⚔️</button>
+                        </div>
+                        <div class="debate-side" id="debateSideB">
+                            <div class="debate-side-name" id="debateNameB"></div>
+                            <div class="debate-side-summary" id="debateSummaryB"></div>
+                            <button class="debate-vote-btn" onclick="voteDebate('B')">Vote ⚔️</button>
+                        </div>
+                    </div>
+                    <div class="debate-results" id="debateResults"></div>
+                    <div style="text-align:center;">
+                        <button class="debate-new-btn" onclick="openDebateForm()" title="Add a new debate topic (admin)">+ New Debate</button>
+                    </div>
+                </div>
+
+                <!-- 8. Reading Group -->
+                <div class="reading-group" id="readingGroup">
+                    <h3>📖 Reading Group</h3>
+                    <p class="reading-current" id="readingCurrent"></p>
+                    <div class="reading-progress" id="readingProgress"></div>
+                    <div class="reading-question" id="readingQuestion"></div>
+                    <a class="reading-join" href="#giscusWidget">Join the Discussion</a>
+                </div>
+
+                <!-- Admin Debug -- add debate form overlay -->
+                <div class="add-debate-overlay" id="debateFormOverlay">
+                    <div class="add-debate-modal">
+                        <h3>New Debate Topic</h3>
+                        <input type="text" id="newDebateQuestion" placeholder="Debate question (e.g. Is free will an illusion?)">
+                        <input type="text" id="newDebateNameA" placeholder="Side A name (e.g. Determinism)">
+                        <textarea id="newDebateSummaryA" placeholder="Side A summary..."></textarea>
+                        <input type="text" id="newDebateNameB" placeholder="Side B name (e.g. Free Will)">
+                        <textarea id="newDebateSummaryB" placeholder="Side B summary..."></textarea>
+                        <div class="admin-btn-row">
+                            <button class="admin-btn secondary" onclick="closeDebateForm()">Cancel</button>
+                            <button class="admin-btn primary" onclick="saveDebate()">Save</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thinker Modal Overlay -->
+                <div class="thinker-modal-overlay" id="thinkerModalOverlay">
+                    <div class="thinker-modal" id="thinkerModal"></div>
+                </div>
+
+                <div class="giscus-comments" id="giscusWidget">
                     <script src="https://giscus.app/client.js"
         data-repo="ihatethebattlefield-hub/philosophy-cafe"
         data-repo-id="R_kgDOTSIdiw"
@@ -1352,6 +2091,7 @@
 
         <!-- Right: Sidebar -->
         <aside class="sidebar">
+            <!-- Thought of the Day -->
             <div class="sidebar-card">
                 <h3><span class="icon">🕯️</span> Thought of the Day</h3>
                 <p class="quote-of-day" id="dailyQuote">
@@ -1360,6 +2100,78 @@
                 </p>
             </div>
 
+            <!-- 2. Poll -->
+            <div class="sidebar-card" id="pollCard">
+                <h3><span class="icon">🗳️</span> Quick Vote</h3>
+                <p class="poll-question" id="pollQuestion">Is free will an illusion?</p>
+                <div class="poll-options">
+                    <button class="poll-btn" onclick="castPollVote('agree')" id="pollAgree">
+                        <span class="bar agree" style="width:0" id="pollBarAgree"></span> Agree
+                        <span class="poll-vote-count" id="pollCountAgree">0</span>
+                    </button>
+                    <button class="poll-btn" onclick="castPollVote('disagree')" id="pollDisagree">
+                        <span class="bar disagree" style="width:0" id="pollBarDisagree"></span> Disagree
+                        <span class="poll-vote-count" id="pollCountDisagree">0</span>
+                    </button>
+                    <button class="poll-btn" onclick="castPollVote('undecided')" id="pollUndecided">
+                        <span class="bar undecided" style="width:0" id="pollBarUndecided"></span> Undecided
+                        <span class="poll-vote-count" id="pollCountUndecided">0</span>
+                    </button>
+                </div>
+                <button class="poll-reset" onclick="resetPoll()">Change my vote</button>
+            </div>
+
+            <!-- 3. Random Philosopher -->
+            <div class="sidebar-card">
+                <h3><span class="icon">🎲</span> Random Philosopher</h3>
+                <p class="join-text" style="font-size:14px;margin-bottom:12px;">Not sure where to start? Let fate choose a thinker for you.</p>
+                <button class="random-btn" onclick="showRandomThinker()">✦ Draw a Thinker ✦</button>
+            </div>
+
+            <!-- 4. Glossary / Lexicon -->
+            <div class="sidebar-card">
+                <h3><span class="icon">📚</span> Glossary</h3>
+                <input type="text" class="glossary-search" id="glossarySearch" placeholder="Search philosophical terms..." oninput="filterGlossary()">
+                <div class="glossary-list" id="glossaryList"></div>
+            </div>
+
+            <!-- 5. Submit a Quote -->
+            <div class="sidebar-card">
+                <h3><span class="icon">✍️</span> Submit a Quote</h3>
+                <div class="quote-submit-form" id="quoteSubmitForm">
+                    <textarea id="quoteText" placeholder="Your philosophical quote..."></textarea>
+                    <input type="text" id="quoteAuthor" placeholder="Author (e.g. Plato)">
+                    <button class="admin-btn primary" onclick="submitQuote()" style="font-size:12px;">Submit Quote</button>
+                </div>
+                <div class="submitted-quotes" id="submittedQuotes">
+                    <p style="font-size:12px;color:var(--ink-light);font-style:italic;">Recent submissions appear here...</p>
+                </div>
+            </div>
+
+            <!-- 6. Event Calendar -->
+            <div class="sidebar-card" id="eventCard">
+                <h3><span class="icon">📅</span> Events</h3>
+                <div class="event-list" id="eventList">
+                    <p style="font-size:12px;color:var(--ink-light);font-style:italic;">No upcoming events yet.</p>
+                </div>
+                <div class="event-add-form" id="eventAddForm">
+                    <input type="text" id="eventTitle" placeholder="Event title...">
+                    <input type="date" id="eventDate">
+                    <input type="text" id="eventDesc" placeholder="Short description...">
+                    <input type="url" id="eventUrl" placeholder="Link (optional)">
+                    <button class="admin-btn primary" onclick="addEvent()" style="font-size:12px;">Add Event</button>
+                </div>
+            </div>
+
+            <!-- 10. This Week in Philosophy -->
+            <div class="sidebar-card">
+                <h3><span class="icon">📰</span> This Week in Philosophy</h3>
+                <div class="weekly-digest" id="weeklyDigest">
+                    <p style="font-size:12px;color:var(--ink-light);font-style:italic;">Loading digest...</p>
+                </div>
+            </div>
+
+            <!-- Join the Discourse -->
             <div class="sidebar-card">
                 <h3><span class="icon">💬</span> Join the Discourse</h3>
                 <p class="join-text">
@@ -1371,6 +2183,7 @@
                 <p class="join-note">Be kind · Cite sources · Question everything.</p>
             </div>
 
+            <!-- Great Minds -->
             <div class="sidebar-card">
                 <h3><span class="icon">🏛️</span> Great Minds</h3>
                 <ul class="thinker-list">
@@ -1463,90 +2276,121 @@
         });
 
         // ============================================================
-        // THOUGHT SEEDS — Pre-seeded discussion starters
+        // THOUGHT SEEDS — Expanded for Daily Rotation (34 prompts)
         // ============================================================
 
-        const ADMIN_PASSWORD = 'sophia2026'; // Change this to your own password
+        const ADMIN_PASSWORD = 'sophia2026';
 
-        // Seed data: each with a title, subtitle, icon, and body content
         const seedPosts = [
-            {
-                icon: '🕯️',
-                title: 'Socrates & the Unexamined Life',
-                subtitle: 'What does it mean to truly know oneself?',
-                body: `<p>In the bustling agora of ancient Athens, a man with a snub nose and bare feet wandered from citizen to citizen, asking questions that seemed simple but cut to the bone. Socrates believed that the unexamined life is not worth living — that we must turn our gaze inward before we can understand anything outward.</p>
-                       <p>His method was deceptively simple: ask questions. Not to win arguments, but to peel back the layers of assumption until only truth remained. He called himself a midwife of ideas — helping others give birth to thoughts they already carried within.</p>
-                       <p class="prompt">❓ What questions would Socrates ask you today? What assumptions are you holding that deserve examination?</p>`
-            },
-            {
-                icon: '🌿',
-                title: 'Nietzsche & the Will to Power',
-                subtitle: 'Creating meaning in a godless universe',
-                body: `<p>When Nietzsche declared "God is dead," he was not celebrating — he was sounding an alarm. Without an external source of meaning, he argued, humanity would face an abyss of nihilism. But within that crisis lay the greatest opportunity: the chance to become our own creators of value.</p>
-                       <p>The Übermensch is not a tyrant but an artist — someone who sculpts their own virtues from raw existence. Nietzsche challenges us to live so fully that we would gladly relive every moment, every joy and every suffering, eternally.</p>
-                       <p class="prompt">❓ If you are the one who must give meaning to your life, what meaning will you create?</p>`
-            },
-            {
-                icon: '🧠',
-                title: 'Descartes & the Thinking Self',
-                subtitle: 'Can we ever be truly certain of anything?',
-                body: `<p>Imagine locking yourself in a room, determined to doubt everything — the chair beneath you, the walls around you, even your own body. This is where Descartes found himself: alone in a universe of radical doubt, with only one thought standing firm: "I think, therefore I am."</p>
-                       <p>From that single anchor, he rebuilt the world. His method teaches us that questioning is not destructive — it is foundational. Every genuine inquiry begins not with answers, but with the courage to say "I do not yet know."</p>
-                       <p class="prompt">❓ What would you still believe if you doubted everything you could possibly doubt?</p>`
-            },
-            {
-                icon: '🏛️',
-                title: 'Aristotle on Virtue & the Good Life',
-                subtitle: 'The golden mean between excess and deficiency',
-                body: `<p>Aristotle taught that virtue is not a feeling — it is a practice. Courage, for him, was not the absence of fear but the perfect balance between cowardice and recklessness. Every virtue sits at a golden mean, a point of harmony that must be discovered anew in each situation.</p>
-                       <p>Eudaimonia — the flourishing life — is not happiness as fleeting pleasure, but a deep and lasting fulfillment that comes from living according to reason and virtue, day after day, habit after habit.</p>
-                       <p class="prompt">❓ What is one habit you could cultivate today that would move you closer to your own 'golden mean'?</p>`
-            },
-            {
-                icon: '🌌',
-                title: 'Simone de Beauvoir & Radical Freedom',
-                subtitle: 'We are condemned to be free — and responsible',
-                body: `<p>Beauvoir took existentialism beyond the café and into lived experience. Her profound insight: "One is not born, but rather becomes, a woman." This was not a statement about biology — it was about how society constructs identity, and how we can choose to transcend those constructions.</p>
-                       <p>Freedom, she argued, is not a gift but a burden. Every choice we make is a kind of legislation — we are saying, through our actions, "this is what a human life should be." The weight of that responsibility is immense, but so is the possibility.</p>
-                       <p class="prompt">❓ What choices are you making today that silently declare "this is how one should live"?</p>`
-            },
-            {
-                icon: '🌸',
-                title: 'Laozi & the Way of Water',
-                subtitle: 'Softness overcomes hardness — stillness reveals truth',
-                body: `<p>The Tao Te Ching opens with a warning: the Tao that can be spoken is not the eternal Tao. It is a philosophy of paradox, where yielding becomes strength and emptiness contains all possibility. The sage does not force, but flows — because water, soft and yielding, wears down the hardest stone.</p>
-                       <p>Wu wei — effortless action — is not passivity. It is acting in such perfect harmony with the nature of things that action feels as natural as a tree growing toward light. The wise ruler governs least, yet everything is accomplished.</p>
-                       <p class="prompt">❓ Where in your life might yielding — rather than forcing — bring the result you seek?</p>`
-            },
-            {
-                icon: '⚖️',
-                title: 'Kant & the Moral Law Within',
-                subtitle: 'Can reason alone tell us what is right?',
-                body: `<p>Immanuel Kant looked up at the starry sky above and felt the moral law within, and saw both as equal sources of awe. His categorical imperative is a radical idea: act only according to that maxim which you could will to become a universal law. In other words, before you act, ask — what if everyone did this?</p>
-                       <p>This places morality not in consequences, not in divine command, but in reason itself. Every rational being carries the moral law within, and every rational being deserves to be treated as an end, never merely as a means.</p>
-                       <p class="prompt">❓ Think of a recent decision you made — would you want it to become a universal law for all people in all times?</p>`
-            },
-            {
-                icon: '🎭',
-                title: 'Camus & the Absurd Hero',
-                subtitle: 'Finding joy in the struggle itself',
-                body: `<p>There is but one truly serious philosophical problem, Camus declared, and that is suicide. The question is whether life is worth living — and his answer was a defiant, rebellious, exuberant yes. Sisyphus, he tells us, must be imagined happy, pushing his rock up the hill, knowing it will roll back down, and choosing to continue anyway.</p>
-                       <p>The absurd arises from the clash between our desire for meaning and the universe's silent indifference. But absurdity is not a dead end — it is a starting point. It liberates us from false hopes and opens the door to authentic existence.</p>
-                       <p class="prompt">❓ What is your "rock" — the thing you push up the hill even though you know it may roll back down?</p>`
-            }
+            { icon:'🕯️', title:'Socrates & the Unexamined Life', subtitle:'What does it mean to truly know oneself?',
+              body:`<p>In the bustling agora of ancient Athens, a man with a snub nose and bare feet wandered from citizen to citizen, asking questions that seemed simple but cut to the bone. Socrates believed that the unexamined life is not worth living — that we must turn our gaze inward before we can understand anything outward.</p><p>His method was deceptively simple: ask questions. Not to win arguments, but to peel back the layers of assumption until only truth remained.</p><p class="prompt">❓ What questions would Socrates ask you today? What assumptions are you holding that deserve examination?</p>` },
+            { icon:'🌿', title:'Nietzsche & the Will to Power', subtitle:'Creating meaning in a godless universe',
+              body:`<p>When Nietzsche declared "God is dead," he was not celebrating — he was sounding an alarm. Without an external source of meaning, he argued, humanity would face an abyss of nihilism. But within that crisis lay the greatest opportunity: the chance to become our own creators of value.</p><p>The Übermensch is not a tyrant but an artist — someone who sculpts their own virtues from raw existence.</p><p class="prompt">❓ If you are the one who must give meaning to your life, what meaning will you create?</p>` },
+            { icon:'🧠', title:'Descartes & the Thinking Self', subtitle:'Can we ever be truly certain of anything?',
+              body:`<p>Imagine locking yourself in a room, determined to doubt everything — the chair beneath you, the walls around you, even your own body. This is where Descartes found himself: alone in a universe of radical doubt, with only one thought standing firm: "I think, therefore I am."</p><p>From that single anchor, he rebuilt the world.</p><p class="prompt">❓ What would you still believe if you doubted everything you could possibly doubt?</p>` },
+            { icon:'🏛️', title:'Aristotle on Virtue & the Good Life', subtitle:'The golden mean between excess and deficiency',
+              body:`<p>Aristotle taught that virtue is not a feeling — it is a practice. Courage, for him, was not the absence of fear but the perfect balance between cowardice and recklessness. Every virtue sits at a golden mean, a point of harmony that must be discovered anew in each situation.</p><p>Eudaimonia — the flourishing life — is not happiness as fleeting pleasure, but a deep and lasting fulfillment that comes from living according to reason and virtue.</p><p class="prompt">❓ What is one habit you could cultivate today that would move you closer to your own 'golden mean'?</p>` },
+            { icon:'🌌', title:'Simone de Beauvoir & Radical Freedom', subtitle:'We are condemned to be free — and responsible',
+              body:`<p>Beauvoir took existentialism beyond the café and into lived experience. Her profound insight: "One is not born, but rather becomes, a woman." This was not a statement about biology — it was about how society constructs identity, and how we can choose to transcend those constructions.</p><p>Freedom, she argued, is not a gift but a burden. Every choice we make is a kind of legislation.</p><p class="prompt">❓ What choices are you making today that silently declare "this is how one should live"?</p>` },
+            { icon:'🌸', title:'Laozi & the Way of Water', subtitle:'Softness overcomes hardness — stillness reveals truth',
+              body:`<p>The Tao Te Ching opens with a warning: the Tao that can be spoken is not the eternal Tao. It is a philosophy of paradox, where yielding becomes strength and emptiness contains all possibility. The sage does not force, but flows — because water, soft and yielding, wears down the hardest stone.</p><p>Wu wei — effortless action — is not passivity. It is acting in such perfect harmony with the nature of things.</p><p class="prompt">❓ Where in your life might yielding — rather than forcing — bring the result you seek?</p>` },
+            { icon:'⚖️', title:'Kant & the Moral Law Within', subtitle:'Can reason alone tell us what is right?',
+              body:`<p>Immanuel Kant looked up at the starry sky above and felt the moral law within, and saw both as equal sources of awe. His categorical imperative is a radical idea: act only according to that maxim which you could will to become a universal law.</p><p>This places morality not in consequences, not in divine command, but in reason itself.</p><p class="prompt">❓ Think of a recent decision — would you want it to become a universal law for all?</p>` },
+            { icon:'🎭', title:'Camus & the Absurd Hero', subtitle:'Finding joy in the struggle itself',
+              body:`<p>There is but one truly serious philosophical problem, Camus declared, and that is suicide. The question is whether life is worth living — and his answer was a defiant, rebellious, exuberant yes. Sisyphus must be imagined happy.</p><p>The absurd arises from the clash between our desire for meaning and the universe's silent indifference.</p><p class="prompt">❓ What is your "rock" — the thing you push up the hill even though you know it may roll back down?</p>` },
+            { icon:'💀', title:'The Stoics & Amor Fati', subtitle:'Love your fate — whatever it brings',
+              body:`<p>Epictetus, a former slave, taught that while we cannot control events, we can control our response to them. Marcus Aurelius, the emperor-philosopher, wrote his Meditations not for publication but as a private exercise in self-mastery. Seneca faced death with remarkable calm.</p><p>The Stoic promise is simple yet radical: if you learn to desire what you already have, you can never be deprived.</p><p class="prompt">❓ What would change if you accepted every event as if you had chosen it yourself?</p>` },
+            { icon:'🔮', title:'Plato\'s Allegory of the Cave', subtitle:'Are we all prisoners of our own perception?',
+              body:`<p>Imagine prisoners chained in a cave since birth, watching shadows on the wall, believing those shadows are the whole of reality. When one prisoner escapes and sees the sun, he is at first blinded — then enlightened. But when he returns to tell the others, they reject him.</p><p>Plato asks: how much of what you believe is merely a shadow of the truth?</p><p class="prompt">❓ What "shadows" might you be mistaking for reality today?</p>` },
+            { icon:'🌀', title:'Heraclitus & the River of Change', subtitle:'Everything flows, nothing stands still',
+              body:`<p>"No man ever steps in the same river twice," Heraclitus wrote, "for it's not the same river and he's not the same man." Change is the only constant. Yet we cling to stability as if the world owed us permanence.</p><p>Embracing flux — the endless becoming — is the key to understanding nature and ourselves.</p><p class="prompt">❓ What in your life are you trying to keep the same, even as everything around it changes?</p>` },
+            { icon:'🐉', title:'Confucius & the Harmony of Ritual', subtitle:'Can ritual and tradition make us better people?',
+              body:`<p>Confucius believed that virtue was not innate but cultivated — through ritual (li), through benevolence (ren), through the constant practice of respect for others. Society is not a collection of individuals but an intricate web of relationships, each demanding its own form of care.</p><p>The gentleman, he taught, seeks harmony, not conformity.</p><p class="prompt">❓ What rituals — from morning coffee to evening reflection — shape who you are?</p>` },
+            { icon:'🏹', title:'Epicurus & the Pursuit of Pleasure', subtitle:'The simple life as the good life',
+              body:`<p>Epicurus is often misunderstood as a hedonist. In truth, he taught that the highest pleasure is the absence of pain — ataraxia, a tranquil mind. The secret to happiness, he argued, is not indulgence but simplicity: good friends, meaningful work, and freedom from fear.</p><p>Wealth beyond what is natural is no more use than an overflowing vessel.</p><p class="prompt">❓ How much of your striving is for things that, once attained, bring no lasting peace?</p>` },
+            { icon:'🪞', title:'David Hume & the Limits of Reason', subtitle:'Is reason really the slave of the passions?',
+              body:`<p>Hume woke Kant from his "dogmatic slumber" by arguing that reason alone cannot motivate action — our passions do. We are not rational beings who occasionally feel; we are feeling beings who occasionally reason.</p><p>Causality itself, Hume argued, is just a habit of the mind, not something we can prove.</p><p class="prompt">❓ Think of a "rational" decision you made recently. What emotion was really driving it?</p>` },
+            { icon:'🗽', title:'John Stuart Mill & Liberty', subtitle:'How much freedom should a society allow?',
+              body:`<p>Mill's "harm principle" is elegantly simple: the only justification for restricting anyone's liberty is to prevent harm to others. You are sovereign over your own body and mind — even if others think your choices are foolish.</p><p>But where does my freedom end and yours begin?</p><p class="prompt">❓ Where would you draw the line between personal liberty and social responsibility?</p>` },
+            { icon:'🎪', title:'Schopenhauer & the World as Will', subtitle:'Is life fundamentally suffering?',
+              body:`<p>Schopenhauer painted a bleak picture: the world is driven by a blind, restless Will that manifests in all living things as ceaseless striving. Satisfaction is fleeting; boredom and suffering are the defaults. Art, compassion, and asceticism offer temporary escape.</p><p>And yet — music, beauty, love. How to reconcile these with the darkness?</p><p class="prompt">❓ Is life more suffering than joy, or does meaning redeem the pain?</p>` },
+            { icon:'🕊️', title:'Simone Weil & Attention as Prayer', subtitle:'What if paying attention is the highest moral act?',
+              body:`<p>Weil believed that attention — pure, open, expectant waiting — is the rarest and most transformative human capacity. To truly see another person, without projecting or judging, is a form of grace. Her life was a radical experiment in empathy.</p><p>She worked in factories alongside laborers to understand their suffering firsthand.</p><p class="prompt">❓ When was the last time you gave someone your complete, undivided attention?</p>` },
+            { icon:'🧩', title:'Wittgenstein & the Limits of Language', subtitle:'Whereof one cannot speak, thereof one must be silent',
+              body:`<p>Wittgenstein believed that most philosophical problems arise from misunderstandings of language. The task of philosophy, he argued, is not to solve these problems but to dissolve them by clarifying how language actually works.</p><p>Language is a toolbox; meaning is use. The mystical — ethics, aesthetics, the meaning of life — lies beyond words.</p><p class="prompt">❓ Is there something you've been trying to say that words cannot capture?</p>` },
+            { icon:'🦉', title:'Hegel & the Dialectic', subtitle:'Do ideas evolve through conflict toward truth?',
+              body:`<p>Hegel saw history as a grand drama of ideas: a thesis arises, its antithesis challenges it, and from their clash a synthesis emerges — which becomes a new thesis, and so on. Spirit unfolds through contradiction toward self-understanding.</p><p>Is progress inevitable, or just a comforting story we tell?</p><p class="prompt">❓ What belief of yours has been shaped by its opposition to another belief?</p>` },
+            { icon:'🌊', title:'Spinoza & the God-Nature Identity', subtitle:'What if God and Nature are one and the same?',
+              body:`<p>Spinoza was excommunicated for his radical vision: Deus sive Natura — God or Nature. There is no transcendent creator separate from the world; the universe itself is divine substance, eternal and self-causing. Everything that happens follows necessarily from this nature.</p><p>Freedom, then, is not escaping causality but understanding it.</p><p class="prompt">❓ If everything is determined, does that make your choices any less meaningful?</p>` },
+            { icon:'🎯', title:'Nietzsche\'s Eternal Recurrence', subtitle:'Would you live your life again — exactly the same?',
+              body:`<p>What if a demon whispered to you: this life, as you live it now, you will have to live again and again, countless times, with every pain and every joy, in the exact same sequence — what would you answer? Would you curse the demon, or bless him?</p><p>This is Nietzsche's ultimate test of affirmation.</p><p class="prompt">❓ If you had to relive today eternally, what would you change about how you spent it?</p>` },
+            { icon:'🔗', title:'Beauvoir & the Ethics of Ambiguity', subtitle:'Can we be ethical without absolute rules?',
+              body:`<p>Beauvoir argued that existence precedes essence — we are not born with a fixed nature but create ourselves through action. This creates an ethics of ambiguity: there are no fixed moral recipes, yet we are responsible for the freedom of ourselves and others.</p><p>Every choice is a wager on what it means to be human.</p><p class="prompt">❓ When have you had to make an ethical choice with no clear right answer?</p>` },
+            { icon:'🧵', title:'Arendt & the Banality of Evil', subtitle:'How do ordinary people commit extraordinary wrongs?',
+              body:`<p>Hannah Arendt, covering the trial of Adolf Eichmann, expected a monster. Instead, she found a bureaucrat — a man who did not hate but simply failed to think. Evil, she concluded, can be banal: committed not by demons but by thoughtless functionaries.</p><p>Thinking — genuine reflection — is the antidote.</p><p class="prompt">❓ Where in your daily life do you act without thinking? What happens when you pause?</p>` },
+            { icon:'🌅', title:'Merleau-Ponty & the Lived Body', subtitle:'Are we minds in bodies, or bodies that think?',
+              body:`<p>Merleau-Ponty rejected the mind-body split entirely. We are not consciousnesses riding around in flesh-vehicles; we are embodied beings whose very perception is shaped by our physical presence in the world. Touch, movement, sensation — these are not secondary to thought.</p><p>They are the ground of thought itself.</p><p class="prompt">❓ How does your body's condition — tired, energized, hungry — change the way you think?</p>` },
+            { icon:'⚡', title:'Foucault & Power-Knowledge', subtitle:'Who decides what counts as truth?',
+              body:`<p>Foucault argued that power and knowledge are inseparable — what we accept as "truth" is shaped by institutions, disciplinary practices, and hidden power structures. The mad, the criminal, the deviant — these categories are not natural but constructed.</p><p>To question knowledge is to question power.</p><p class="prompt">❓ What do you believe is "just common sense" that might actually reflect a hidden power structure?</p>` },
+            { icon:'🧘', title:'Buddhist Philosophy & the Self', subtitle:'What if the self is an illusion?',
+              body:`<p>The Buddha taught anatta — no-self. What we experience as a unified, continuous self is actually a bundle of constantly changing physical and mental processes. Clinging to the illusion of a permanent self is the root of suffering.</p><p>Liberation comes not from finding the self, but from seeing through it.</p><p class="prompt">❓ If there is no permanent "you," what changes about how you live?</p>` },
+            { icon:'🕸️', title:'Derrida & Deconstruction', subtitle:'Does every text contain the seeds of its own undoing?',
+              body:`<p>Derrida's deconstruction is not destruction — it is a careful reading that reveals the hidden assumptions and contradictions within any text. There is no pure, stable meaning; every meaning depends on what it excludes. Différance — endless deferral — is the nature of language.</p><p>The margins are as important as the center.</p><p class="prompt">❓ What are you not saying that, by its absence, shapes what you are saying?</p>` },
+            { icon:'🏺', title:'The Pre-Socratics & the Stuff of Reality', subtitle:'What is everything made of?',
+              body:`<p>Before Socrates, Greek thinkers asked: what is the arche — the fundamental substance of everything? Thales said water. Anaximenes said air. Heraclitus said fire. Democritus proposed atoms — tiny indivisible particles whirling in the void. No gods, no myths — just matter.</p><p>These were the first scientists.</p><p class="prompt">❓ If you had to name the single most basic "stuff" of reality, what would it be?</p>` },
+            { icon:'🌓', title:'Kierkegaard & the Leap of Faith', subtitle:'Can belief be rational, or must we leap?',
+              body:`<p>Kierkegaard, the father of existentialism, argued that faith is not a conclusion but a choice — a leap into the absurd. Abraham, asked to sacrifice his son, could not justify his faith rationally; he simply obeyed. That is the terror and the beauty of genuine commitment.</p><p>To exist is to choose, and to choose is to risk everything.</p><p class="prompt">❓ What commitment have you made that cannot be justified by reason alone?</p>` },
+            { icon:'🎨', title:'Nietzsche\'s Apollonian & Dionysian', subtitle:'Order or chaos — which is the true source of art?',
+              body:`<p>In The Birth of Tragedy, Nietzsche describes two artistic impulses: the Apollonian (order, form, reason, dreams) and the Dionysian (chaos, intoxication, ecstasy, music). Great art — and a great life — requires both. Too much order is sterile; too much chaos destroys.</p><p>The tension between them is creative.</p><p class="prompt">❓ Are you more Apollonian or Dionysian? What would balance look like?</p>` },
+            { icon:'🔔', title:'Levinas & the Face of the Other', subtitle:'Is ethics born when we truly see another person?',
+              body:`<p>For Levinas, ethics begins not with rules or principles but with the encounter with another human face. The face of the Other makes a demand on us — "Do not kill me" — that precedes and grounds all philosophy. Responsibility is not chosen; it is imposed by the Other's vulnerability.</p><p>Ethics is first philosophy.</p><p class="prompt">❓ When has someone's face — their sheer presence — changed how you behaved?</p>` },
+            { icon:'🌳', title:'Aquinas & Natural Law', subtitle:'Can reason alone reveal moral truth?',
+              body:`<p>Thomas Aquinas synthesized Christian theology with Aristotelian philosophy, arguing that reason and faith are complementary, not opposed. Natural law — the moral order discoverable by reason — is written into the structure of creation itself.</p><p>To act rightly is to act in accordance with our nature as rational beings.</p><p class="prompt">❓ Do you believe some moral truths exist independently of human opinion?</p>` },
+            { icon:'📜', title:'Rawls & the Veil of Ignorance', subtitle:'What kind of society would you design from scratch?',
+              body:`<p>John Rawls proposed a thought experiment: design a society without knowing who you would be in it — rich or poor, talented or disabled, young or old. Behind this "veil of ignorance," what principles of justice would you choose?</p><p>Rawls believed you would choose fairness.</p><p class="prompt">❓ If you didn't know your position in society, what rules would you create for everyone?</p>` },
+            { icon:'🦋', title:'Zhuangzi & the Butterfly Dream', subtitle:'How do you know you\'re not dreaming right now?',
+              body:`<p>Zhuangzi dreamed he was a butterfly, fluttering happily. When he woke, he could not tell: was he Zhuangzi who had dreamed of being a butterfly, or a butterfly now dreaming he was Zhuangzi? The boundary between self and world, dream and waking, is not as firm as we think.</p><p>Perhaps transformation is the only constant.</p><p class="prompt">❓ If this moment were a dream, would you live it differently?</p>` }
         ];
 
-        // Render seeds with optional font
+        // ---- Seed likes (9. Like/Reaction System) ----
+        function getSeedLikes(idx) {
+            const likes = JSON.parse(localStorage.getItem('seedLikes') || '{}');
+            return likes[idx] || { count: 0 };
+        }
+        function getUserSeedLikes() {
+            return JSON.parse(localStorage.getItem('userSeedLikes') || '[]');
+        }
+        function toggleSeedLike(idx) {
+            const likes = JSON.parse(localStorage.getItem('seedLikes') || '{}');
+            const userLikes = getUserSeedLikes();
+            if (!likes[idx]) likes[idx] = { count: 0 };
+            if (userLikes.includes(idx)) {
+                likes[idx].count = Math.max(0, likes[idx].count - 1);
+                const pos = userLikes.indexOf(idx);
+                if (pos > -1) userLikes.splice(pos, 1);
+            } else {
+                likes[idx].count += 1;
+                userLikes.push(idx);
+            }
+            localStorage.setItem('seedLikes', JSON.stringify(likes));
+            localStorage.setItem('userSeedLikes', JSON.stringify(userLikes));
+            renderSeeds();
+        }
+
+        // Render seeds with likes
         function renderSeeds(fontFamily) {
             const list = document.getElementById('seedList');
             const saved = JSON.parse(localStorage.getItem('deletedSeeds') || '[]');
             const bodyFont = fontFamily || localStorage.getItem('seedFont') || 'Cormorant Garamond';
+            const userLikes = getUserSeedLikes();
 
             list.innerHTML = '';
             seedPosts.forEach((seed, i) => {
-                if (saved.includes(i)) return; // Skip deleted
+                if (saved.includes(i)) return;
                 const isCursive = ['Dancing Script','Great Vibes','Tangerine','Caveat','Alex Brush','Parisienne'].includes(bodyFont);
                 const bodySize = isCursive ? '22px' : '17px';
+                const likes = getSeedLikes(i);
+                const liked = userLikes.includes(i);
                 const li = document.createElement('li');
                 li.className = 'seed-item';
                 li.setAttribute('data-index', i);
@@ -1561,7 +2405,10 @@
                             <span class="seed-expand">▼</span>
                         </summary>
                         <div class="seed-body-wrapper">
-                            <div class="seed-body" style="font-family:'${bodyFont}',serif;font-size:${bodySize};line-height:${isCursive?'2.2':'1.9'};">${seed.body}</div>
+                            <div class="seed-body" style="font-family:'${bodyFont}',serif;font-size:${bodySize};line-height:${isCursive?'2.2':'1.9'};">
+                                ${seed.body}
+                                <button class="seed-like-btn ${liked?'liked':''}" onclick="event.stopPropagation();toggleSeedLike(${i})">💡 ${likes.count}</button>
+                            </div>
                         </div>
                     </details>
                     <button class="seed-delete" onclick="event.stopPropagation();deleteSeed(${i})" title="Remove this seed">✕</button>
@@ -1570,38 +2417,408 @@
             });
         }
 
-        // Font change
-        function changeSeedFont(font) {
-            localStorage.setItem('seedFont', font);
-            renderSeeds(font);
-        }
-
-        // Admin — delete seed
+        function changeSeedFont(font) { localStorage.setItem('seedFont', font); renderSeeds(font); }
         function deleteSeed(idx) {
             const saved = JSON.parse(localStorage.getItem('deletedSeeds') || '[]');
             if (!saved.includes(idx)) saved.push(idx);
             localStorage.setItem('deletedSeeds', JSON.stringify(saved));
             const el = document.querySelector(`.seed-item[data-index="${idx}"]`);
-            if (el) {
-                el.classList.add('removing');
-                setTimeout(() => renderSeeds(), 500);
+            if (el) { el.classList.add('removing'); setTimeout(() => renderSeeds(), 500); }
+        }
+        function restoreAllSeeds() { localStorage.removeItem('deletedSeeds'); renderSeeds(); }
+
+        // ============================================================
+        // 1. DAILY DISCUSSION THREAD
+        // ============================================================
+        function dismissDailyThread() {
+            const today = new Date().toISOString().slice(0,10);
+            localStorage.setItem('dailyThreadDismissed', today);
+            document.getElementById('dailyThread').style.display = 'none';
+        }
+        function showDailyThread() {
+            const today = new Date().toISOString().slice(0,10);
+            const dismissed = localStorage.getItem('dailyThreadDismissed');
+            if (dismissed === today) { document.getElementById('dailyThread').style.display = 'none'; return; }
+            const doy = Math.floor((new Date() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+            const seed = seedPosts[doy % seedPosts.length];
+            document.getElementById('dailyIcon').textContent = seed.icon;
+            document.getElementById('dailyTitle').textContent = seed.title;
+            document.getElementById('dailySubtitle').textContent = seed.subtitle;
+            document.getElementById('dailyBody').innerHTML = seed.body;
+            document.getElementById('dailyThread').style.display = 'block';
+        }
+
+        // ============================================================
+        // 2. POLL / QUICK VOTE
+        // ============================================================
+        const pollData = { question:'Is free will an illusion?', agree:0, disagree:0, undecided:0 };
+        function loadPoll() {
+            const saved = JSON.parse(localStorage.getItem('pollData'));
+            if (saved) { pollData.question = saved.question; pollData.agree = saved.agree; pollData.disagree = saved.disagree; pollData.undecided = saved.undecided; }
+            document.getElementById('pollQuestion').textContent = pollData.question;
+            updatePollBars();
+            const myVote = localStorage.getItem('pollMyVote');
+            if (myVote) document.getElementById('poll'+myVote.charAt(0).toUpperCase()+myVote.slice(1)).classList.add('voted');
+        }
+        function savePoll() { localStorage.setItem('pollData', JSON.stringify(pollData)); }
+        function castPollVote(option) {
+            const myVote = localStorage.getItem('pollMyVote');
+            if (myVote && myVote !== option) {
+                ['agree','disagree','undecided'].forEach(o => {
+                    document.getElementById('poll'+o.charAt(0).toUpperCase()+o.slice(1)).classList.remove('voted');
+                });
+                if (myVote === 'agree') pollData.agree = Math.max(0, pollData.agree - 1);
+                else if (myVote === 'disagree') pollData.disagree = Math.max(0, pollData.disagree - 1);
+                else pollData.undecided = Math.max(0, pollData.undecided - 1);
+            }
+            if (!myVote || myVote !== option) {
+                pollData[option] += 1;
+                localStorage.setItem('pollMyVote', option);
+                document.getElementById('poll'+option.charAt(0).toUpperCase()+option.slice(1)).classList.add('voted');
+            }
+            savePoll();
+            updatePollBars();
+        }
+        function resetPoll() {
+            const myVote = localStorage.getItem('pollMyVote');
+            if (myVote) { pollData[myVote] = Math.max(0, pollData[myVote] - 1); localStorage.removeItem('pollMyVote'); }
+            ['agree','disagree','undecided'].forEach(o => document.getElementById('poll'+o.charAt(0).toUpperCase()+o.slice(1)).classList.remove('voted'));
+            savePoll();
+            updatePollBars();
+        }
+        function updatePollBars() {
+            const total = pollData.agree + pollData.disagree + pollData.undecided || 1;
+            document.getElementById('pollBarAgree').style.width = (pollData.agree/total*100) + '%';
+            document.getElementById('pollBarDisagree').style.width = (pollData.disagree/total*100) + '%';
+            document.getElementById('pollBarUndecided').style.width = (pollData.undecided/total*100) + '%';
+            document.getElementById('pollCountAgree').textContent = pollData.agree;
+            document.getElementById('pollCountDisagree').textContent = pollData.disagree;
+            document.getElementById('pollCountUndecided').textContent = pollData.undecided;
+        }
+
+        // ============================================================
+        // 3. RANDOM PHILOSOPHER GENERATOR
+        // ============================================================
+        const thinkersDB = [
+            { emoji:'🕯️', name:'Socrates', years:'c. 470–399 BCE', bio:'The father of Western philosophy. Never wrote a word — his method of questioning lives on in every classroom debate. He was sentenced to death for "corrupting the youth" by teaching them to ask too many questions.', quote:'The only true wisdom is in knowing you know nothing.', school:'Greek / Ethics' },
+            { emoji:'🏛️', name:'Plato', years:'c. 428–348 BCE', bio:'Student of Socrates, teacher of Aristotle. His Theory of Forms argues that the visible world is but a shadow of a higher, eternal reality. The Allegory of the Cave remains one of philosophy\'s most powerful images.', quote:'The measure of a man is what he does with power.', school:'Greek / Idealism' },
+            { emoji:'🏺', name:'Aristotle', years:'384–322 BCE', bio:'Tutor to Alexander the Great and founder of the Lyceum. Wrote on everything from logic to biology to poetry. His virtue ethics — the golden mean between extremes — still shapes moral philosophy today.', quote:'We are what we repeatedly do. Excellence, then, is not an act, but a habit.', school:'Greek / Virtue Ethics' },
+            { emoji:'🧠', name:'René Descartes', years:'1596–1650', bio:'French philosopher and mathematician. His method of radical doubt led to the foundational insight "I think, therefore I am." He split mind from body in a way philosophy is still wrestling with.', quote:'I think, therefore I am.', school:'French / Rationalism' },
+            { emoji:'⚖️', name:'Immanuel Kant', years:'1724–1804', bio:'German philosopher who reframed ethics around duty and reason. His categorical imperative asks: what if everyone acted on your principle? The starry sky above and the moral law within.', quote:'Act only according to that maxim whereby you can at the same time will that it should become a universal law.', school:'German / Deontology' },
+            { emoji:'🌿', name:'Friedrich Nietzsche', years:'1844–1900', bio:'German philologist turned philosopher. Proclaimed the death of God, diagnosed nihilism, and called for the creation of new values. The Übermensch is not a tyrant — but an artist of the self.', quote:'He who has a why to live can bear almost any how.', school:'German / Existentialism' },
+            { emoji:'🎭', name:'Albert Camus', years:'1913–1960', bio:'French-Algerian writer and philosopher. He argued that life is absurd — but that we must rebel against that absurdity with joy and defiance. Sisyphus, he insisted, must be imagined happy.', quote:'In the midst of winter, I found there was, within me, an invincible summer.', school:'French / Absurdism' },
+            { emoji:'🌌', name:'Simone de Beauvoir', years:'1908–1986', bio:'French existentialist and feminist philosopher. Her insight that "one is not born, but rather becomes, a woman" rewired feminism. Freedom, she argued, is a burden we cannot escape — only embrace.', quote:'One is not born, but rather becomes, a woman.', school:'French / Existentialism & Feminism' },
+            { emoji:'🗽', name:'Jean-Paul Sartre', years:'1905–1980', bio:'French existentialist who argued that existence precedes essence — we exist first and define ourselves through action. Radical freedom comes with radical responsibility. We are condemned to be free.', quote:'Man is condemned to be free.', school:'French / Existentialism' },
+            { emoji:'🌸', name:'Laozi', years:'c. 6th century BCE', bio:'Legendary founder of Daoism. The Tao Te Ching teaches the way of water — soft, yielding, yet unstoppable. Wu wei — effortless action — is the path of the sage.', quote:'The journey of a thousand miles begins with one step.', school:'Chinese / Daoism' },
+            { emoji:'🐉', name:'Confucius', years:'551–479 BCE', bio:'Chinese philosopher whose ethical system shaped East Asian civilization for two millennia. He taught that virtue is cultivated through ritual, learning, and right relationships — not born, but built.', quote:'It does not matter how slowly you go as long as you do not stop.', school:'Chinese / Confucianism' },
+            { emoji:'🦋', name:'Zhuangzi', years:'c. 369–286 BCE', bio:'Daoist philosopher of playful profundity. His butterfly dream questions the boundary between dream and reality. His writing is full of humor, paradox, and the joy of uncertainty.', quote:'I dreamed I was a butterfly. Now I do not know whether I was then a man dreaming I was a butterfly, or whether I am now a butterfly dreaming I am a man.', school:'Chinese / Daoism' },
+            { emoji:'💀', name:'Marcus Aurelius', years:'121–180 CE', bio:'Roman emperor and Stoic philosopher. His Meditations, written in a tent during military campaigns, are an intimate guide to self-discipline, resilience, and inner peace.', quote:'You have power over your mind — not outside events. Realize this, and you will find strength.', school:'Roman / Stoicism' },
+            { emoji:'🪞', name:'David Hume', years:'1711–1776', bio:'Scottish empiricist and skeptic. He argued that causality is just a mental habit, that the self is a bundle of perceptions, and that reason is the slave of the passions.', quote:'A wise man proportions his belief to the evidence.', school:'Scottish / Empiricism' },
+            { emoji:'🔮', name:'Baruch Spinoza', years:'1632–1677', bio:'Dutch-Jewish philosopher excommunicated for heresy. He identified God with Nature — Deus sive Natura — and argued that everything follows necessarily from the divine substance.', quote:'The highest activity a human being can attain is learning for understanding, because to understand is to be free.', school:'Dutch / Rationalism' },
+            { emoji:'🎪', name:'Arthur Schopenhauer', years:'1788–1860', bio:'German pessimist philosopher. He saw the world as driven by a blind, striving Will. Art and asceticism offer temporary escape from suffering. His influence extends to Freud, Wagner, and Tolstoy.', quote:'Talent hits a target no one else can hit; Genius hits a target no one else can see.', school:'German / Pessimism' },
+            { emoji:'🕊️', name:'Hannah Arendt', years:'1906–1975', bio:'German-American political philosopher. She coined "the banality of evil" covering Eichmann\'s trial. Her work on totalitarianism, action, and thinking remains urgently relevant.', quote:'The sad truth is that most evil is done by people who never make up their minds to be good or evil.', school:'German-American / Political Philosophy' },
+            { emoji:'⚡', name:'Michel Foucault', years:'1926–1984', bio:'French philosopher-historian who analyzed the relationship between power and knowledge. His studies of prisons, madness, and sexuality revealed how institutions shape what counts as truth.', quote:'I don\'t feel that it is necessary to know exactly what I am. The main interest in life and work is to become someone else that you were not in the beginning.', school:'French / Post-Structuralism' },
+            { emoji:'🌓', name:'Søren Kierkegaard', years:'1813–1855', bio:'Danish philosopher, father of existentialism. He argued that truth is subjective and that faith requires a leap — not a rational conclusion. Anxiety and despair are the price of freedom.', quote:'Life can only be understood backwards; but it must be lived forwards.', school:'Danish / Existentialism' },
+            { emoji:'🧘', name:'Siddhartha Gautama (Buddha)', years:'c. 563–483 BCE', bio:'Indian spiritual teacher whose insights on suffering, impermanence, and the illusion of self form the foundation of Buddhist philosophy. The Middle Way avoids both indulgence and asceticism.', quote:'Peace comes from within. Do not seek it without.', school:'Indian / Buddhism' },
+            { emoji:'🔔', name:'Emmanuel Levinas', years:'1906–1995', bio:'French-Lithuanian philosopher who placed ethics before ontology. The encounter with the face of the Other, he argued, imposes an infinite responsibility that precedes all philosophy.', quote:'The face of the Other calls me to responsibility.', school:'French-Lithuanian / Ethics' },
+            { emoji:'📜', name:'John Rawls', years:'1921–2002', bio:'American political philosopher who revived social contract theory. His "veil of ignorance" thought experiment asks us to design a just society without knowing our own place in it.', quote:'Justice is the first virtue of social institutions, as truth is of systems of thought.', school:'American / Political Philosophy' }
+        ];
+
+        function showRandomThinker() {
+            const idx = Math.floor(Math.random() * thinkersDB.length);
+            const t = thinkersDB[idx];
+            const modal = document.getElementById('thinkerModal');
+            modal.innerHTML = `
+                <span class="thinker-emoji">${t.emoji}</span>
+                <h3>${t.name}</h3>
+                <p class="thinker-years">${t.years} · ${t.school}</p>
+                <p class="thinker-bio">${t.bio}</p>
+                <div class="thinker-quote">"${t.quote}"<div class="thinker-quote-author">— ${t.name}</div></div>
+                <button class="close-btn" onclick="closeThinkerModal()">Close</button>
+                <button class="reroll-btn" onclick="showRandomThinker()">✦ Another</button>
+            `;
+            document.getElementById('thinkerModalOverlay').classList.add('open');
+        }
+        function closeThinkerModal() { document.getElementById('thinkerModalOverlay').classList.remove('open'); }
+        document.getElementById('thinkerModalOverlay').addEventListener('click', function(e) { if (e.target === this) closeThinkerModal(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && document.getElementById('thinkerModalOverlay').classList.contains('open')) closeThinkerModal(); });
+
+        // ============================================================
+        // 4. GLOSSARY / LEXICON
+        // ============================================================
+        const glossaryTerms = [
+            { term:'A Priori', def:'Knowledge that is independent of experience — known through reason alone. Contrast with a posteriori.' },
+            { term:'Absurdism', def:'The philosophy of Albert Camus: the conflict between humanity\'s search for meaning and the universe\'s silent indifference.' },
+            { term:'Categorical Imperative', def:'Kant\'s supreme moral principle: act only on that maxim which you can will to become a universal law.' },
+            { term:'Cogito Ergo Sum', def:'"I think, therefore I am" — Descartes\' foundational certainty after doubting everything else.' },
+            { term:'Dao (Tao)', def:'The ineffable Way that underlies all of reality in Daoist philosophy. Cannot be named, only lived.' },
+            { term:'Deontology', def:'Ethics based on duty and rules rather than consequences. Associated with Kant.' },
+            { term:'Determinism', def:'The view that all events, including human choices, are causally determined by prior states.' },
+            { term:'Dialectic', def:'Hegel\'s process of thesis-antithesis-synthesis through which ideas and history evolve.' },
+            { term:'Dualism', def:'The view that mind and body are fundamentally distinct substances. Associated with Descartes.' },
+            { term:'Empiricism', def:'The theory that all knowledge comes from sensory experience. Key figures: Locke, Hume, Berkeley.' },
+            { term:'Epistemology', def:'The branch of philosophy concerned with knowledge — what it is, how we get it, and its limits.' },
+            { term:'Eudaimonia', def:'Aristotle\'s concept of the good life: flourishing, well-being, living in accordance with virtue.' },
+            { term:'Existentialism', def:'Philosophy emphasizing individual freedom, choice, and the creation of meaning in an absurd universe.' },
+            { term:'Golden Mean', def:'Aristotle\'s idea that virtue lies at a midpoint between excess and deficiency.' },
+            { term:'Hedonism', def:'The ethical view that pleasure is the highest good. Often misunderstood; Epicurus taught modest pleasures.' },
+            { term:'Idealism', def:'The metaphysical view that reality is fundamentally mental or idea-based (as opposed to material).' },
+            { term:'Materialism', def:'The view that only matter exists and all phenomena (including consciousness) are physical.' },
+            { term:'Metaphysics', def:'The branch of philosophy concerned with the nature of reality: being, existence, time, causation.' },
+            { term:'Nihilism', def:'The rejection of all moral, religious, and metaphysical beliefs, often accompanied by a sense of meaninglessness.' },
+            { term:'Ontology', def:'The study of being and existence — what kinds of things exist and what it means to exist.' },
+            { term:'Phenomenology', def:'The study of conscious experience from the first-person perspective. Associated with Husserl, Heidegger, Merleau-Ponty.' },
+            { term:'Rationalism', def:'The view that reason, not sensory experience, is the primary source of knowledge. Key figures: Descartes, Spinoza, Leibniz.' },
+            { term:'Skepticism', def:'The philosophical attitude of doubting knowledge claims. Can be global (everything) or local (specific domains).' },
+            { term:'Stoicism', def:'Hellenistic philosophy teaching virtue, self-control, and acceptance of what we cannot change.' },
+            { term:'Tabula Rasa', def:'"Blank slate" — Locke\'s idea that the mind at birth has no innate ideas; all knowledge comes from experience.' },
+            { term:'Teleology', def:'The explanation of things in terms of their purpose or end goal. Aristotle\'s final cause.' },
+            { term:'Übermensch', def:'Nietzsche\'s "Overman" — the ideal human who creates their own values beyond good and evil.' },
+            { term:'Utilitarianism', def:'Ethical theory that the right action maximizes overall happiness. Key figures: Bentham, Mill.' },
+            { term:'Veil of Ignorance', def:'Rawls\' thought experiment: design a just society without knowing your own social position.' },
+            { term:'Wu Wei', def:'Daoist principle of "effortless action" — acting in harmony with the Dao without forcing or striving.' }
+        ];
+
+        function renderGlossary(filter) {
+            const list = document.getElementById('glossaryList');
+            const q = (filter || '').toLowerCase().trim();
+            const filtered = q ? glossaryTerms.filter(g => g.term.toLowerCase().includes(q) || g.def.toLowerCase().includes(q)) : glossaryTerms;
+            list.innerHTML = filtered.map(g =>
+                `<div class="glossary-item" onclick="this.classList.toggle('open')">
+                    <span class="glossary-term">${g.term}</span>
+                    <div class="glossary-def">${g.def}</div>
+                </div>`
+            ).join('') || '<p style="font-size:12px;color:var(--ink-light);">No matching terms.</p>';
+        }
+        function filterGlossary() { renderGlossary(document.getElementById('glossarySearch').value); }
+
+        // ============================================================
+        // 5. SUBMIT A QUOTE
+        // ============================================================
+        function submitQuote() {
+            const text = document.getElementById('quoteText').value.trim();
+            const author = document.getElementById('quoteAuthor').value.trim();
+            if (!text || !author) { showToast('Please fill in both quote and author.', 'error'); return; }
+            const quotes = JSON.parse(localStorage.getItem('submittedQuotes') || '[]');
+            quotes.unshift({ text, author, date: new Date().toISOString().slice(0,10) });
+            localStorage.setItem('submittedQuotes', JSON.stringify(quotes));
+            document.getElementById('quoteText').value = '';
+            document.getElementById('quoteAuthor').value = '';
+            renderSubmittedQuotes();
+            showToast('Quote submitted! Thank you.', 'success');
+        }
+        function deleteQuote(idx) {
+            const quotes = JSON.parse(localStorage.getItem('submittedQuotes') || '[]');
+            quotes.splice(idx, 1);
+            localStorage.setItem('submittedQuotes', JSON.stringify(quotes));
+            renderSubmittedQuotes();
+        }
+        function renderSubmittedQuotes() {
+            const quotes = JSON.parse(localStorage.getItem('submittedQuotes') || '[]');
+            const container = document.getElementById('submittedQuotes');
+            if (quotes.length === 0) { container.innerHTML = '<p style="font-size:12px;color:var(--ink-light);font-style:italic;">Recent submissions appear here...</p>'; return; }
+            const isAdmin = localStorage.getItem('adminAuth') === 'true';
+            container.innerHTML = quotes.map((q, i) =>
+                `<div class="submitted-quote-item">
+                    "${q.text}"<span class="sq-author">— ${q.author}</span>
+                    ${isAdmin ? `<span class="quote-delete-btn" style="display:inline;" onclick="deleteQuote(${i})">✕</span>` : ''}
+                </div>`
+            ).join('');
+        }
+        function refreshAdminQuoteBtns() {
+            renderSubmittedQuotes();
+        }
+
+        // ============================================================
+        // 6. EVENT CALENDAR
+        // ============================================================
+        function addEvent() {
+            const title = document.getElementById('eventTitle').value.trim();
+            const date = document.getElementById('eventDate').value;
+            const desc = document.getElementById('eventDesc').value.trim();
+            const url = document.getElementById('eventUrl').value.trim();
+            if (!title || !date) { showToast('Title and date are required.', 'error'); return; }
+            const events = JSON.parse(localStorage.getItem('events') || '[]');
+            events.push({ title, date, desc, url });
+            events.sort((a,b) => new Date(a.date) - new Date(b.date));
+            localStorage.setItem('events', JSON.stringify(events));
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventDate').value = '';
+            document.getElementById('eventDesc').value = '';
+            document.getElementById('eventUrl').value = '';
+            renderEvents();
+            showToast('Event added!', 'success');
+        }
+        function deleteEvent(idx) {
+            const events = JSON.parse(localStorage.getItem('events') || '[]');
+            events.splice(idx, 1);
+            localStorage.setItem('events', JSON.stringify(events));
+            renderEvents();
+        }
+        function renderEvents() {
+            const events = JSON.parse(localStorage.getItem('events') || '[]');
+            const list = document.getElementById('eventList');
+            const isAdmin = localStorage.getItem('adminAuth') === 'true';
+            if (events.length === 0) { list.innerHTML = '<p style="font-size:12px;color:var(--ink-light);font-style:italic;">No upcoming events yet.</p>'; return; }
+            list.innerHTML = events.map((e, i) => {
+                const d = new Date(e.date + 'T00:00:00');
+                const dateStr = d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+                return `<div class="event-item">
+                    <div class="event-date">${dateStr}</div>
+                    <div class="event-title">${e.title}${isAdmin ? `<span class="event-delete" style="display:inline;" onclick="deleteEvent(${i})">✕</span>` : ''}</div>
+                    ${e.desc ? `<div class="event-desc">${e.desc}</div>` : ''}
+                    ${e.url ? `<a class="event-link" href="${e.url}" target="_blank">Details →</a>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        // ============================================================
+        // 7. DEBATE ARENA
+        // ============================================================
+        const defaultDebate = {
+            question: 'Is happiness the ultimate goal of life?',
+            sideA: { name: 'Aristotle (Yes)', summary: 'Happiness — eudaimonia — is the highest good and the end toward which all human action aims. A life lived according to virtue naturally leads to flourishing. Every art, every inquiry, every action is directed toward some good, and the highest good is happiness.' },
+            sideB: { name: 'Kant (Not Quite)', summary: 'Happiness is not the foundation of morality — duty is. A good will, acting from respect for the moral law, is the only unqualified good. If happiness were the supreme goal, morality would reduce to prudence and self-interest.' },
+            votesA: 0, votesB: 0
+        };
+        function loadDebate() {
+            const saved = JSON.parse(localStorage.getItem('debateData'));
+            const d = saved || defaultDebate;
+            if (!saved) localStorage.setItem('debateData', JSON.stringify(defaultDebate));
+            document.getElementById('debateQuestion').textContent = d.question;
+            document.getElementById('debateNameA').textContent = d.sideA.name;
+            document.getElementById('debateSummaryA').textContent = d.sideA.summary;
+            document.getElementById('debateNameB').textContent = d.sideB.name;
+            document.getElementById('debateSummaryB').textContent = d.sideB.summary;
+            updateDebateResults(d);
+            const myVote = localStorage.getItem('debateMyVote');
+            if (myVote) {
+                const btn = myVote === 'A' ? document.querySelector('#debateSideA .debate-vote-btn') : document.querySelector('#debateSideB .debate-vote-btn');
+                if (btn) btn.classList.add('voted');
             }
         }
-
-        // Admin — restore all deleted seeds
-        function restoreAllSeeds() {
-            localStorage.removeItem('deletedSeeds');
-            renderSeeds();
+        function voteDebate(side) {
+            const d = JSON.parse(localStorage.getItem('debateData')) || defaultDebate;
+            const myVote = localStorage.getItem('debateMyVote');
+            if (myVote && myVote !== side) {
+                if (myVote === 'A') d.votesA = Math.max(0, d.votesA - 1);
+                else d.votesB = Math.max(0, d.votesB - 1);
+                document.querySelectorAll('.debate-vote-btn').forEach(b => b.classList.remove('voted'));
+            }
+            if (!myVote || myVote !== side) {
+                if (side === 'A') d.votesA += 1; else d.votesB += 1;
+                localStorage.setItem('debateMyVote', side);
+                const btn = side === 'A' ? document.querySelector('#debateSideA .debate-vote-btn') : document.querySelector('#debateSideB .debate-vote-btn');
+                if (btn) btn.classList.add('voted');
+            }
+            localStorage.setItem('debateData', JSON.stringify(d));
+            updateDebateResults(d);
+        }
+        function updateDebateResults(d) {
+            const total = (d.votesA + d.votesB) || 1;
+            document.getElementById('debateResults').innerHTML = `
+                <div class="debate-bar-container">A: <span class="debate-bar fill" style="width:${(d.votesA/total*100).toFixed(0)}%"></span> ${d.votesA}</div>
+                <div class="debate-bar-container">B: <span class="debate-bar fill" style="width:${(d.votesB/total*100).toFixed(0)}%"></span> ${d.votesB}</div>
+            `;
+        }
+        function openDebateForm() {
+            document.getElementById('debateFormOverlay').classList.add('open');
+            document.getElementById('newDebateQuestion').focus();
+        }
+        function closeDebateForm() { document.getElementById('debateFormOverlay').classList.remove('open'); }
+        document.getElementById('debateFormOverlay').addEventListener('click', function(e) { if (e.target === this) closeDebateForm(); });
+        function saveDebate() {
+            const q = document.getElementById('newDebateQuestion').value.trim();
+            const nA = document.getElementById('newDebateNameA').value.trim();
+            const sA = document.getElementById('newDebateSummaryA').value.trim();
+            const nB = document.getElementById('newDebateNameB').value.trim();
+            const sB = document.getElementById('newDebateSummaryB').value.trim();
+            if (!q || !nA || !sA || !nB || !sB) { showToast('All fields are required.', 'error'); return; }
+            const d = { question:q, sideA:{name:nA,summary:sA}, sideB:{name:nB,summary:sB}, votesA:0, votesB:0 };
+            localStorage.setItem('debateData', JSON.stringify(d));
+            localStorage.removeItem('debateMyVote');
+            closeDebateForm();
+            loadDebate();
+            showToast('New debate topic added!', 'success');
         }
 
-        // Admin — login / logout
+        // ============================================================
+        // 8. READING GROUP
+        // ============================================================
+        function renderReadingGroup() {
+            const book = { title:'Meditations', author:'Marcus Aurelius', chapters:['Book I: Debts & Lessons','Book II: On the River Gran','Book III: In Carnuntum','Book IV: The Inner Citadel','Book V: In the Morning','Book VI: The Unity of All','Book VII: On Endurance','Book VIII: The Nature of the Whole','Book IX: On Justice','Book X: On the Whole','Book XI: On Character','Book XII: On the Summit'], question:'What does it mean to live "according to nature"? How does Aurelius reconcile his duty as emperor with his Stoic ideals of simplicity and detachment?' };
+            document.getElementById('readingCurrent').innerHTML = `Now reading: <strong>${book.title}</strong> by ${book.author}`;
+            const progress = JSON.parse(localStorage.getItem('readingProgress') || '[]');
+            document.getElementById('readingProgress').innerHTML = book.chapters.map((ch, i) => {
+                let cls = '';
+                if (progress.includes(i)) cls = 'done';
+                if (i === progress.length && i < book.chapters.length) cls = 'current';
+                else if (i === 0 && progress.length === 0) cls = 'current';
+                return `<span class="reading-chapter ${cls}" onclick="toggleReadingChapter(${i})">${ch}</span>`;
+            }).join('');
+            document.getElementById('readingQuestion').textContent = '💬 ' + book.question;
+        }
+        function toggleReadingChapter(idx) {
+            const progress = JSON.parse(localStorage.getItem('readingProgress') || '[]');
+            if (progress.includes(idx)) progress.splice(progress.indexOf(idx), 1);
+            else progress.push(idx);
+            localStorage.setItem('readingProgress', JSON.stringify(progress));
+            renderReadingGroup();
+        }
+
+        // ============================================================
+        // 10. WEEKLY DIGEST
+        // ============================================================
+        function renderWeeklyDigest() {
+            const poll = JSON.parse(localStorage.getItem('pollData'));
+            const debate = JSON.parse(localStorage.getItem('debateData'));
+            const events = JSON.parse(localStorage.getItem('events') || '[]');
+            const quotes = JSON.parse(localStorage.getItem('submittedQuotes') || '[]');
+            const likes = JSON.parse(localStorage.getItem('seedLikes') || '{}');
+            const weekNum = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 604800000);
+            const totalLikes = Object.values(likes).reduce((s, l) => s + (l.count || 0), 0);
+
+            document.getElementById('weeklyDigest').innerHTML = `
+                <div class="digest-section">
+                    <div class="digest-label">Week ${weekNum} of ${new Date().getFullYear()}</div>
+                </div>
+                <div class="digest-section">
+                    <div class="digest-label">🗳️ Poll Results</div>
+                    <p>${poll ? poll.question : 'N/A'}</p>
+                    <p style="font-size:11px;">Agree: ${poll?.agree||0} · Disagree: ${poll?.disagree||0} · Undecided: ${poll?.undecided||0}</p>
+                </div>
+                <div class="digest-section">
+                    <div class="digest-label">⚔️ Debate Standings</div>
+                    <p style="font-size:11px;">${debate?.sideA?.name||'N/A'}: ${debate?.votesA||0} votes vs ${debate?.sideB?.name||'N/A'}: ${debate?.votesB||0} votes</p>
+                </div>
+                <div class="digest-section">
+                    <div class="digest-label">📅 Upcoming Events</div>
+                    ${events.filter(e => { const d = new Date(e.date+'T00:00:00'); const now = new Date(); return d >= now; }).slice(0,3).map(e => `<li>${e.title} — ${new Date(e.date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}</li>`).join('') || '<p style="font-size:11px;">No upcoming events.</p>'}
+                </div>
+                <div class="digest-section">
+                    <div class="digest-label">💡 Total Seed Likes</div>
+                    <p style="font-size:11px;">${totalLikes} likes across all thought seeds.</p>
+                </div>
+                <div class="digest-section">
+                    <div class="digest-label">✍️ New Quotes</div>
+                    ${quotes.slice(0,3).map(q => `<li>"${q.text}" — ${q.author}</li>`).join('') || '<p style="font-size:11px;">No quotes submitted yet.</p>'}
+                </div>
+            `;
+        }
+
+        // ============================================================
+        // ADMIN — login / logout (extended)
+        // ============================================================
         function toggleAdmin() {
             if (localStorage.getItem('adminAuth') === 'true') {
-                // Logout
                 localStorage.removeItem('adminAuth');
                 document.getElementById('adminTrigger').classList.remove('active');
                 document.getElementById('adminTrigger').innerHTML = '🔑';
                 document.getElementById('thoughtSeeds').classList.remove('admin-mode');
+                document.getElementById('eventCard').classList.remove('admin-mode');
+                document.getElementById('debateArena').classList.remove('admin-mode');
+                refreshAdminQuoteBtns();
+                renderEvents();
             } else {
                 document.getElementById('adminModal').classList.add('open');
                 document.getElementById('adminPassword').value = '';
@@ -1609,7 +2826,6 @@
                 setTimeout(() => document.getElementById('adminPassword').focus(), 100);
             }
         }
-
         function attemptLogin() {
             if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
                 localStorage.setItem('adminAuth', 'true');
@@ -1617,36 +2833,50 @@
                 document.getElementById('adminTrigger').classList.add('active');
                 document.getElementById('adminTrigger').innerHTML = '🔒 Exit';
                 document.getElementById('thoughtSeeds').classList.add('admin-mode');
-            } else {
-                document.getElementById('adminError').style.display = 'block';
-            }
+                document.getElementById('eventCard').classList.add('admin-mode');
+                document.getElementById('debateArena').classList.add('admin-mode');
+                refreshAdminQuoteBtns();
+                renderEvents();
+            } else { document.getElementById('adminError').style.display = 'block'; }
+        }
+        function closeAdmin() { document.getElementById('adminModal').classList.remove('open'); }
+        document.getElementById('adminModal').addEventListener('click', function(e) { if (e.target === this) closeAdmin(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && document.getElementById('adminModal').classList.contains('open')) closeAdmin(); });
+
+        // ============================================================
+        // TOAST UTILITY
+        // ============================================================
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast show ' + (type || 'success');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.className = 'toast', 3000);
         }
 
-        function closeAdmin() {
-            document.getElementById('adminModal').classList.remove('open');
-        }
-
-        // Click outside modal to close
-        document.getElementById('adminModal').addEventListener('click', function(e) {
-            if (e.target === this) closeAdmin();
-        });
-
-        // ESC to close modal
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && document.getElementById('adminModal').classList.contains('open')) {
-                closeAdmin();
-            }
-        });
-
-        // Init
-        (function initSeeds() {
+        // ============================================================
+        // INIT ALL
+        // ============================================================
+        (function initAll() {
             const savedFont = localStorage.getItem('seedFont') || 'Cormorant Garamond';
             document.getElementById('fontPicker').value = savedFont;
             renderSeeds(savedFont);
+            showDailyThread();
+            loadPoll();
+            renderGlossary('');
+            renderSubmittedQuotes();
+            renderEvents();
+            loadDebate();
+            renderReadingGroup();
+            renderWeeklyDigest();
             if (localStorage.getItem('adminAuth') === 'true') {
                 document.getElementById('adminTrigger').classList.add('active');
                 document.getElementById('adminTrigger').innerHTML = '🔒 Exit';
                 document.getElementById('thoughtSeeds').classList.add('admin-mode');
+                document.getElementById('eventCard').classList.add('admin-mode');
+                document.getElementById('debateArena').classList.add('admin-mode');
+                refreshAdminQuoteBtns();
+                renderEvents();
             }
         })();
     </script>
