@@ -1113,6 +1113,23 @@
         .seed-delete:hover { background: var(--wine); color: white; }
         .admin-mode .seed-delete { display: flex; align-items: center; justify-content: center; }
 
+        .seed-restore-btn {
+            display: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            background: var(--cream);
+            border: 1px solid var(--border-subtle);
+            padding: 4px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .seed-restore-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .admin-mode .seed-restore-btn { display: inline-block; }
+
         /* Admin toggle button & modal */
         .admin-trigger {
             display: inline-flex;
@@ -1291,7 +1308,8 @@
                     <ul class="seed-list" id="seedList">
                         <!-- Seeds rendered by JavaScript -->
                     </ul>
-                    <div style="text-align:right;margin-top:8px;">
+                    <div style="text-align:right;margin-top:8px;display:flex;align-items:center;gap:8px;justify-content:flex-end;">
+                        <button class="seed-restore-btn" id="restoreBtn" onclick="restoreAllSeeds()" title="Restore all deleted seeds">↩ Restore All</button>
                         <button class="admin-trigger" id="adminTrigger" onclick="toggleAdmin()" title="Admin">🔑</button>
                     </div>
                 </div>
@@ -1570,12 +1588,19 @@
             }
         }
 
+        // Admin — restore all deleted seeds
+        function restoreAllSeeds() {
+            localStorage.removeItem('deletedSeeds');
+            renderSeeds();
+        }
+
         // Admin — login / logout
         function toggleAdmin() {
             if (localStorage.getItem('adminAuth') === 'true') {
                 // Logout
                 localStorage.removeItem('adminAuth');
                 document.getElementById('adminTrigger').classList.remove('active');
+                document.getElementById('adminTrigger').innerHTML = '🔑';
                 document.getElementById('thoughtSeeds').classList.remove('admin-mode');
             } else {
                 document.getElementById('adminModal').classList.add('open');
@@ -1590,6 +1615,7 @@
                 localStorage.setItem('adminAuth', 'true');
                 document.getElementById('adminModal').classList.remove('open');
                 document.getElementById('adminTrigger').classList.add('active');
+                document.getElementById('adminTrigger').innerHTML = '🔒 Exit';
                 document.getElementById('thoughtSeeds').classList.add('admin-mode');
             } else {
                 document.getElementById('adminError').style.display = 'block';
@@ -1619,6 +1645,7 @@
             renderSeeds(savedFont);
             if (localStorage.getItem('adminAuth') === 'true') {
                 document.getElementById('adminTrigger').classList.add('active');
+                document.getElementById('adminTrigger').innerHTML = '🔒 Exit';
                 document.getElementById('thoughtSeeds').classList.add('admin-mode');
             }
         })();
