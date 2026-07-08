@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Library — Σοφία Philosophy Café</title>
+    <link rel="stylesheet" href="philcafe.css">
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="philosophycafe.html" class="nav-logo">
+                <div class="nav-logo-icon">Φ</div>
+                <div>
+                    <span class="nav-logo-text">SOPHIA</span>
+                    <span class="nav-logo-sub">The Philosophy Café</span>
+                </div>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="philosophycafe.html#feed">Discourse</a></li>
+                <li><a href="philosophycafe.html#compose">Compose</a></li>
+                <li><a href="library.html" class="active">Library</a></li>
+                <li><a href="philosophycafe.html#about">About</a></li>
+            </ul>
+            <button class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+
+    <header class="page-hero">
+        <a href="philosophycafe.html" class="back-link">← Back to the Café</a>
+        <div class="page-ornament">📚 ⚜ 📜</div>
+        <h1>The Library</h1>
+        <div class="dates">Free &amp; open resources for the wandering mind</div>
+        <div class="school">Curated from the web</div>
+        <div class="page-divider"></div>
+    </header>
+
+    <div class="page-container wide">
+        <p class="prose" style="text-align:center; max-width:640px; margin:0 auto 32px;">
+            A quiet reading room of the best philosophy the internet offers without charge — encyclopedias,
+            free books, lectures, podcasts, and courses. Every link leads outward into deeper thought.
+        </p>
+
+        <div class="cat-filter" id="catFilter">
+            <button class="cat-btn active" data-cat="all">All</button>
+            <button class="cat-btn" data-cat="ref">Reference</button>
+            <button class="cat-btn" data-cat="books">Books</button>
+            <button class="cat-btn" data-cat="courses">Courses</button>
+            <button class="cat-btn" data-cat="audio">Audio</button>
+            <button class="cat-btn" data-cat="community">Community</button>
+        </div>
+
+        <div class="resource-grid" id="resourceGrid">
+            <!-- Reference -->
+            <a class="resource-card" data-cat="ref" href="https://plato.stanford.edu/" target="_blank" rel="noopener">
+                <div class="resource-icon">📖</div>
+                <h3>Stanford Encyclopedia of Philosophy</h3>
+                <p>Peer-reviewed, expert-authored articles on every philosopher and topic. The gold standard reference, maintained by scholars worldwide.</p>
+                <span class="resource-tag">Reference</span>
+                <span class="resource-link">Visit →</span>
+            </a>
+
+            <a class="resource-card" data-cat="ref" href="https://iep.utm.edu/" target="_blank" rel="noopener">
+                <div class="resource-icon">🗂️</div>
+                <h3>Internet Encyclopedia of Philosophy</h3>
+                <p>Free, scholarly, peer-reviewed entries written by professors. Accessible yet rigorous — ideal for first encounters.</p>
+                <span class="resource-tag">Reference</span>
+                <span class="resource-link">Visit →</span>
+            </a>
+
+            <a class="resource-card" data-cat="ref" href="https://philpapers.org/" target="_blank" rel="noopener">
+                <div class="resource-icon">🔍</div>
+                <h3>PhilPapers</h3>
+                <p>The comprehensive index and bibliography of philosophical research, monitored from journals and archives across the world.</p>
+                <span class="resource-tag">Reference</span>
+                <span class="resource-link">Visit →</span>
+            </a>
+
+            <!-- Books -->
+            <a class="resource-card" data-cat="books" href="https://www.gutenberg.org/ebooks/bookshelf/57" target="_blank" rel="noopener">
+                <div class="resource-icon">📜</div>
+                <h3>Project Gutenberg — Philosophy Shelf</h3>
+                <p>Tens of thousands of free eBooks, including the complete works of Plato, Kant, Nietzsche, and more. No fees, no registration.</p>
+                <span class="resource-tag">Books</span>
+                <span class="resource-link">Visit →</span>
+            </a>
+
+            <a class="resource-card" data-cat="books" href="https://www.openculture.com/free-philosophy-ebooks" target="_blank" rel="noopener">
+                <div class="resource-icon">💡</div>
+                <h3>Open Culture — Free Philosophy eBooks</h3>
+                <p>A growing list of 135+ essential works by Aristotle, Hegel, Kant, Wittgenstein and many others, ready to download.</p>
+                <span class="resource-tag">Books</span>
+                <span class="resource-link">Visit →</span>
+            </a>
+
+            <a class="resource-card" data-cat="books" href="https://www.infobooks.org/free-pdf-books/philosophy/" target="_blank" rel="noopener">
+                <div class="resource-icon">📄</div>
+                <h3>Infobooks — Free Philosophy PDFs</h3>
+                <p>50+ free philosophy books in PDF — classics by Plato, Descartes, Marcus Aurelius, and beyond. No registration required.</p>
+                <span class="resource-tag">Books</span>
+                <span class="resource-link">Visit →</span>
+            </a>
+
+            <!-- Courses -->
+            <a class="resource-card" data-cat="courses" href="https://www.classcentral.com/report/philosophy-free-online-courses/" target="_blank" rel="noopener">
+                <div class="resource-icon">🎓</div>
+                <h3>150+ Free Philosophy Courses</h3>
+                <p>Class Central's guide rounds up free courses from Plato to AI ethics, drawn from universities, TED, and independent platforms.</p>
+                <span class="resource-tag">Courses</span>
+                <span class="resource-link">Visit →</span>
+            </a>
+
+            <a class="resource-card" data-cat="courses" href="https://oyc.yale.edu/philosophy" target="_blank" rel="noopener">
+                <div class="resource-icon">🏛️</div>
+                <h3>Yale Open Courses — Philosophy</h3>
+                <p>Full video lectures including "Death" (Shelly Kagan) and "Introduction to Political Philosophy" (Steven Smith).</p>
+                <span class="resource-tag">Courses</span>
+                <span class="resource-link">Visit →</span>
+            </a>
+
+            <a class="resource-card" data-cat="courses" href="https://royalinstitutephilosophy.org/education/online-learning/" target="_blank" rel="noopener">
+                <div class="resource-icon">🎥</div>
+                <h3>Royal Institute of Philosophy</h3>
+                <p>Free podcasts, articles, and video lectures — from 15-minute Philosophy Briefings to full debates and online courses.</p>
+                <span class="resource-tag">Courses</span>
+                <span class="resource-link">Visit →</span>
+            </a>
+
+            <!-- Audio -->
+            <a class="resource-card" data-cat="audio" href="https://philosophybites.com/" target="_blank" rel="noopener">
+                <div class="resource-icon">🎧</div>
+                <h3>Philosophy Bites</h3>
+                <p>Short interviews with top philosophers on a single idea each — perfect for a walk or a commute. Hundreds of episodes.</p>
+                <span class="resource-tag">Audio</span>
+                <span class="resource-link">Listen →</span>
+            </a>
+
+            <a class="resource-card" data-cat="audio" href="https://www.partiallyexaminedlife.com/" target="_blank" rel="noopener">
+                <div class="resource-icon">🎙️</div>
+                <h3>The Partially Examined Life</h3>
+                <p>"A philosophy podcast by some guys who were at one point set on doing philosophy for a living." Discussion-driven and warm.</p>
+                <span class="resource-tag">Audio</span>
+                <span class="resource-link">Listen →</span>
+            </a>
+
+            <!-- Community -->
+            <a class="resource-card" data-cat="community" href="https://thedailyidea.org/resources/" target="_blank" rel="noopener">
+                <div class="resource-icon">🌐</div>
+                <h3>The Daily Idea — 400+ Resources</h3>
+                <p>Organized by topic — ethics, metaphysics, existentialism, feminist philosophy — with articles, podcasts, and videos.</p>
+                <span class="resource-tag">Community</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card" data-cat="community" href="https://www.reddit.com/r/philosophy/" target="_blank" rel="noopener">
+                <div class="resource-icon">💬</div>
+                <h3>r/philosophy</h3>
+                <p>One of the largest online philosophy communities — discussions, papers, and weekly threads for every level of reader.</p>
+                <span class="resource-tag">Community</span>
+                <span class="resource-link">Join →</span>
+            </a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p class="footer-text">Σοφία — The Philosophy Café</p>
+        <p class="footer-greek">γνῶθι σεαυτόν · Know Thyself</p>
+    </footer>
+
+    <script src="page-script.js"></script>
+    <script>
+        // Category filter for library
+        const filter = document.getElementById('catFilter');
+        const grid = document.getElementById('resourceGrid');
+        filter.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('cat-btn')) return;
+            filter.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            const cat = e.target.dataset.cat;
+            grid.querySelectorAll('.resource-card').forEach(card => {
+                card.style.display = (cat === 'all' || card.dataset.cat === cat) ? 'flex' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

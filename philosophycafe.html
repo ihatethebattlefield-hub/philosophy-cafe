@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Σοφία — The Philosophy Café</title>
+    <style>
+        /* ============================================================
+           PHILOSOPHY CAFÉ — A Place for Thought
+           ============================================================ */
+
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+
+        :root {
+            --parchment: #f5f0e8;
+            --parchment-dark: #e8dcc8;
+            --ink: #2c2416;
+            --ink-light: #5a4e3c;
+            --gold: #b8860b;
+            --gold-light: #d4a94e;
+            --gold-pale: #f0e4c8;
+            --wine: #722f37;
+            --wine-light: #a0525a;
+            --sage: #6b7f6b;
+            --sage-light: #8fa88f;
+            --cream: #faf7f0;
+            --marble: #e8e0d5;
+            --shadow: rgba(44, 36, 22, 0.08);
+            --shadow-md: rgba(44, 36, 22, 0.15);
+            --shadow-lg: rgba(44, 36, 22, 0.25);
+            --card-bg: #fdfaf4;
+            --border-subtle: #e0d8c8;
+            --accent-glow: rgba(184, 134, 11, 0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Cormorant Garamond', 'Georgia', serif;
+            background: var(--parchment);
+            color: var(--ink);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ---- Subtle marble texture background ---- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(210, 180, 140, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(180, 160, 130, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(200, 175, 140, 0.05) 0%, transparent 50%),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(180, 160, 130, 0.015) 2px, rgba(180, 160, 130, 0.015) 4px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ---- Scrollbar ---- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--parchment-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--gold-light); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+        /* ============================================================
+           NAVIGATION
+           ============================================================ */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(180deg, rgba(245,240,232,0.98) 0%, rgba(245,240,232,0.92) 100%);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            box-shadow: 0 1px 20px var(--shadow);
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-logo-icon {
+            width: 42px;
+            height: 42px;
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            color: var(--gold);
+            background: var(--gold-pale);
+            transition: all 0.4s ease;
+        }
+
+        .nav-logo:hover .nav-logo-icon {
+            background: var(--gold);
+            color: var(--cream);
+            transform: rotate(15deg);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .nav-logo-text {
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            color: var(--ink);
+        }
+
+        .nav-logo-sub {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 11px;
+            font-style: italic;
+            color: var(--ink-light);
+            letter-spacing: 2px;
+            display: block;
+            margin-top: -2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--ink-light);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            position: relative;
+            padding: 4px 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover { color: var(--gold); }
+        .nav-links a:hover::after { width: 100%; }
+
+        .nav-links a.active { color: var(--gold); }
+        .nav-links a.active::after { width: 100%; }
+
+        /* ---- Mobile menu ---- */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            color: var(--ink);
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--ink);
+            margin: 5px 0;
+            transition: 0.3s;
+        }
+
+        /* ============================================================
+           HERO
+           ============================================================ */
+        .hero {
+            text-align: center;
+            padding: 80px 20px 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-ornament {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 28px;
+            letter-spacing: 8px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+
+        .hero h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: var(--ink);
+            margin-bottom: 8px;
+        }
+
+        .hero h1 .greek {
+            color: var(--gold);
+            font-style: italic;
+        }
+
+        .hero-tagline {
+            font-size: 20px;
+            font-style: italic;
+            color: var(--ink-light);
+            letter-spacing: 2px;
+            font-weight: 400;
+            margin-bottom: 24px;
+        }
+
+        .hero-divider {
+            width: 120px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 0 auto 24px;
+        }
+
+        .hero-quote {
+            font-size: 15px;
+            font-style: italic;
+            color: var(--sage);
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.8;
+            position: relative;
+        }
+
+        .hero-quote::before { content: '"'; font-size: 40px; color: var(--gold-pale); position: absolute; left: -20px; top: -10px; }
+        .hero-quote::after { content: '"'; font-size: 40px; color: var(--gold-pale); position: absolute; right: -20px; bottom: -30px; }
+
+        /* ---- Floating particles ---- */
+        .particles {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            font-size: 14px;
+            opacity: 0.08;
+            color: var(--gold);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-30px) rotate(3deg); }
+            50% { transform: translateY(-15px) rotate(-2deg); }
+            75% { transform: translateY(-35px) rotate(1deg); }
+        }
+
+        /* ============================================================
+           MAIN LAYOUT
+           ============================================================ */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px 80px;
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 40px;
+        }
+
+        /* ============================================================
+           POST COMPOSER
+           ============================================================ */
+        .composer {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 2px 20px var(--shadow);
+            margin-bottom: 32px;
+            transition: box-shadow 0.4s ease;
+        }
+
+        .composer:focus-within {
+            box-shadow: 0 4px 30px var(--shadow-md), 0 0 0 2px var(--gold-pale);
+        }
+
+        .composer-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .composer-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-pale), var(--parchment-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 16px;
+            border: 2px solid var(--gold-pale);
+        }
+
+        .composer-title {
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: var(--ink);
+        }
+
+        .composer-subtitle {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--ink-light);
+        }
+
+        .composer-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .composer-inputs input,
+        .composer-inputs textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            background: var(--cream);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            color: var(--ink);
+            transition: all 0.3s ease;
+            resize: vertical;
+        }
+
+        .composer-inputs input:focus,
+        .composer-inputs textarea:focus {
+            outline: none;
+            border-color: var(--gold-light);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+            background: #fff;
+        }
+
+        .composer-inputs input::placeholder,
+        .composer-inputs textarea::placeholder {
+            color: #c4b99a;
+            font-style: italic;
+        }
+
+        .composer-inputs textarea {
+            min-height: 120px;
+            line-height: 1.8;
+        }
+
+        .composer-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag-option {
+            padding: 6px 16px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            color: var(--ink-light);
+            background: var(--cream);
+            transition: all 0.3s ease;
+        }
+
+        .tag-option:hover {
+            border-color: var(--gold-light);
+            color: var(--gold);
+            background: var(--gold-pale);
+        }
+
+        .tag-option.selected {
+            background: var(--gold);
+            color: #fff;
+            border-color: var(--gold);
+        }
+
+        .composer-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 4px;
+        }
+
+        .composer-hint {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--sage);
+        }
+
+        .btn-post {
+            padding: 12px 32px;
+            background: var(--ink);
+            color: var(--cream);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-post::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-post:hover {
+            background: var(--gold);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(184, 134, 11, 0.3);
+        }
+
+        .btn-post:hover::before { left: 100%; }
+
+        .btn-post:active { transform: translateY(0); }
+
+        /* ============================================================
+           FILTER BAR
+           ============================================================ */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            color: var(--ink-light);
+            text-transform: uppercase;
+        }
+
+        .filter-btn {
+            padding: 6px 16px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            color: var(--ink-light);
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--ink);
+            color: var(--cream);
+            border-color: var(--ink);
+        }
+
+        .sort-btn {
+            margin-left: auto;
+            padding: 6px 16px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            color: var(--ink-light);
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .sort-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        /* ============================================================
+           POST CARDS
+           ============================================================ */
+        .posts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .post-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 2px 12px var(--shadow);
+            transition: all 0.4s ease;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+            position: relative;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px var(--shadow-md);
+            border-color: var(--gold-pale);
+        }
+
+        .post-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 28px;
+            right: 28px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-pale), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .post-card:hover::before { opacity: 1; }
+
+        .post-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .post-meta {
+            flex: 1;
+        }
+
+        .post-author {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--ink);
+        }
+
+        .post-time {
+            font-size: 12px;
+            color: var(--ink-light);
+            font-style: italic;
+        }
+
+        .post-title {
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            color: var(--ink);
+            line-height: 1.4;
+        }
+
+        .post-body {
+            font-size: 16px;
+            line-height: 1.9;
+            color: var(--ink);
+            margin-bottom: 16px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .post-body::first-letter {
+            font-size: 52px;
+            float: left;
+            line-height: 0.7;
+            padding-right: 8px;
+            padding-top: 4px;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+        }
+
+        .post-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .post-tag {
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .tag-metaphysics { background: #ede0f0; color: #6b3fa0; }
+        .tag-ethics { background: #e8f0e0; color: #3a6b3a; }
+        .tag-existentialism { background: #f0e8e0; color: #8b4513; }
+        .tag-epistemology { background: #e0e8f0; color: #2a4a7a; }
+        .tag-politics { background: #f0e0e0; color: #8b2a2a; }
+        .tag-stoicism { background: #e0f0f0; color: #2a6b6b; }
+        .tag-logic { background: #f5f0e0; color: #6b5a2a; }
+        .tag-aesthetics { background: #f0e0f0; color: #7a2a7a; }
+
+        .post-actions {
+            display: flex;
+            gap: 20px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .post-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: var(--ink-light);
+            transition: all 0.3s ease;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .post-action-btn:hover {
+            color: var(--gold);
+            background: var(--gold-pale);
+        }
+
+        .post-action-btn.liked { color: var(--wine); }
+        .post-action-btn .icon { font-size: 16px; }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            color: var(--ink-light);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        /* ============================================================
+           SIDEBAR
+           ============================================================ */
+        .sidebar {
+            position: sticky;
+            top: 90px;
+            align-self: start;
+        }
+
+        .sidebar-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-card h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: var(--ink);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-card h3 .icon { font-size: 18px; }
+
+        .quote-of-day {
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--ink-light);
+        }
+
+        .quote-of-day .author {
+            display: block;
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--gold);
+            font-style: normal;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+            text-align: right;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 13px;
+        }
+
+        .stat-item:last-child { border-bottom: none; }
+        .stat-value { font-family: 'Cinzel', serif; color: var(--gold); font-weight: 600; }
+
+        .thinker-list {
+            list-style: none;
+        }
+
+        .thinker-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .thinker-list li:hover { color: var(--gold); padding-left: 4px; }
+        .thinker-list li:last-child { border-bottom: none; }
+        .thinker-list li a {
+            color: inherit;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+        .thinker-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+
+        /* ============================================================
+           TOAST
+           ============================================================ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--ink);
+            color: var(--cream);
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            pointer-events: none;
+            box-shadow: 0 8px 30px var(--shadow-lg);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success { border-left: 3px solid var(--sage); }
+        .toast.error { border-left: 3px solid var(--wine); }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border-subtle);
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-text {
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: var(--ink-light);
+        }
+
+        .footer-greek {
+            font-size: 11px;
+            color: var(--gold);
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 0 20px 60px;
+            }
+
+            .sidebar { position: static; }
+
+            .nav-links { display: none; }
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: var(--parchment);
+                padding: 20px;
+                border-bottom: 1px solid var(--border-subtle);
+                box-shadow: 0 10px 30px var(--shadow);
+            }
+
+            .menu-toggle { display: block; }
+
+            .hero { padding: 50px 20px 40px; }
+            .hero h1 { font-size: 32px; letter-spacing: 3px; }
+        }
+
+        @media (max-width: 500px) {
+            .composer { padding: 20px; }
+            .post-card { padding: 20px; }
+            .composer-actions { flex-direction: column; gap: 12px; align-items: stretch; }
+            .btn-post { width: 100%; text-align: center; }
+        }
+
+        /* ---- Selection styling ---- */
+        ::selection { background: var(--gold-pale); color: var(--ink); }
+
+        /* ---- Focus visible ---- */
+        :focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; }
+        /* ---- Discourse (Giscus) ---- */
+        .discourse { margin-bottom: 40px; }
+        .discourse-intro { margin-bottom: 22px; }
+        .discourse-title {
+            font-family: 'Cinzel', serif;
+            font-size: 26px;
+            color: var(--ink);
+            letter-spacing: 0.04em;
+            margin-bottom: 8px;
+        }
+        .discourse-title::after {
+            content: '';
+            display: block;
+            width: 60px; height: 2px;
+            margin-top: 10px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+        }
+        .discourse-sub {
+            font-size: 18px;
+            color: var(--ink-light);
+            font-style: italic;
+            max-width: 60ch;
+        }
+        .giscus-comments {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 8px 30px var(--shadow);
+        }
+        .join-text { font-size: 16.5px; color: var(--ink-light); line-height: 1.65; }
+        .join-note {
+            margin-top: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            letter-spacing: 0.03em;
+            color: var(--gold);
+            font-style: italic;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Floating philosophy symbols -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <div class="nav-logo">
+                <div class="nav-logo-icon">Φ</div>
+                <div>
+                    <span class="nav-logo-text">SOPHIA</span>
+                    <span class="nav-logo-sub">The Philosophy Café</span>
+                </div>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="philosophycafe.html#feed" class="active">Discourse</a></li>
+                <li><a href="compose.html">Compose</a></li>
+                <li><a href="library.html">Library</a></li>
+                <li><a href="philosophycafe.html#about">About</a></li>
+            </ul>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero">
+        <div class="hero-ornament">◆ ◇ ◆</div>
+        <h1>Σοφία — <span class="greek">Sophia</span></h1>
+        <p class="hero-tagline">Where minds meet &amp; ideas breathe</p>
+        <div class="hero-divider"></div>
+        <p class="hero-quote">
+            The unexamined life is not worth living — yet the examined life,
+            shared among friends, becomes something sacred.
+        </p>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Left: Feed -->
+        <div class="feed" id="feed">
+            <!-- Discourse: shared, public discussion powered by Giscus.
+                 The values below are PLACEHOLDERS — replace OWNER/REPO,
+                 REPO_ID and CATEGORY_ID with your own (see SETUP.md). -->
+            <section class="discourse">
+                <div class="discourse-intro">
+                    <h2 class="discourse-title">The Discourse</h2>
+                    <p class="discourse-sub">
+                        A shared table of minds. Post a thought, reply to another,
+                        and watch the conversation unfold. Sign in with GitHub to join —
+                        every voice here is public and visible to all who visit.
+                    </p>
+                </div>
+
+                <div class="giscus-comments">
+                    <script src="https://giscus.app/client.js"
+                        data-repo="OWNER/REPO"
+                        data-repo-id="REPO_ID"
+                        data-category="General"
+                        data-category-id="CATEGORY_ID"
+                        data-mapping="pathname"
+                        data-strict="0"
+                        data-reactions-enabled="1"
+                        data-emit-metadata="0"
+                        data-input-position="top"
+                        data-theme="https://OWNER.github.io/REPO/giscus-theme.css"
+                        data-lang="en"
+                        data-loading="lazy"
+                        crossorigin="anonymous"
+                        async>
+                    </script>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right: Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <h3><span class="icon">🕯️</span> Thought of the Day</h3>
+                <p class="quote-of-day" id="dailyQuote">
+                    "I think, therefore I am."
+                    <span class="author">— René Descartes</span>
+                </p>
+            </div>
+
+            <div class="sidebar-card">
+                <h3><span class="icon">💬</span> Join the Discourse</h3>
+                <p class="join-text">
+                    The conversation below is public and stored in this site's
+                    GitHub Discussions. To post, sign in with your GitHub account
+                    using the button at the top of the discussion. No account?
+                    Creating one is free and takes a minute.
+                </p>
+                <p class="join-note">Be kind · Cite sources · Question everything.</p>
+            </div>
+
+            <div class="sidebar-card">
+                <h3><span class="icon">🏛️</span> Great Minds</h3>
+                <ul class="thinker-list">
+                    <li><a href="thinkers/plato.html"><span class="thinker-dot"></span> Plato — Theory of Forms</a></li>
+                    <li><a href="thinkers/aristotle.html"><span class="thinker-dot"></span> Aristotle — The Golden Mean</a></li>
+                    <li><a href="thinkers/kant.html"><span class="thinker-dot"></span> Kant — Categorical Imperative</a></li>
+                    <li><a href="thinkers/nietzsche.html"><span class="thinker-dot"></span> Nietzsche — Will to Power</a></li>
+                    <li><a href="thinkers/sartre.html"><span class="thinker-dot"></span> Sartre — Radical Freedom</a></li>
+                    <li><a href="thinkers/beauvoir.html"><span class="thinker-dot"></span> Simone de Beauvoir — The Second Sex</a></li>
+                    <li><a href="thinkers/confucius.html"><span class="thinker-dot"></span> Confucius — The Analects</a></li>
+                    <li><a href="thinkers/laozi.html"><span class="thinker-dot"></span> Laozi — The Dao</a></li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" id="about">
+        <p class="footer-text">Σοφία — The Philosophy Café</p>
+        <p class="footer-greek">γνῶθι σεαυτόν · Know Thyself</p>
+    </footer>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================================
+        // PHILOSOPHY CAFÉ — JavaScript
+        // ============================================================
+
+        // ---- Floating particles ----
+        const particlesContainer = document.getElementById('particles');
+        const symbols = ['Φ', 'Σ', 'Ψ', 'Ω', 'Δ', '∞', '∵', '∴', '⊕', '⊗', '∀', '∃', '◊', '†', '‡'];
+        for (let i = 0; i < 25; i++) {
+            const p = document.createElement('span');
+            p.className = 'particle';
+            p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.animationDelay = Math.random() * 20 + 's';
+            p.style.animationDuration = (15 + Math.random() * 25) + 's';
+            p.style.fontSize = (10 + Math.random() * 22) + 'px';
+            particlesContainer.appendChild(p);
+        }
+
+        // ---- Daily quotes ----
+        const quotes = [
+            { text: "I think, therefore I am.", author: "René Descartes" },
+            { text: "The only true wisdom is in knowing you know nothing.", author: "Socrates" },
+            { text: "He who has a why to live can bear almost any how.", author: "Friedrich Nietzsche" },
+            { text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.", author: "Aristotle" },
+            { text: "The unexamined life is not worth living.", author: "Socrates" },
+            { text: "One cannot step twice in the same river.", author: "Heraclitus" },
+            { text: "Man is condemned to be free.", author: "Jean-Paul Sartre" },
+            { text: "The mind is not a vessel to be filled, but a fire to be kindled.", author: "Plutarch" },
+            { text: "To be is to be perceived.", author: "George Berkeley" },
+            { text: "Happiness is not an ideal of reason but of imagination.", author: "Immanuel Kant" },
+            { text: "The journey of a thousand miles begins with one step.", author: "Laozi" },
+            { text: "I would never die for my beliefs because I might be wrong.", author: "Bertrand Russell" },
+            { text: "God is dead. God remains dead. And we have killed him.", author: "Friedrich Nietzsche" },
+            { text: "Liberty consists in doing what one desires.", author: "John Stuart Mill" },
+            { text: "The life which is unexamined is not worth living.", author: "Plato" },
+        ];
+
+        function setDailyQuote() {
+            const today = new Date();
+            const idx = (today.getFullYear() * 10000 + (today.getMonth()+1) * 100 + today.getDate()) % quotes.length;
+            const q = quotes[idx];
+            document.getElementById('dailyQuote').innerHTML =
+                `"${q.text}"<span class="author">— ${q.author}</span>`;
+        }
+        setDailyQuote();
+
+        // ---- Discourse: live, public discussion (Giscus) ----
+        // The conversation below is rendered by the <script> in the
+        // "The Discourse" section. All comments are public and shared across
+        // every visitor through this site's GitHub Discussions. To configure
+        // it (repo, repo-id, category-id, theme), see SETUP.md.
+
+        // Mobile menu
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('open');
+        });
+
+        // Close mobile menu on link click
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('open');
+            });
+        });
+    </script>
+</body>
+</html>

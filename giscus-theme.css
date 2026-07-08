@@ -1,0 +1,37 @@
+/* ============================================================
+   giscus-theme.css — Philosophy Café "parchment" theme
+   Drop-in custom theme for Giscus comments.
+   Reference it from data-theme in philosophycafe.html:
+     data-theme="https://OWNER.github.io/REPO/giscus-theme.css"
+   ============================================================ */
+
+.giscus,
+.giscus-frame {
+  color-scheme: light;
+}
+
+:root {
+  --color-white: #fdfaf4;
+  --color-canvas-default: #fdfaf4;
+  --color-canvas-subtle: #f5f0e8;
+  --color-canvas-inset: #f0e8da;
+  --color-border-default: #e0d8c8;
+  --color-border-muted: #e8dcc8;
+  --color-fg-default: #2c2416;
+  --color-fg-muted: #5a4e3c;
+  --color-accent-fg: #b8860b;
+  --color-accent-emphasis: #b8860b;
+  --color-success-fg: #6b7f6b;
+  --color-attention-fg: #a8856b;
+  --color-danger-fg: #722f37;
+  --color-btn-bg: #faf7f0;
+  --color-btn-border: #e0d8c8;
+  --color-btn-primary-bg: #b8860b;
+  --color-btn-primary-border: #b8860b;
+  --color-btn-primary-fg: #ffffff;
+  --color-input-bg: #faf7f0;
+  --color-input-border: #e0d8c8;
+  --color-link: #b8860b;
+  --color-neutral-muted: rgba(44, 36, 22, 0.08);
+  --color-prettylights-syntax-comment: #8a7f6b;
+}
