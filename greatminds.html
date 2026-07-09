@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Great Minds — Σοφία Philosophy Café</title>
+    <link rel="stylesheet" href="philcafe.css">
+    <style>
+        .thinker-search {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto 28px;
+            display: block;
+            padding: 12px 18px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            color: var(--ink);
+            background: var(--cream);
+            transition: all 0.3s ease;
+        }
+        .thinker-search:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .thinker-count {
+            text-align: center;
+            font-size: 12px;
+            color: var(--ink-light);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+        .thinker-card p { font-size: 14px; line-height: 1.7; }
+        .empty-state { text-align: center; color: var(--ink-light); font-style: italic; padding: 30px; }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="philosophycafe.html" class="nav-logo">
+                <div class="nav-logo-icon">Φ</div>
+                <div>
+                    <span class="nav-logo-text">SOPHIA</span>
+                    <span class="nav-logo-sub">The Philosophy Café</span>
+                </div>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="philosophycafe.html#feed">Discourse</a></li>
+                <li><a href="compose.html">Compose</a></li>
+                <li><a href="library.html">Library</a></li>
+                <li><a href="thought-seeds.html">Seeds</a></li>
+                <li><a href="glossary.html">Glossary</a></li>
+                <li><a href="greatminds.html" class="active">Great Minds</a></li>
+                <li><a href="philosophycafe.html#about">About</a></li>
+            </ul>
+            <button class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+
+    <header class="page-hero">
+        <a href="philosophycafe.html" class="back-link">← Back to the Café</a>
+        <div class="page-ornament">🏛️ ⚜ 🏛️</div>
+        <h1>Great Minds</h1>
+        <div class="dates">Thirty-eight guides across centuries and continents</div>
+        <div class="school">From Socrates to the present</div>
+        <div class="page-divider"></div>
+    </header>
+
+    <div class="page-container wide">
+        <p class="prose" style="text-align:center; max-width:680px; margin:0 auto 32px;">
+            A gallery of philosophers whose questions still shape how we think about truth, justice, freedom,
+            and the good life. Each card opens a dedicated room of biography, ideas, quotations, and readings.
+        </p>
+
+        <input type="text" class="thinker-search" id="thinkerSearch" placeholder="Search by name, school, or idea (e.g. Stoicism, Dao, Cogito)..." oninput="filterThinkers()">
+        <div class="thinker-count" id="thinkerCount"></div>
+
+        <div class="resource-grid" id="thinkerGrid">
+            <a class="resource-card thinker-card" href="thinkers/socrates.html" data-keywords="Socrates Athens Classical Greek Examined Life">
+                <div class="resource-icon">🏛️</div>
+                <h3>Socrates</h3>
+                <p>c. 470 – 399 BCE · Athens<br>Classical Greek · The Examined Life</p>
+                <span class="resource-tag">Ancient Greek</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/plato.html" data-keywords="Plato Academy Ancient Greek Theory of Forms">
+                <div class="resource-icon">🏛️</div>
+                <h3>Plato</h3>
+                <p>c. 428 – 348 BCE · Athens<br>Founder of the Academy · Theory of Forms</p>
+                <span class="resource-tag">Ancient Greek</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/aristotle.html" data-keywords="Aristotle Stagira Peripatetic Golden Mean">
+                <div class="resource-icon">🏛️</div>
+                <h3>Aristotle</h3>
+                <p>384 – 322 BCE · Stagira<br>The Peripatetic · The Golden Mean</p>
+                <span class="resource-tag">Ancient Greek</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/epicurus.html" data-keywords="Epicurus Samos Athens Epicureanism Tranquility">
+                <div class="resource-icon">🏛️</div>
+                <h3>Epicurus</h3>
+                <p>341 – 270 BCE · Samos &amp; Athens<br>Epicureanism · Tranquility</p>
+                <span class="resource-tag">Hellenistic</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/marcus-aurelius.html" data-keywords="Marcus Aurelius Rome Stoicism Stoic Duty">
+                <div class="resource-icon">🏛️</div>
+                <h3>Marcus Aurelius</h3>
+                <p>121 – 180 CE · Rome<br>Stoicism · Stoic Duty</p>
+                <span class="resource-tag">Roman</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/confucius.html" data-keywords="Confucius Lu China Confucianism Analects">
+                <div class="resource-icon">☯️</div>
+                <h3>Confucius</h3>
+                <p>551 – 479 BCE · Lu (China)<br>Confucianism (Ru) · The Analects</p>
+                <span class="resource-tag">Chinese</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/laozi.html" data-keywords="Laozi Chu China Daoism Taoism Dao">
+                <div class="resource-icon">☯️</div>
+                <h3>Laozi</h3>
+                <p>c. 6th century BCE · Chu (China)<br>Daoism (Taoism) · The Dao</p>
+                <span class="resource-tag">Chinese</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/buddha.html" data-keywords="Siddhartha Gautama Buddha India Nepal Buddhism Middle Way">
+                <div class="resource-icon">☸️</div>
+                <h3>Siddhartha Gautama</h3>
+                <p>c. 563 – 483 BCE · India &amp; Nepal<br>Buddhism · The Middle Way</p>
+                <span class="resource-tag">Indian</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/adi-shankara.html" data-keywords="Adi Shankara India Advaita Vedanta Non-Dual Brahman">
+                <div class="resource-icon">☸️</div>
+                <h3>Adi Shankara</h3>
+                <p>c. 700 – 750 CE · India<br>Advaita Vedanta · Non-Dual Brahman</p>
+                <span class="resource-tag">Indian</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/avicenna.html" data-keywords="Avicenna Ibn Sina Persia Islamic Flying Man">
+                <div class="resource-icon">📜</div>
+                <h3>Avicenna (Ibn Sina)</h3>
+                <p>980 – 1037 · Persia &amp; Central Asia<br>Islamic Peripatetic · The Flying Man</p>
+                <span class="resource-tag">Islamic</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/averroes.html" data-keywords="Averroes Ibn Rushd Cordoba Aristotelianism Faith Reason">
+                <div class="resource-icon">📜</div>
+                <h3>Averroes (Ibn Rushd)</h3>
+                <p>1126 – 1198 · Córdoba, Al-Andalus<br>Aristotelianism · Faith &amp; Reason</p>
+                <span class="resource-tag">Islamic</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/maimonides.html" data-keywords="Maimonides Moses Cordoba Cairo Jewish Negative Theology">
+                <div class="resource-icon">📜</div>
+                <h3>Moses Maimonides</h3>
+                <p>1135 – 1204 · Córdoba &amp; Cairo<br>Jewish Philosophy · Negative Theology</p>
+                <span class="resource-tag">Jewish</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/augustine.html" data-keywords="Augustine Hippo Christian Philosophy Grace Confessions">
+                <div class="resource-icon">📜</div>
+                <h3>Augustine of Hippo</h3>
+                <p>354 – 430 CE · Thagaste &amp; Hippo<br>Christian Philosophy · Inner Grace</p>
+                <span class="resource-tag">Christian</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/aquinas.html" data-keywords="Thomas Aquinas Italy Paris Scholasticism Natural Law">
+                <div class="resource-icon">📜</div>
+                <h3>Thomas Aquinas</h3>
+                <p>1225 – 1274 · Italy &amp; Paris<br>Scholasticism · Natural Law</p>
+                <span class="resource-tag">Christian</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/descartes.html" data-keywords="Descartes France Rationalism Cogito Dualism">
+                <div class="resource-icon">🔭</div>
+                <h3>René Descartes</h3>
+                <p>1596 – 1650 · France<br>Rationalism · Cogito Ergo Sum</p>
+                <span class="resource-tag">Early Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/spinoza.html" data-keywords="Spinoza Amsterdam Rationalism God Nature Monism">
+                <div class="resource-icon">🔭</div>
+                <h3>Baruch Spinoza</h3>
+                <p>1632 – 1677 · Amsterdam &amp; The Hague<br>Rationalism · God as Nature</p>
+                <span class="resource-tag">Early Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/leibniz.html" data-keywords="Leibniz Germany Rationalism Monads Best Possible Worlds">
+                <div class="resource-icon">🔭</div>
+                <h3>Gottfried Leibniz</h3>
+                <p>1646 – 1716 · Germany<br>Rationalism · Best of All Possible Worlds</p>
+                <span class="resource-tag">Early Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/locke.html" data-keywords="John Locke England Empiricism Liberalism Natural Rights">
+                <div class="resource-icon">🔭</div>
+                <h3>John Locke</h3>
+                <p>1632 – 1704 · England<br>Empiricism &amp; Liberalism · Natural Rights</p>
+                <span class="resource-tag">Early Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/berkeley.html" data-keywords="George Berkeley Ireland Empiricism Idealism Esse Percipi">
+                <div class="resource-icon">🔭</div>
+                <h3>George Berkeley</h3>
+                <p>1685 – 1753 · Ireland<br>Empiricism &amp; Idealism · Esse est Percipi</p>
+                <span class="resource-tag">Early Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/hume.html" data-keywords="David Hume Scotland Empiricism Skepticism Causation">
+                <div class="resource-icon">🔭</div>
+                <h3>David Hume</h3>
+                <p>1711 – 1776 · Scotland<br>Empiricism &amp; Skepticism · Custom &amp; Causation</p>
+                <span class="resource-tag">Early Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/kant.html" data-keywords="Immanuel Kant Konigsberg German Idealism Categorical Imperative">
+                <div class="resource-icon">📖</div>
+                <h3>Immanuel Kant</h3>
+                <p>1724 – 1804 · Königsberg<br>German Idealism · Categorical Imperative</p>
+                <span class="resource-tag">Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/rousseau.html" data-keywords="Rousseau Geneva France Social Contract General Will">
+                <div class="resource-icon">📖</div>
+                <h3>Jean-Jacques Rousseau</h3>
+                <p>1712 – 1778 · Geneva &amp; France<br>Social Contract · The General Will</p>
+                <span class="resource-tag">Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/wollstonecraft.html" data-keywords="Mary Wollstonecraft England Feminism Rights of Women">
+                <div class="resource-icon">📖</div>
+                <h3>Mary Wollstonecraft</h3>
+                <p>1759 – 1797 · England<br>Feminism &amp; Political Philosophy · Rights of Women</p>
+                <span class="resource-tag">Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/bentham.html" data-keywords="Jeremy Bentham England Utilitarianism Felicific Calculus">
+                <div class="resource-icon">📖</div>
+                <h3>Jeremy Bentham</h3>
+                <p>1748 – 1832 · England<br>Utilitarianism · The Felicific Calculus</p>
+                <span class="resource-tag">Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/mill.html" data-keywords="John Stuart Mill England Utilitarianism Liberty">
+                <div class="resource-icon">📖</div>
+                <h3>John Stuart Mill</h3>
+                <p>1806 – 1873 · England<br>Utilitarianism &amp; Liberalism · Liberty &amp; Utility</p>
+                <span class="resource-tag">Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/hegel.html" data-keywords="Hegel Germany German Idealism Dialectic Spirit">
+                <div class="resource-icon">📖</div>
+                <h3>G.W.F. Hegel</h3>
+                <p>1770 – 1831 · Germany<br>German Idealism · Dialectic &amp; Spirit</p>
+                <span class="resource-tag">Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/schopenhauer.html" data-keywords="Schopenhauer Danzig Frankfurt Pessimism Will">
+                <div class="resource-icon">📖</div>
+                <h3>Arthur Schopenhauer</h3>
+                <p>1788 – 1860 · Danzig &amp; Frankfurt<br>Pessimism · The World as Will</p>
+                <span class="resource-tag">Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/kierkegaard.html" data-keywords="Kierkegaard Copenhagen Existentialism Leap of Faith">
+                <div class="resource-icon">📖</div>
+                <h3>Søren Kierkegaard</h3>
+                <p>1813 – 1855 · Copenhagen<br>Existentialism · The Leap of Faith</p>
+                <span class="resource-tag">Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/nietzsche.html" data-keywords="Nietzsche Röcken Existentialism Critique Will to Power">
+                <div class="resource-icon">📖</div>
+                <h3>Friedrich Nietzsche</h3>
+                <p>1844 – 1900 · Röcken<br>Existentialism &amp; Critique · Will to Power</p>
+                <span class="resource-tag">Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/marx.html" data-keywords="Karl Marx Trier London Historical Materialism Class Struggle">
+                <div class="resource-icon">📖</div>
+                <h3>Karl Marx</h3>
+                <p>1818 – 1883 · Trier &amp; London<br>Historical Materialism · Class Struggle</p>
+                <span class="resource-tag">Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/william-james.html" data-keywords="William James United States Pragmatism Stream of Consciousness">
+                <div class="resource-icon">📖</div>
+                <h3>William James</h3>
+                <p>1842 – 1910 · United States<br>Pragmatism · Stream of Consciousness</p>
+                <span class="resource-tag">Modern</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/wittgenstein.html" data-keywords="Wittgenstein Austria England Analytic Philosophy Language Games">
+                <div class="resource-icon">🧠</div>
+                <h3>Ludwig Wittgenstein</h3>
+                <p>1889 – 1951 · Austria &amp; England<br>Analytic Philosophy · Language Games</p>
+                <span class="resource-tag">Contemporary</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/heidegger.html" data-keywords="Heidegger Germany Phenomenology Being-in-the-World">
+                <div class="resource-icon">🧠</div>
+                <h3>Martin Heidegger</h3>
+                <p>1889 – 1976 · Germany<br>Phenomenology &amp; Ontology · Being-in-the-World</p>
+                <span class="resource-tag">Contemporary</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/sartre.html" data-keywords="Sartre Paris Existentialism Radical Freedom">
+                <div class="resource-icon">🧠</div>
+                <h3>Jean-Paul Sartre</h3>
+                <p>1905 – 1980 · Paris<br>Existentialism · Radical Freedom</p>
+                <span class="resource-tag">Contemporary</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/beauvoir.html" data-keywords="Simone de Beauvoir Paris Existentialism Feminism Second Sex">
+                <div class="resource-icon">🧠</div>
+                <h3>Simone de Beauvoir</h3>
+                <p>1908 – 1986 · Paris<br>Existentialism &amp; Feminism · The Second Sex</p>
+                <span class="resource-tag">Contemporary</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/arendt.html" data-keywords="Hannah Arendt Germany USA Political Philosophy Banality of Evil">
+                <div class="resource-icon">🧠</div>
+                <h3>Hannah Arendt</h3>
+                <p>1906 – 1975 · Germany &amp; USA<br>Political Philosophy · The Banality of Evil</p>
+                <span class="resource-tag">Contemporary</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/foucault.html" data-keywords="Michel Foucault France Post-structuralism Power Knowledge">
+                <div class="resource-icon">🧠</div>
+                <h3>Michel Foucault</h3>
+                <p>1926 – 1984 · France<br>Post-structuralism · Power/Knowledge</p>
+                <span class="resource-tag">Contemporary</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+
+            <a class="resource-card thinker-card" href="thinkers/nussbaum.html" data-keywords="Martha Nussbaum United States Liberalism Ethics Capabilities">
+                <div class="resource-icon">🧠</div>
+                <h3>Martha Nussbaum</h3>
+                <p>1947– · United States<br>Liberalism &amp; Ethics · Capabilities Approach</p>
+                <span class="resource-tag">Contemporary</span>
+                <span class="resource-link">Explore →</span>
+            </a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p class="footer-text">Σοφία — The Philosophy Café</p>
+        <p class="footer-greek">γνῶθι σεαυτόν · Know Thyself</p>
+    </footer>
+
+    <script src="page-script.js"></script>
+    <script>
+        function filterThinkers() {
+            const grid = document.getElementById('thinkerGrid');
+            const count = document.getElementById('thinkerCount');
+            const q = document.getElementById('thinkerSearch').value.toLowerCase().trim();
+            const cards = Array.from(grid.querySelectorAll('.resource-card'));
+            let visible = 0;
+            cards.forEach(card => {
+                const text = (card.textContent + ' ' + card.dataset.keywords).toLowerCase();
+                const match = !q || text.includes(q);
+                card.style.display = match ? 'flex' : 'none';
+                if (match) visible++;
+            });
+            count.textContent = `${visible} thinker${visible === 1 ? '' : 's'}`;
+        }
+        filterThinkers();
+    </script>
+</body>
+</html>
