@@ -4,10 +4,14 @@
 -- debate & poll history storage.
 -- ============================================================
 
+-- Safe upgrade: add the label column if the table already exists.
+ALTER TABLE daily_archive ADD COLUMN IF NOT EXISTS label TEXT NOT NULL DEFAULT '';
+
 CREATE TABLE IF NOT EXISTS daily_archive (
     id SERIAL PRIMARY KEY,
     archive_date DATE NOT NULL,
     archive_type TEXT NOT NULL CHECK (archive_type IN ('debate', 'poll')),
+    label TEXT NOT NULL DEFAULT '',
     question TEXT NOT NULL,
     data JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ DEFAULT NOW()
