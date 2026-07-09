@@ -171,6 +171,48 @@
         .nav-links a.active { color: var(--gold); }
         .nav-links a.active::after { width: 100%; }
 
+        /* ---- Online counter ---- */
+        .online-counter {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--sage);
+            background: rgba(107,127,107,0.06);
+            border: 1px solid rgba(107,127,107,0.15);
+            border-radius: 20px;
+            padding: 5px 14px;
+            cursor: default;
+            transition: all 0.5s ease;
+        }
+        .online-counter .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--sage);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        .online-counter.warm .dot { background: var(--gold); }
+        .online-counter.warm {
+            color: var(--gold);
+            border-color: rgba(184,134,11,0.2);
+            background: rgba(184,134,11,0.06);
+        }
+        .online-counter.hot .dot { background: var(--wine); animation-duration: 0.8s; }
+        .online-counter.hot {
+            color: var(--wine);
+            border-color: rgba(114,47,55,0.2);
+            background: rgba(114,47,55,0.06);
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.75); }
+        }
+
         /* ---- Mobile menu ---- */
         .menu-toggle {
             display: none;
@@ -903,6 +945,7 @@
             .post-card { padding: 20px; }
             .composer-actions { flex-direction: column; gap: 12px; align-items: stretch; }
             .btn-post { width: 100%; text-align: center; }
+            .online-counter { display: none; }
         }
 
         /* ---- Selection styling ---- */
@@ -1554,6 +1597,20 @@
             text-align: right;
             margin-top: 2px;
         }
+        .submitted-quote-item .quote-delete {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--wine);
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+            padding: 0 2px;
+            flex-shrink: 0;
+        }
+        .admin-mode .submitted-quote-item .quote-delete { display: inline-block; }
+        .submitted-quote-item .quote-delete:hover { opacity: 1; }
 
         /* ============================================================
            6. EVENT CALENDAR
@@ -1983,6 +2040,11 @@
                 <li><a href="greatminds.html">Great Minds</a></li>
                 <li><a href="philosophycafe.html#about">About</a></li>
             </ul>
+            <div class="online-counter" id="onlineCounter" title="Visitors currently browsing">
+                <span class="dot"></span>
+                <span id="onlineCount">1</span>
+                <span>online</span>
+            </div>
             <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
                 <span></span><span></span><span></span>
             </button>
@@ -2173,7 +2235,7 @@
             </div>
 
             <!-- 4. Submit a Quote -->
-            <div class="sidebar-card">
+            <div class="sidebar-card" id="quoteCard">
                 <h3><span class="icon">✍️</span> Submit a Quote</h3>
                 <div class="quote-submit-form" id="quoteSubmitForm">
                     <textarea id="quoteText" placeholder="Your philosophical quote..."></textarea>
@@ -2457,15 +2519,28 @@
         }
         async function renderSubmittedQuotes() {
             try {
-                const { data: quotes } = await supabase.from('submitted_quotes').select('quote_text,author,created_at').order('created_at', {ascending:false}).limit(20);
+                const { data: quotes } = await supabase.from('submitted_quotes').select('id,quote_text,author,created_at').order('created_at', {ascending:false}).limit(20);
                 const container = document.getElementById('submittedQuotes');
                 if (!quotes || quotes.length === 0) { container.innerHTML = '<p style="font-size:12px;color:var(--ink-light);font-style:italic;">Recent submissions appear here...</p>'; return; }
                 container.innerHTML = quotes.map(q =>
                     `<div class="submitted-quote-item">
                         <span>"${q.quote_text}"<span class="sq-author">— ${q.author}</span></span>
+                        <button class="quote-delete" onclick="deleteQuote('${q.id}')" title="Delete quote" aria-label="Delete quote">🗑️</button>
                     </div>`
                 ).join('');
             } catch(e) { console.warn('Quotes load failed', e); }
+        }
+        async function deleteQuote(id) {
+            if (!confirm('Delete this quote?')) return;
+            try {
+                await supabase.from('submitted_quotes').delete().eq('id', id);
+                await renderSubmittedQuotes();
+                await renderWeeklyDigest();
+                showToast('Quote deleted.', 'success');
+            } catch(e) {
+                console.warn('Quote delete failed', e);
+                showToast('Delete failed, please try again.', 'error');
+            }
         }
         function refreshAdminQuoteBtns() { renderSubmittedQuotes(); }
 
@@ -2762,6 +2837,7 @@
                 document.getElementById('adminTrigger').innerHTML = '🔑';
                 document.getElementById('eventCard').classList.remove('admin-mode');
                 document.getElementById('debateArena').classList.remove('admin-mode');
+                document.getElementById('quoteCard').classList.remove('admin-mode');
                 refreshAdminQuoteBtns();
                 renderEvents();
             } else {
@@ -2779,6 +2855,7 @@
                 document.getElementById('adminTrigger').innerHTML = '🔒 Exit';
                 document.getElementById('eventCard').classList.add('admin-mode');
                 document.getElementById('debateArena').classList.add('admin-mode');
+                document.getElementById('quoteCard').classList.add('admin-mode');
                 refreshAdminQuoteBtns();
                 renderEvents();
             } else { document.getElementById('adminError').style.display = 'block'; }
@@ -2799,9 +2876,75 @@
         }
 
         // ============================================================
+        // ONLINE PRESENCE TRACKER (Supabase Realtime)
+        // ============================================================
+        let _onlineCount = 1;
+        function updateOnlineBadge(count) {
+            _onlineCount = count;
+            const el = document.getElementById('onlineCount');
+            const badge = document.getElementById('onlineCounter');
+            if (el) el.textContent = count;
+            if (badge) {
+                badge.classList.remove('warm', 'hot');
+                if (count >= 10) badge.classList.add('hot');
+                else if (count >= 4) badge.classList.add('warm');
+            }
+        }
+        async function sendHeartbeat() {
+            try {
+                // Upsert current user
+                await supabase.from('online_users').upsert({
+                    user_id: siteUserId,
+                    last_seen: new Date().toISOString()
+                });
+                // Clean up stale users (>90s) and count active
+                await supabase.from('online_users')
+                    .delete()
+                    .lt('last_seen', new Date(Date.now() - 90000).toISOString());
+                const { count, error } = await supabase
+                    .from('online_users')
+                    .select('*', { count: 'exact', head: true })
+                    .gte('last_seen', new Date(Date.now() - 90000).toISOString());
+                if (!error && count !== null) updateOnlineBadge(count);
+            } catch(e) { console.warn('Heartbeat failed', e); }
+        }
+        function initOnlinePresence() {
+            // Send heartbeat immediately
+            sendHeartbeat();
+            // Then every 30 seconds
+            setInterval(sendHeartbeat, 30000);
+            // Subscribe to Supabase Realtime for instant updates
+            try {
+                supabase
+                    .channel('online-presence')
+                    .on('postgres_changes',
+                        { event: '*', schema: 'public', table: 'online_users' },
+                        () => { sendHeartbeat(); }
+                    )
+                    .subscribe();
+            } catch(e) { console.warn('Realtime subscription failed', e); }
+            // Fallback: refresh count every 10s in case realtime misses
+            setInterval(async () => {
+                try {
+                    const { count, error } = await supabase
+                        .from('online_users')
+                        .select('*', { count: 'exact', head: true })
+                        .gte('last_seen', new Date(Date.now() - 90000).toISOString());
+                    if (!error && count !== null) updateOnlineBadge(count);
+                } catch(e) {}
+            }, 10000);
+            // Cleanup on page unload
+            window.addEventListener('beforeunload', () => {
+                supabase.from('online_users').delete().eq('user_id', siteUserId)
+                    .then(() => {}).catch(() => {});
+            });
+        }
+
+        // ============================================================
         // INIT ALL
         // ============================================================
         (async function initAll() {
+            initOnlinePresence();
             showDailyThread();
             await loadPoll();
             await renderSubmittedQuotes();
@@ -2814,6 +2957,7 @@
                 document.getElementById('adminTrigger').innerHTML = '🔒 Exit';
                 document.getElementById('eventCard').classList.add('admin-mode');
                 document.getElementById('debateArena').classList.add('admin-mode');
+                document.getElementById('quoteCard').classList.add('admin-mode');
                 refreshAdminQuoteBtns();
                 renderEvents();
             }
