@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>φιλοσοφία · The Philosophy Café</title>
+        <link>https://ihatethebattlefield-hub.github.io/philosophy-cafe/</link>
+        <description>Agora of the mind — where thoughts breathe &amp; wisdom awakens. Daily philosophical debates, polls, thought seeds, and curated resources.</description>
+        <language>en-us</language>
+        <lastBuildDate>Thu, 09 Jul 2026 13:00:00 GMT</lastBuildDate>
+        <atom:link href="https://ihatethebattlefield-hub.github.io/philosophy-cafe/rss.xml" rel="self" type="application/rss+xml"/>
+        <item>
+            <title>Daily Debate: Fear of Death</title>
+            <link>https://ihatethebattlefield-hub.github.io/philosophy-cafe/philosophycafe.html#feed</link>
+            <guid isPermaLink="false">debate-fear-of-death-2026-07-09</guid>
+            <pubDate>Thu, 09 Jul 2026 00:00:00 GMT</pubDate>
+            <description>Should we fear death? Epicurus says no — where death is, I am not. The mortalist says yes — fear of death makes us value life. Vote and join the debate.</description>
+        </item>
+        <item>
+            <title>Weekly Poll: Free Will</title>
+            <link>https://ihatethebattlefield-hub.github.io/philosophy-cafe/philosophycafe.html#feed</link>
+            <guid isPermaLink="false">poll-free-will-2026-07-09</guid>
+            <pubDate>Thu, 09 Jul 2026 00:00:00 GMT</pubDate>
+            <description>Is free will an illusion? Cast your vote in this week's philosophical poll.</description>
+        </item>
+        <item>
+            <title>The Philosophy Café — New Features</title>
+            <link>https://ihatethebattlefield-hub.github.io/philosophy-cafe/philosophycafe.html</link>
+            <guid isPermaLink="false">update-2026-07-09</guid>
+            <pubDate>Thu, 09 Jul 2026 00:00:00 GMT</pubDate>
+            <description>Site-wide search now available (Ctrl+K or /). Browse past debates &amp; votes archive. Improved security with Supabase Auth. New sitemap and RSS feed for syndication.</description>
+        </item>
+    </channel>
+</rss>

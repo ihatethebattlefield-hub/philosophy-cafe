@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>φιλοσοφία (philosophía) — The Philosophy Café</title>
+    <meta name="description" content="Agora of the mind — where thoughts breathe &amp; wisdom awakens. Daily philosophical debates, polls, thought seeds, and curated resources.">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="sitemap.xml">
+    <link rel="alternate" type="application/rss+xml" title="φιλοσοφία RSS Feed" href="rss.xml">
     <style>
         /* ============================================================
            φιλοσοφία — PHILOSOPHY CAFÉ — A Place for Thought
@@ -217,6 +220,135 @@
         @keyframes pulse-dot {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.4; transform: scale(0.75); }
+        }
+
+        /* ---- Search trigger in nav ---- */
+        .search-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+        .search-trigger:hover { opacity: 1; border-color: var(--gold); color: var(--gold); background: var(--gold-pale); }
+
+        /* ---- Search overlay ---- */
+        .search-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(44, 36, 22, 0.7);
+            z-index: 1001;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 12vh;
+            backdrop-filter: blur(6px);
+        }
+        .search-overlay.open { display: flex; }
+        .search-modal {
+            width: 100%;
+            max-width: 560px;
+            background: var(--cream);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            overflow: hidden;
+            animation: searchSlideIn 0.2s ease;
+        }
+        @keyframes searchSlideIn {
+            from { opacity: 0; transform: translateY(-12px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .search-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            color: var(--ink);
+            outline: none;
+            padding: 4px 0;
+        }
+        .search-input::placeholder { color: var(--ink-light); }
+        .search-close {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--ink-light);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .search-close:hover { background: var(--gold-pale); color: var(--ink); }
+        .search-results {
+            max-height: 50vh;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        .search-results::-webkit-scrollbar { width: 4px; }
+        .search-results::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 2px; }
+        .search-hint {
+            padding: 20px 16px;
+            text-align: center;
+            color: var(--ink-light);
+            font-size: 13px;
+            font-style: italic;
+        }
+        .search-result-group {
+            padding: 8px 16px 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+        }
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            border-left: 3px solid transparent;
+        }
+        .search-result-item:hover, .search-result-item.active { background: var(--gold-pale); border-left-color: var(--gold); }
+        .search-result-icon { font-size: 20px; flex-shrink: 0; }
+        .search-result-text { flex: 1; min-width: 0; }
+        .search-result-title { font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .search-result-sub { font-size: 11px; color: var(--ink-light); margin-top: 1px; }
+        .search-no-results {
+            padding: 24px 16px;
+            text-align: center;
+            color: var(--ink-light);
+            font-size: 14px;
+        }
+        .search-footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 16px;
+            border-top: 1px solid var(--border-subtle);
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: var(--ink-light);
         }
 
         /* ---- Mobile menu ---- */
@@ -2485,6 +2617,7 @@
                 <span id="onlineCount">1</span>
                 <span>online</span>
             </div>
+            <button class="search-trigger" id="searchTrigger" onclick="openSearch()" title="Search" aria-label="Search">🔍</button>
             <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
                 <span></span><span></span><span></span>
             </button>
@@ -2549,17 +2682,37 @@
                     <button class="daily-thread-jump" onclick="joinDiscussion()">Join the Discussion ↓</button>
                 </div>
 
-                <!-- Admin Password Modal -->
+                <!-- Search Modal -->
+                <div class="search-overlay" id="searchOverlay">
+                    <div class="search-modal">
+                        <div class="search-header">
+                            <input type="text" class="search-input" id="searchInput" placeholder="Search thinkers, ideas, seeds..." autocomplete="off" onkeydown="if(event.key==='Escape')closeSearch()">
+                            <button class="search-close" onclick="closeSearch()" aria-label="Close search">✕</button>
+                        </div>
+                        <div class="search-results" id="searchResults">
+                            <p class="search-hint">Type to search across philosophers, thought seeds, glossary terms, and more.</p>
+                        </div>
+                        <div class="search-footer">
+                            <span>↑↓ navigate</span><span>⏎ open</span><span>Esc close</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin / Auth Modal (Supabase Auth) -->
                 <div class="admin-modal-overlay" id="adminModal">
                     <div class="admin-modal">
-                        <h3>Admin Access</h3>
-                        <p class="admin-subtitle">Enter the keeper's key to manage the café.</p>
-                        <input type="password" class="admin-input" id="adminPassword" placeholder="Password..." onkeydown="if(event.key==='Enter')attemptLogin()">
-                        <p class="admin-error" id="adminError">Incorrect password.</p>
+                        <h3 id="adminModalTitle">Admin Access</h3>
+                        <p class="admin-subtitle" id="adminSubtitle">Sign in to manage the café.</p>
+                        <div id="adminAuthError" class="admin-error" style="display:none;"></div>
+                        <input type="email" class="admin-input" id="adminEmail" placeholder="Email..." style="margin-bottom:6px;">
+                        <input type="password" class="admin-input" id="adminPassword" placeholder="Password..." onkeydown="if(event.key==='Enter')adminSignIn()">
                         <div class="admin-btn-row">
                             <button class="admin-btn secondary" onclick="closeAdmin()">Cancel</button>
-                            <button class="admin-btn primary" onclick="attemptLogin()">Unlock</button>
+                            <button class="admin-btn primary" id="adminSubmitBtn" onclick="adminSignIn()">Sign In</button>
                         </div>
+                        <p style="font-size:11px;color:var(--ink-light);margin-top:10px;text-align:center;">
+                            <a href="#" onclick="adminSignUp();return false;" style="color:var(--ink);text-decoration:underline;">Create admin account</a>
+                        </p>
                     </div>
                 </div>
 
@@ -2807,7 +2960,10 @@
     <footer class="footer" id="about">
         <p class="footer-text">φιλοσοφία — The Philosophy Café</p>
         <p class="footer-greek">γνῶθι σεαυτόν · Know Thyself</p>
-        <button class="admin-trigger" id="adminTrigger" onclick="toggleAdmin()" title="Admin" style="margin-top:10px;">🔑</button>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+            <button class="admin-trigger" id="adminTrigger" onclick="toggleAdmin()" title="Admin" style="margin-top:10px;">🔑</button>
+            <button class="admin-trigger" onclick="exportMyData()" title="Export my data (GDPR)" style="margin-top:10px;">📤 Export Data</button>
+        </div>
     </footer>
 
     <!-- Toast -->
@@ -2819,6 +2975,15 @@
         // ============================================================
         // φιλοσοφία · PHILOSOPHY CAFÉ — JavaScript
         // ============================================================
+
+        // ---- Utility: sanitize user input before rendering ----
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
 
         // ---- Floating particles ----
         const particlesContainer = document.getElementById('particles');
@@ -3124,13 +3289,14 @@
                 if (!quotes || quotes.length === 0) { container.innerHTML = '<p style="font-size:13px;color:var(--ink-light);font-style:italic;">Be the first to submit a quote. What words have stayed with you?</p>'; return; }
                 container.innerHTML = quotes.map(q =>
                     `<div class="submitted-quote-item">
-                        <span>"${q.quote_text}"<span class="sq-author">— ${q.author}</span></span>
-                        <button class="quote-delete" onclick="deleteQuote('${q.id}')" title="Delete quote" aria-label="Delete quote">🗑️</button>
+                        <span>"${escapeHtml(q.quote_text)}"<span class="sq-author">— ${escapeHtml(q.author)}</span></span>
+                        <button class="quote-delete" onclick="deleteQuote('${escapeHtml(String(q.id))}')" title="Delete quote" aria-label="Delete quote">🗑️</button>
                     </div>`
                 ).join('');
             } catch(e) { console.warn('Quotes load failed', e); document.getElementById('submittedQuotes').innerHTML = '<p style="font-size:13px;color:var(--ink-light);font-style:italic;">Be the first to submit a quote. What words have stayed with you?</p>'; }
         }
         async function deleteQuote(id) {
+            if (!isAdmin) { showToast('Only admins can delete quotes.', 'error'); return; }
             if (!confirm('Delete this quote?')) return;
             try {
                 await supabase.from('submitted_quotes').delete().eq('id', id);
@@ -3165,6 +3331,7 @@
             showToast('Event added!', 'success');
         }
         function deleteEvent(idx) {
+            if (!isAdmin) return;
             const events = JSON.parse(localStorage.getItem('events') || '[]');
             events.splice(idx, 1);
             localStorage.setItem('events', JSON.stringify(events));
@@ -3173,16 +3340,18 @@
         function renderEvents() {
             const events = JSON.parse(localStorage.getItem('events') || '[]');
             const list = document.getElementById('eventList');
-            const isAdmin = localStorage.getItem('adminAuth') === 'true';
             if (events.length === 0) { list.innerHTML = '<p style="font-size:13px;color:var(--ink-light);font-style:italic;">Nothing scheduled yet — but the best conversations are often spontaneous.</p>'; return; }
             list.innerHTML = events.map((e, i) => {
                 const d = new Date(e.date + 'T00:00:00');
                 const dateStr = d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+                const safeTitle = escapeHtml(e.title);
+                const safeDesc = escapeHtml(e.desc || '');
+                const safeUrl = escapeHtml(e.url || '');
                 return `<div class="event-item">
                     <div class="event-date">${dateStr}</div>
-                    <div class="event-title">${e.title}${isAdmin ? `<span class="event-delete" style="display:inline;" onclick="deleteEvent(${i})">✕</span>` : ''}</div>
-                    ${e.desc ? `<div class="event-desc">${e.desc}</div>` : ''}
-                    ${e.url ? `<a class="event-link" href="${e.url}" target="_blank">Details →</a>` : ''}
+                    <div class="event-title">${safeTitle}${isAdmin ? `<span class="event-delete" style="display:inline;" onclick="deleteEvent(${i})">✕</span>` : ''}</div>
+                    ${e.desc ? `<div class="event-desc">${safeDesc}</div>` : ''}
+                    ${e.url ? `<a class="event-link" href="${safeUrl}" target="_blank" rel="noopener">Details →</a>` : ''}
                 </div>`;
             }).join('');
         }
@@ -3432,7 +3601,7 @@
                     <div class="digest-label">📅 Upcoming Events</div>
                     ${(() => {
                         const events = JSON.parse(localStorage.getItem('events') || '[]');
-                        return events.filter(e => { const d = new Date(e.date+'T00:00:00'); const now = new Date(); return d >= now; }).slice(0,3).map(e => `<li>${e.title} — ${new Date(e.date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}</li>`).join('') || '<p style="font-size:11px;">No upcoming events.</p>';
+                        return events.filter(e => { const d = new Date(e.date+'T00:00:00'); const now = new Date(); return d >= now; }).slice(0,3).map(e => `<li>${escapeHtml(e.title)} — ${new Date(e.date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}</li>`).join('') || '<p style="font-size:11px;">No upcoming events.</p>';
                     })()}
                 </div>
                 <div class="digest-section">
@@ -3446,39 +3615,175 @@
         // ============================================================
         // ADMIN — login / logout (extended)
         // ============================================================
-        function toggleAdmin() {
-            if (localStorage.getItem('adminAuth') === 'true') {
-                localStorage.removeItem('adminAuth');
-                document.getElementById('adminTrigger').classList.remove('active');
-                document.getElementById('adminTrigger').innerHTML = '🔑';
-                document.getElementById('eventCard').classList.remove('admin-mode');
-                document.getElementById('debateArena').classList.remove('admin-mode');
-                document.getElementById('quoteCard').classList.remove('admin-mode');
-                refreshAdminQuoteBtns();
-                renderEvents();
-            } else {
-                document.getElementById('adminModal').classList.add('open');
-                document.getElementById('adminPassword').value = '';
-                document.getElementById('adminError').style.display = 'none';
-                setTimeout(() => document.getElementById('adminPassword').focus(), 100);
-            }
+        // ---- Admin Auth (Supabase) ----
+        let isAdmin = false;
+        let adminMode = 'signin'; // 'signin' | 'signup'
+
+        async function checkAdminStatus() {
+            if (!supabase) return false;
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) { isAdmin = false; return false; }
+                const { data } = await supabase.from('admins').select('id').eq('user_id', session.user.id).single();
+                isAdmin = !!data;
+                return isAdmin;
+            } catch(e) { isAdmin = false; return false; }
         }
-        function attemptLogin() {
-            if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
-                localStorage.setItem('adminAuth', 'true');
-                document.getElementById('adminModal').classList.remove('open');
-                document.getElementById('adminTrigger').classList.add('active');
-                document.getElementById('adminTrigger').innerHTML = '🔒 Exit';
+
+        function isAdminUser() { return isAdmin; }
+
+        function applyAdminUI() {
+            const trigger = document.getElementById('adminTrigger');
+            if (isAdmin) {
+                trigger.classList.add('active');
+                trigger.innerHTML = '🔒 Exit';
                 document.getElementById('eventCard').classList.add('admin-mode');
                 document.getElementById('debateArena').classList.add('admin-mode');
                 document.getElementById('quoteCard').classList.add('admin-mode');
                 refreshAdminQuoteBtns();
                 renderEvents();
-            } else { document.getElementById('adminError').style.display = 'block'; }
+            } else {
+                trigger.classList.remove('active');
+                trigger.innerHTML = '🔑';
+                document.getElementById('eventCard').classList.remove('admin-mode');
+                document.getElementById('debateArena').classList.remove('admin-mode');
+                document.getElementById('quoteCard').classList.remove('admin-mode');
+                refreshAdminQuoteBtns();
+                renderEvents();
+            }
         }
+
+        function toggleAdmin() {
+            if (isAdmin) {
+                supabase.auth.signOut().then(() => {
+                    isAdmin = false;
+                    applyAdminUI();
+                });
+            } else {
+                adminMode = 'signin';
+                document.getElementById('adminModalTitle').textContent = 'Admin Access';
+                document.getElementById('adminSubtitle').textContent = 'Sign in to manage the café.';
+                document.getElementById('adminSubmitBtn').textContent = 'Sign In';
+                document.getElementById('adminEmail').value = '';
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminAuthError').style.display = 'none';
+                document.getElementById('adminModal').classList.add('open');
+                setTimeout(() => document.getElementById('adminEmail').focus(), 100);
+            }
+        }
+
+        async function adminSignIn() {
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            if (!email || !password) {
+                document.getElementById('adminAuthError').textContent = 'Please enter email and password.';
+                document.getElementById('adminAuthError').style.display = 'block';
+                return;
+            }
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) {
+                    document.getElementById('adminAuthError').textContent = error.message;
+                    document.getElementById('adminAuthError').style.display = 'block';
+                    return;
+                }
+                document.getElementById('adminModal').classList.remove('open');
+                await checkAdminStatus();
+                applyAdminUI();
+                if (!isAdmin) {
+                    showToast('Account is not an admin. Signing out.', 'error');
+                    await supabase.auth.signOut();
+                    applyAdminUI();
+                } else {
+                    showToast('Welcome back, admin.', 'success');
+                }
+            } catch(e) {
+                document.getElementById('adminAuthError').textContent = 'Network error. Please try again.';
+                document.getElementById('adminAuthError').style.display = 'block';
+            }
+        }
+
+        function adminSignUp() {
+            adminMode = 'signup';
+            document.getElementById('adminModalTitle').textContent = 'Create Admin Account';
+            document.getElementById('adminSubtitle').textContent = 'After sign-up, an existing admin must approve your account.';
+            document.getElementById('adminSubmitBtn').textContent = 'Sign Up';
+            document.getElementById('adminAuthError').style.display = 'none';
+            document.getElementById('adminEmail').value = '';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        document.getElementById('adminSubmitBtn').addEventListener('click', async function() {
+            if (adminMode === 'signin') {
+                await adminSignIn();
+            } else {
+                const email = document.getElementById('adminEmail').value.trim();
+                const password = document.getElementById('adminPassword').value;
+                if (!email || !password) {
+                    document.getElementById('adminAuthError').textContent = 'Please enter email and password.';
+                    document.getElementById('adminAuthError').style.display = 'block';
+                    return;
+                }
+                try {
+                    const { data, error } = await supabase.auth.signUp({ email, password });
+                    if (error) {
+                        document.getElementById('adminAuthError').textContent = error.message;
+                        document.getElementById('adminAuthError').style.display = 'block';
+                        return;
+                    }
+                    document.getElementById('adminModal').classList.remove('open');
+                    showToast('Account created! An existing admin must approve it. Check your email to confirm.', 'success');
+                } catch(e) {
+                    document.getElementById('adminAuthError').textContent = 'Network error. Please try again.';
+                    document.getElementById('adminAuthError').style.display = 'block';
+                }
+            }
+        });
+
         function closeAdmin() { document.getElementById('adminModal').classList.remove('open'); }
         document.getElementById('adminModal').addEventListener('click', function(e) { if (e.target === this) closeAdmin(); });
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && document.getElementById('adminModal').classList.contains('open')) closeAdmin(); });
+
+        // Listen for auth state changes
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                await checkAdminStatus();
+                applyAdminUI();
+            } else if (event === 'SIGNED_OUT') {
+                isAdmin = false;
+                applyAdminUI();
+            }
+        });
+
+        // ---- GDPR Data Export ----
+        async function exportMyData() {
+            try {
+                const exports = { exported_at: new Date().toISOString(), user_id: siteUserId };
+                const [{ data: pollVotes }, { data: debateVotes }, { data: explanations }, { data: quotes }, { data: likes }] = await Promise.all([
+                    supabase.from('poll_votes').select('*').eq('user_id', siteUserId),
+                    supabase.from('debate_votes').select('*').eq('user_id', siteUserId),
+                    supabase.from('debate_explanations').select('*').eq('user_id', siteUserId),
+                    supabase.from('submitted_quotes').select('*').eq('user_id', siteUserId),
+                    supabase.from('seed_likes').select('*').eq('user_id', siteUserId)
+                ]);
+                exports.poll_votes = pollVotes || [];
+                exports.debate_votes = debateVotes || [];
+                exports.debate_explanations = explanations || [];
+                exports.submitted_quotes = quotes || [];
+                exports.seed_likes = likes || [];
+                const blob = new Blob([JSON.stringify(exports, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'philosophy-cafe-my-data.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Your data has been exported.', 'success');
+            } catch(e) {
+                console.warn('Export failed', e);
+                showToast('Export failed. Please try again.', 'error');
+            }
+        }
 
         // ============================================================
         // TOAST UTILITY
@@ -3819,6 +4124,137 @@
         });
 
         // ============================================================
+        // SEARCH — site-wide client-side search
+        // ============================================================
+        let searchIndex = [];
+        let searchActiveIdx = -1;
+
+        function buildSearchIndex() {
+            searchIndex = [];
+            // Thinkers
+            thinkersDB.forEach(t => {
+                searchIndex.push({ type:'thinker', icon:t.emoji, title:t.name, sub:t.school + ' · ' + t.years, keywords:t.name + ' ' + t.bio + ' ' + t.quote + ' ' + t.school, link:null, action: () => { closeSearch(); showRandomThinkerById(thinkersDB.indexOf(t)); } });
+            });
+            // Thought Seeds
+            if (typeof seedPosts !== 'undefined') {
+                seedPosts.forEach((s, i) => {
+                    searchIndex.push({ type:'seed', icon:s.icon, title:s.title, sub:s.subtitle, keywords:s.title + ' ' + s.subtitle, link:'thought-seeds.html', action: null });
+                });
+            }
+            // Pages
+            searchIndex.push(
+                { type:'page', icon:'🏛️', title:'Library', sub:'Curated resources & readings', keywords:'library resources books articles', link:'library.html', action:null },
+                { type:'page', icon:'📖', title:'Glossary', sub:'Philosophical terms A–Z', keywords:'glossary terms definitions', link:'glossary.html', action:null },
+                { type:'page', icon:'🧠', title:'Great Minds', sub:'Directory of philosophers', keywords:'great minds philosophers thinkers', link:'greatminds.html', action:null },
+                { type:'page', icon:'✍️', title:'Compose', sub:'Writing exercises & reflections', keywords:'compose writing exercises reflect', link:'compose.html', action:null },
+                { type:'page', icon:'🌱', title:'Thought Seeds', sub:'Philosophical seeds for contemplation', keywords:'seeds thoughts contemplation philosophy', link:'thought-seeds.html', action:null },
+                { type:'page', icon:'💬', title:'Discourse', sub:'Daily debates, votes & conversation', keywords:'discourse debate vote poll conversation', link:'philosophycafe.html#feed', action:null },
+                { type:'page', icon:'📊', title:'Past Debates & Votes', sub:'Browse searchable archives', keywords:'past archives history debates votes', link:null, action: () => { closeSearch(); setTimeout(() => openPastPortal(), 200); } }
+            );
+            // Reading group
+            if (typeof readingSchedule !== 'undefined') {
+                readingSchedule.forEach(s => {
+                    searchIndex.push({ type:'reading', icon:'📚', title:'Reading Group Week '+s.week, sub:s.books.join(', '), keywords:s.books.join(' ') + ' ' + s.analysis + ' ' + s.question, link:null, action: null });
+                });
+            }
+        }
+
+        function openSearch() {
+            if (!searchIndex.length) buildSearchIndex();
+            document.getElementById('searchOverlay').classList.add('open');
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResults').innerHTML = '<p class="search-hint">Type to search across philosophers, thought seeds, glossary terms, and more.</p>';
+            searchActiveIdx = -1;
+            setTimeout(() => document.getElementById('searchInput').focus(), 100);
+        }
+        function closeSearch() {
+            document.getElementById('searchOverlay').classList.remove('open');
+            searchActiveIdx = -1;
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const q = e.target.value.trim().toLowerCase();
+            const container = document.getElementById('searchResults');
+            if (!q) {
+                container.innerHTML = '<p class="search-hint">Type to search across philosophers, thought seeds, glossary terms, and more.</p>';
+                searchActiveIdx = -1;
+                return;
+            }
+            const results = searchIndex.filter(item =>
+                item.title.toLowerCase().includes(q) ||
+                (item.sub && item.sub.toLowerCase().includes(q)) ||
+                (item.keywords && item.keywords.toLowerCase().includes(q))
+            ).slice(0, 20);
+
+            if (!results.length) {
+                container.innerHTML = '<p class="search-no-results">No results for "' + escapeHtml(q) + '" — try a different term.</p>';
+                searchActiveIdx = -1;
+                return;
+            }
+            let lastType = '';
+            let html = '';
+            results.forEach((r, i) => {
+                if (r.type !== lastType) {
+                    const labels = { thinker:'Thinkers', seed:'Thought Seeds', page:'Pages', reading:'Reading Group' };
+                    html += '<div class="search-result-group">' + (labels[r.type] || r.type) + '</div>';
+                    lastType = r.type;
+                }
+                html += '<div class="search-result-item" data-idx="' + i + '" onclick="selectSearchResult(' + i + ')">' +
+                    '<span class="search-result-icon">' + r.icon + '</span>' +
+                    '<span class="search-result-text"><div class="search-result-title">' + escapeHtml(r.title) + '</div><div class="search-result-sub">' + escapeHtml(r.sub || '') + '</div></span>' +
+                    '</div>';
+            });
+            container.innerHTML = html;
+            searchActiveIdx = -1;
+        });
+
+        document.getElementById('searchInput').addEventListener('keydown', function(e) {
+            const items = document.querySelectorAll('.search-result-item');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (items.length === 0) return;
+                searchActiveIdx = Math.min(searchActiveIdx + 1, items.length - 1);
+                items.forEach((el, i) => el.classList.toggle('active', i === searchActiveIdx));
+                items[searchActiveIdx]?.scrollIntoView({ block:'nearest' });
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (items.length === 0) return;
+                searchActiveIdx = Math.max(searchActiveIdx - 1, 0);
+                items.forEach((el, i) => el.classList.toggle('active', i === searchActiveIdx));
+                items[searchActiveIdx]?.scrollIntoView({ block:'nearest' });
+            } else if (e.key === 'Enter' && searchActiveIdx >= 0) {
+                e.preventDefault();
+                selectSearchResult(searchActiveIdx);
+            }
+        });
+
+        function showRandomThinkerById(idx) {
+            const t = thinkersDB[idx];
+            if (!t) return;
+            const modal = document.getElementById('thinkerModal');
+            modal.innerHTML = '<span class="thinker-emoji">' + t.emoji + '</span><h3>' + escapeHtml(t.name) + '</h3><p class="thinker-years">' + escapeHtml(t.years) + ' · ' + escapeHtml(t.school) + '</p><p class="thinker-bio">' + escapeHtml(t.bio) + '</p><div class="thinker-quote">"' + escapeHtml(t.quote) + '"<div class="thinker-quote-author">— ' + escapeHtml(t.name) + '</div></div><button class="close-btn" onclick="closeThinkerModal()">Close</button><button class="reroll-btn" onclick="showRandomThinker()">✦ Another</button>';
+            document.getElementById('thinkerModalOverlay').classList.add('open');
+        }
+
+        function selectSearchResult(idx) {
+            const results = searchIndex.filter(item => {
+                const q = document.getElementById('searchInput').value.trim().toLowerCase();
+                return item.title.toLowerCase().includes(q) || (item.sub && item.sub.toLowerCase().includes(q)) || (item.keywords && item.keywords.toLowerCase().includes(q));
+            }).slice(0, 20);
+            const r = results[idx];
+            if (!r) return;
+            if (r.action) { r.action(); return; }
+            if (r.link) { closeSearch(); window.location.href = r.link; return; }
+            closeSearch();
+        }
+
+        document.getElementById('searchOverlay').addEventListener('click', function(e) { if (e.target === this) closeSearch(); });
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+            if (e.key === '/' && document.activeElement === document.body) { e.preventDefault(); openSearch(); }
+        });
+
+        // ============================================================
         // INIT ALL
         // ============================================================
         (async function initAll() {
@@ -3830,7 +4266,9 @@
             await loadDebate();
             renderReadingGroup();
             await renderWeeklyDigest();
-            if (localStorage.getItem('adminAuth') === 'true') {
+            // Restore admin state from Supabase Auth session
+            await checkAdminStatus();
+            if (isAdmin) {
                 document.getElementById('adminTrigger').classList.add('active');
                 document.getElementById('adminTrigger').innerHTML = '🔒 Exit';
                 document.getElementById('eventCard').classList.add('admin-mode');
