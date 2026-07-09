@@ -1941,10 +1941,10 @@
             flex-direction: column;
             gap: 8px;
             max-height: 600px;
-            overflow: hidden;
+            overflow-y: auto;
             transition: max-height 0.4s ease;
         }
-        .reading-schedule.collapsed { max-height: 0; }
+        .reading-schedule.collapsed { max-height: 0; overflow-y: hidden; }
         .reading-week {
             display: flex;
             gap: 10px;
@@ -2144,6 +2144,123 @@
         .add-debate-modal input:focus,
         .add-debate-modal textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
 
+        /* ---- Start Here module (gentle compass) ---- */
+        .start-here {
+            background: linear-gradient(135deg, var(--gold-pale), var(--cream));
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin-bottom: 32px;
+            text-align: center;
+            box-shadow: 0 2px 20px var(--shadow);
+        }
+        .start-here-title {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            letter-spacing: 2px;
+            color: var(--ink);
+            margin-bottom: 6px;
+        }
+        .start-here-sub {
+            font-size: 15px;
+            font-style: italic;
+            color: var(--ink-light);
+            margin-bottom: 18px;
+        }
+        .start-here-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .start-here-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink);
+            background: var(--card-bg);
+            border: 1px solid var(--gold);
+            border-radius: 30px;
+            padding: 11px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .start-here-btn:hover { background: var(--gold); color: var(--cream); transform: translateY(-2px); box-shadow: 0 4px 14px var(--shadow-md); }
+
+        /* ---- Giscus onboarding ---- */
+        .giscus-onboarding {
+            background: rgba(184,134,11,0.06);
+            border: 1px solid rgba(184,134,11,0.18);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 24px 0;
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--ink-light);
+        }
+        .giscus-onboarding strong { color: var(--ink); }
+
+        /* ---- Daily thread featured badge (sharper, more distinct) ---- */
+        .daily-thread-badge {
+            display: inline-block;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--wine);
+            background: rgba(114,47,55,0.10);
+            border: 1px solid rgba(114,47,55,0.2);
+            border-radius: 20px;
+            padding: 5px 14px;
+            margin-bottom: 14px;
+        }
+
+        /* ---- Debate hint ---- */
+        .debate-hint {
+            font-size: 12.5px;
+            font-style: italic;
+            color: var(--ink-light);
+            text-align: center;
+            margin: 14px 0 4px;
+            line-height: 1.6;
+        }
+
+        /* ---- Quote "show another" ---- */
+        .quote-another {
+            display: inline-block;
+            margin-top: 12px;
+            background: none;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            color: var(--gold);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .quote-another:hover { color: var(--wine); text-decoration: underline; }
+
+        /* ---- Collapsible sidebar cards ---- */
+        .sidebar-card.collapsible > h3 { cursor: pointer; user-select: none; display: flex; align-items: center; gap: 8px; }
+        .card-caret { margin-left: auto; font-size: 12px; color: var(--gold); transition: transform 0.3s ease; }
+        .sidebar-card.collapsible.collapsed > h3 .card-caret { transform: rotate(-90deg); }
+        .sidebar-card.collapsible.collapsed > *:not(h3) { display: none; }
+
+        /* ---- Skeleton loading ---- */
+        .skeleton { position: relative; overflow: hidden; background: var(--marble); border-radius: 4px; }
+        .skeleton::after {
+            content: ''; position: absolute; inset: 0; transform: translateX(-100%);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.65), transparent);
+            animation: shimmer 1.4s infinite;
+        }
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
+        @media (prefers-reduced-motion: reduce) { .skeleton::after { animation: none; } }
+
+        /* ---- Mobile reorder: most inviting widgets first ---- */
+        @media (max-width: 860px) {
+            .sidebar { display: flex; flex-direction: column; }
+            .sidebar > .sidebar-card:nth-child(1) { order: 3; }
+            .sidebar > .sidebar-card:nth-child(2) { order: 2; }
+            .sidebar > .sidebar-card:nth-child(3) { order: 1; }
+        }
+
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -2198,6 +2315,18 @@
     <div class="main-container">
         <!-- Left: Feed -->
         <div class="feed" id="feed">
+
+            <!-- Start Here: a gentle compass for first-time visitors -->
+            <div class="start-here" id="startHere">
+                <h2 class="start-here-title">Where would you like to begin?</h2>
+                <p class="start-here-sub">No rush. Choose one thread and follow it as far as you like.</p>
+                <div class="start-here-actions">
+                    <button class="start-here-btn" onclick="document.getElementById('dailyThread').scrollIntoView({behavior:'smooth'})">✦ Read today's prompt</button>
+                    <button class="start-here-btn" onclick="document.getElementById('giscusWidget').scrollIntoView({behavior:'smooth'})">💬 Join the discussion</button>
+                    <button class="start-here-btn" onclick="showRandomThinker()">🎲 Meet a philosopher</button>
+                </div>
+            </div>
+
             <!-- Discourse: shared, public discussion powered by Giscus.
                  The values below are PLACEHOLDERS — replace OWNER/REPO,
                  REPO_ID and CATEGORY_ID with your own (see SETUP.md). -->
@@ -2214,7 +2343,7 @@
                 <!-- 1. Daily Discussion Thread -->
                 <div class="daily-thread" id="dailyThread">
                     <button class="daily-thread-dismiss" onclick="dismissDailyThread()" title="Hide for today">✕</button>
-                    <span class="daily-thread-badge">Today's Café Conversation</span>
+                    <span class="daily-thread-badge">★ Today's Featured Discussion</span>
                     <div class="daily-thread-icon" id="dailyIcon"></div>
                     <div class="daily-thread-title" id="dailyTitle"></div>
                     <div class="daily-thread-subtitle" id="dailySubtitle"></div>
@@ -2252,6 +2381,7 @@
                             <button class="debate-vote-btn" onclick="voteDebate('B')">Vote ⚔️</button>
                         </div>
                     </div>
+                    <p class="debate-hint">Tap a side to cast your vote — you can change your mind anytime. The tallies appear once you've voted.</p>
                     <div class="debate-results" id="debateResults"></div>
                     <div class="debate-explanation" id="debateExplanation" style="display:none;">
                         <div class="debate-explanation-form" id="debateExplanationForm">
@@ -2285,7 +2415,7 @@
                         </div>
                     </div>
                     <div class="reading-schedule-title" id="scheduleToggle">Full 12-Week Schedule</div>
-                    <div class="reading-schedule" id="readingSchedule"></div>
+                    <div class="reading-schedule collapsed" id="readingSchedule"></div>
                     <div class="reading-progress" id="readingProgress"></div>
                     <a class="reading-join" href="#giscusWidget">Join the Discussion</a>
                 </div>
@@ -2309,6 +2439,11 @@
                 <!-- Thinker Modal Overlay -->
                 <div class="thinker-modal-overlay" id="thinkerModalOverlay">
                     <div class="thinker-modal" id="thinkerModal"></div>
+                </div>
+
+                <!-- Giscus onboarding note -->
+                <div class="giscus-onboarding">
+                    <p><strong>Join the conversation.</strong> To share a thought here, sign in with your GitHub account using the button at the top of the discussion below. No GitHub account yet? Creating one is <strong>free and takes about a minute</strong> — and whatever you write becomes part of the café for everyone who visits.</p>
                 </div>
 
                 <div class="giscus-comments" id="giscusWidget">
@@ -2342,6 +2477,7 @@
                     "I think, therefore I am."
                     <span class="author">— René Descartes</span>
                 </p>
+                <button class="quote-another" onclick="showAnotherThought()">↻ Show me a different thought</button>
             </div>
 
             <!-- 2. Poll -->
@@ -2384,15 +2520,15 @@
                     <button class="admin-btn primary" onclick="submitQuote()" style="font-size:12px;">Submit Quote</button>
                 </div>
                 <div class="submitted-quotes" id="submittedQuotes">
-                    <p style="font-size:12px;color:var(--ink-light);font-style:italic;">Recent submissions appear here...</p>
+                    <p style="font-size:13px;color:var(--ink-light);font-style:italic;">Be the first to submit a quote. What words have stayed with you?</p>
                 </div>
             </div>
 
             <!-- 5. Event Calendar -->
-            <div class="sidebar-card" id="eventCard">
-                <h3><span class="icon">📅</span> Events</h3>
+            <div class="sidebar-card collapsible collapsed" id="eventCard">
+                <h3 onclick="toggleCard(this.closest('.sidebar-card'))"><span class="icon">📅</span> Events <span class="card-caret">▸</span></h3>
                 <div class="event-list" id="eventList">
-                    <p style="font-size:12px;color:var(--ink-light);font-style:italic;">No upcoming events yet.</p>
+                    <p style="font-size:13px;color:var(--ink-light);font-style:italic;">Nothing scheduled yet — but the best conversations are often spontaneous.</p>
                 </div>
                 <div class="event-add-form" id="eventAddForm">
                     <input type="text" id="eventTitle" placeholder="Event title...">
@@ -2404,10 +2540,12 @@
             </div>
 
             <!-- 6. This Week in Philosophy -->
-            <div class="sidebar-card">
-                <h3><span class="icon">📰</span> This Week in Philosophy</h3>
+            <div class="sidebar-card collapsible collapsed" id="weeklyCard">
+                <h3 onclick="toggleCard(this.closest('.sidebar-card'))"><span class="icon">📰</span> This Week in Philosophy <span class="card-caret">▸</span></h3>
                 <div class="weekly-digest" id="weeklyDigest">
-                    <p style="font-size:12px;color:var(--ink-light);font-style:italic;">Loading digest...</p>
+                    <div class="skeleton" style="height:14px;width:90%;margin:6px 0"></div>
+                    <div class="skeleton" style="height:14px;width:70%;margin:6px 0"></div>
+                    <div class="skeleton" style="height:14px;width:82%;margin:6px 0"></div>
                 </div>
             </div>
 
@@ -2487,12 +2625,25 @@
             { text: "The life which is unexamined is not worth living.", author: "Plato" },
         ];
 
-        function setDailyQuote() {
-            const today = new Date();
-            const idx = (today.getFullYear() * 10000 + (today.getMonth()+1) * 100 + today.getDate()) % quotes.length;
+        let currentQuoteIdx = -1;
+        function renderDailyQuote(idx) {
+            currentQuoteIdx = idx;
             const q = quotes[idx];
             document.getElementById('dailyQuote').innerHTML =
                 `"${q.text}"<span class="author">— ${q.author}</span>`;
+        }
+        function setDailyQuote() {
+            const today = new Date();
+            const idx = (today.getFullYear() * 10000 + (today.getMonth()+1) * 100 + today.getDate()) % quotes.length;
+            renderDailyQuote(idx);
+        }
+        function showAnotherThought() {
+            if (!quotes.length) return;
+            let next = currentQuoteIdx;
+            while (quotes.length > 1 && next === currentQuoteIdx) {
+                next = Math.floor(Math.random() * quotes.length);
+            }
+            renderDailyQuote(next);
         }
         setDailyQuote();
 
@@ -2534,6 +2685,7 @@
         // ============================================================
         const pollData = { question:'Is free will an illusion?', agree:0, disagree:0, undecided:0 };
         async function loadPoll() {
+            document.getElementById('pollQuestion').innerHTML = '<span class="skeleton" style="display:inline-block;width:60%;height:1em;"></span>';
             try {
                 const [{ data: configRows }, { data: votes }] = await Promise.all([
                     supabase.from('poll_config').select('question').order('id', {ascending:false}).limit(1),
@@ -2552,7 +2704,7 @@
                     const btnId = 'poll' + myVotes[0].option.charAt(0).toUpperCase() + myVotes[0].option.slice(1);
                     document.getElementById(btnId).classList.add('voted');
                 }
-            } catch(e) { console.warn('Poll load failed', e); }
+            } catch(e) { console.warn('Poll load failed', e); document.getElementById('pollQuestion').textContent = pollData.question; }
         }
         async function castPollVote(option) {
             try {
@@ -2649,17 +2801,18 @@
             } catch(e) { console.warn('Quote submit failed', e); showToast('Submission failed, please try again.', 'error'); }
         }
         async function renderSubmittedQuotes() {
+            document.getElementById('submittedQuotes').innerHTML = '<div class="skeleton" style="height:14px;width:90%;margin:6px 0"></div><div class="skeleton" style="height:14px;width:70%;margin:6px 0"></div>';
             try {
                 const { data: quotes } = await supabase.from('submitted_quotes').select('id,quote_text,author,created_at').order('created_at', {ascending:false}).limit(20);
                 const container = document.getElementById('submittedQuotes');
-                if (!quotes || quotes.length === 0) { container.innerHTML = '<p style="font-size:12px;color:var(--ink-light);font-style:italic;">Recent submissions appear here...</p>'; return; }
+                if (!quotes || quotes.length === 0) { container.innerHTML = '<p style="font-size:13px;color:var(--ink-light);font-style:italic;">Be the first to submit a quote. What words have stayed with you?</p>'; return; }
                 container.innerHTML = quotes.map(q =>
                     `<div class="submitted-quote-item">
                         <span>"${q.quote_text}"<span class="sq-author">— ${q.author}</span></span>
                         <button class="quote-delete" onclick="deleteQuote('${q.id}')" title="Delete quote" aria-label="Delete quote">🗑️</button>
                     </div>`
                 ).join('');
-            } catch(e) { console.warn('Quotes load failed', e); }
+            } catch(e) { console.warn('Quotes load failed', e); document.getElementById('submittedQuotes').innerHTML = '<p style="font-size:13px;color:var(--ink-light);font-style:italic;">Be the first to submit a quote. What words have stayed with you?</p>'; }
         }
         async function deleteQuote(id) {
             if (!confirm('Delete this quote?')) return;
@@ -2705,7 +2858,7 @@
             const events = JSON.parse(localStorage.getItem('events') || '[]');
             const list = document.getElementById('eventList');
             const isAdmin = localStorage.getItem('adminAuth') === 'true';
-            if (events.length === 0) { list.innerHTML = '<p style="font-size:12px;color:var(--ink-light);font-style:italic;">No upcoming events yet.</p>'; return; }
+            if (events.length === 0) { list.innerHTML = '<p style="font-size:13px;color:var(--ink-light);font-style:italic;">Nothing scheduled yet — but the best conversations are often spontaneous.</p>'; return; }
             list.innerHTML = events.map((e, i) => {
                 const d = new Date(e.date + 'T00:00:00');
                 const dateStr = d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
@@ -2728,6 +2881,7 @@
             votesA: 0, votesB: 0
         };
         async function loadDebate() {
+            document.getElementById('debateQuestion').innerHTML = '<span class="skeleton" style="display:inline-block;width:70%;height:1.1em;"></span>';
             try {
                 const { data: configRows } = await supabase.from('debate_config').select('*').eq('active', true).order('id', {ascending:false}).limit(1);
                 let d;
@@ -2757,7 +2911,7 @@
                     if (btn) btn.classList.add('voted');
                 }
                 renderDebateExplanation();
-            } catch(e) { console.warn('Debate load failed', e); }
+            } catch(e) { console.warn('Debate load failed', e); document.getElementById('debateQuestion').textContent = defaultDebate.question; }
         }
         async function voteDebate(side) {
             try {
@@ -3008,7 +3162,7 @@
                     ${q.length ? `<li>"${q[0].quote_text}" — ${q[0].author}</li>` : '<p style="font-size:11px;">No quotes submitted yet.</p>'}
                 </div>
                 `;
-            } catch(e) { console.warn('Weekly digest load failed', e); }
+            } catch(e) { console.warn('Weekly digest load failed', e); document.getElementById('weeklyDigest').innerHTML = '<p style="font-size:13px;color:var(--ink-light);font-style:italic;">This week\'s summary is taking a rest. Check back shortly.</p>'; }
         }
 
         // ============================================================
@@ -3057,6 +3211,12 @@
             toast.className = 'toast show ' + (type || 'success');
             clearTimeout(toast._timeout);
             toast._timeout = setTimeout(() => toast.className = 'toast', 3000);
+        }
+
+        // Collapsible sidebar cards (Events, This Week in Philosophy)
+        function toggleCard(card) {
+            if (!card) return;
+            card.classList.toggle('collapsed');
         }
 
         // ============================================================
