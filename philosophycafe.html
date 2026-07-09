@@ -62,9 +62,15 @@
 
         /* ---- Scrollbar ---- */
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--parchment-dark); }
-        ::-webkit-scrollbar-thumb { background: var(--gold-light); border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: transparent; border-radius: 4px; transition: background 0.3s ease; }
+        :hover::-webkit-scrollbar-thumb { background: var(--gold-light); }
         ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(184,134,11,0.3) transparent;
+        }
 
         /* ============================================================
            NAVIGATION
@@ -774,8 +780,7 @@
            SIDEBAR
            ============================================================ */
         .sidebar {
-            position: sticky;
-            top: 90px;
+            position: static;
             align-self: start;
         }
 
@@ -1868,6 +1873,12 @@
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 16px;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        .reading-week-focus.focus-update { animation: focusFadeIn 0.45s ease; }
+        @keyframes focusFadeIn {
+            0% { opacity: 0.45; transform: translateY(-8px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
         .reading-week-focus .week-label {
             font-family: 'Inter', sans-serif;
@@ -1916,108 +1927,40 @@
             margin-bottom: 4px;
             font-style: normal;
         }
-        .reading-schedule-title {
-            font-family: 'Inter', sans-serif;
-            font-size: 11px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--ink);
-            font-weight: 600;
-            margin: 16px 0 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-        }
-        .reading-schedule-title::after {
-            content: '▼';
-            font-size: 10px;
-            color: var(--ink-light);
-            transition: transform 0.3s ease;
-        }
-        .reading-schedule-title.collapsed::after { transform: rotate(-90deg); }
         .reading-schedule {
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 600px;
-            overflow-y: auto;
-            transition: max-height 0.4s ease;
-        }
-        .reading-schedule.collapsed { max-height: 0; overflow-y: hidden; }
-        .reading-week {
-            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
             gap: 10px;
-            padding: 10px 12px;
+            margin-top: 16px;
+        }
+        .reading-week {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
             border: 1px solid var(--border-subtle);
-            border-radius: 10px;
+            border-radius: 999px;
             cursor: pointer;
             transition: all 0.3s ease;
+            background: var(--card-bg);
         }
-        .reading-week:hover { border-color: var(--gold-light); background: rgba(184,134,11,0.03); }
+        .reading-week:hover { border-color: var(--gold-light); background: rgba(184,134,11,0.06); }
         .reading-week.active {
             border-color: var(--gold);
             background: var(--gold-pale);
+            color: var(--ink);
         }
-        .reading-week .week-number {
-            flex-shrink: 0;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--parchment-dark);
-            color: var(--ink-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Cinzel', serif;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        .reading-week.active .week-number {
-            background: var(--gold);
-            color: var(--cream);
-        }
+        .reading-week .week-number { display: none; }
         .reading-week .week-content { flex: 1; min-width: 0; }
         .reading-week .week-content .week-books {
             font-family: 'Cinzel', serif;
             font-size: 12px;
             font-weight: 600;
             color: var(--ink);
-            margin-bottom: 3px;
+            white-space: nowrap;
         }
-        .reading-week .week-content .week-goal-short {
-            font-family: 'Inter', sans-serif;
-            font-size: 10px;
-            color: var(--ink-light);
-            line-height: 1.4;
-        }
-        .reading-week .week-content .week-question-short {
-            font-family: 'Inter', sans-serif;
-            font-size: 10px;
-            color: var(--ink-light);
-            font-style: italic;
-            line-height: 1.4;
-            margin-top: 3px;
-        }
-        .reading-progress {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 16px 0;
-        }
-        .reading-chapter {
-            padding: 6px 14px;
-            border: 1px solid var(--border-subtle);
-            border-radius: 20px;
-            font-family: 'Inter', sans-serif;
-            font-size: 11px;
-            letter-spacing: 0.5px;
-            color: var(--ink-light);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .reading-chapter.done { background: var(--sage-light); color: #fff; border-color: var(--sage-light); }
-        .reading-chapter.current { background: var(--gold-pale); color: var(--gold); border-color: var(--gold); font-weight: 600; }
+        .reading-week .week-content .week-goal-short,
+        .reading-week .week-content .week-question-short { display: none; }
         .reading-join {
             display: inline-flex;
             align-items: center;
@@ -2239,9 +2182,22 @@
 
         /* ---- Collapsible sidebar cards ---- */
         .sidebar-card.collapsible > h3 { cursor: pointer; user-select: none; display: flex; align-items: center; gap: 8px; }
-        .card-caret { margin-left: auto; font-size: 12px; color: var(--gold); transition: transform 0.3s ease; }
+        .card-caret { margin-left: auto; font-size: 12px; color: var(--gold); transition: transform 0.35s ease; transform: rotate(90deg); }
         .sidebar-card.collapsible.collapsed > h3 .card-caret { transform: rotate(-90deg); }
-        .sidebar-card.collapsible.collapsed > *:not(h3) { display: none; }
+
+        .sidebar-card.collapsible .card-body {
+            max-height: 1200px;
+            overflow: hidden;
+            opacity: 1;
+            transform: translateY(0);
+            transition: max-height 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.35s ease 0.05s, transform 0.35s ease 0.05s;
+        }
+        .sidebar-card.collapsible.collapsed .card-body {
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-18px);
+            transition: max-height 0.45s cubic-bezier(0.55, 0.085, 0.68, 0.53), opacity 0.25s ease, transform 0.3s ease;
+        }
 
         /* ---- Skeleton loading ---- */
         .skeleton { position: relative; overflow: hidden; background: var(--marble); border-radius: 4px; }
@@ -2406,7 +2362,7 @@
                     <h3>📖 Reading Group <span style="font-family:'Inter',sans-serif;font-size:10px;font-weight:400;color:var(--ink-light);letter-spacing:1px;">· μελέτη</span></h3>
                     <p class="reading-current" id="readingCurrent"></p>
                     <div class="reading-week-focus" id="readingWeekFocus">
-                        <div class="week-label">This Week's Focus</div>
+                        <div class="week-label">This Week's Analysis</div>
                         <div class="week-books" id="focusBooks"></div>
                         <div class="week-goal" id="focusGoal"></div>
                         <div class="week-question">
@@ -2414,9 +2370,7 @@
                             <span id="focusQuestion"></span>
                         </div>
                     </div>
-                    <div class="reading-schedule-title" id="scheduleToggle">Full 12-Week Schedule</div>
-                    <div class="reading-schedule collapsed" id="readingSchedule"></div>
-                    <div class="reading-progress" id="readingProgress"></div>
+                    <div class="reading-schedule" id="readingSchedule"></div>
                     <a class="reading-join" href="#giscusWidget">Join the Discussion</a>
                 </div>
 
@@ -2525,27 +2479,31 @@
             </div>
 
             <!-- 5. Event Calendar -->
-            <div class="sidebar-card collapsible collapsed" id="eventCard">
+            <div class="sidebar-card collapsible" id="eventCard">
                 <h3 onclick="toggleCard(this.closest('.sidebar-card'))"><span class="icon">📅</span> Events <span class="card-caret">▸</span></h3>
-                <div class="event-list" id="eventList">
-                    <p style="font-size:13px;color:var(--ink-light);font-style:italic;">Nothing scheduled yet — but the best conversations are often spontaneous.</p>
-                </div>
-                <div class="event-add-form" id="eventAddForm">
-                    <input type="text" id="eventTitle" placeholder="Event title...">
-                    <input type="date" id="eventDate">
-                    <input type="text" id="eventDesc" placeholder="Short description...">
-                    <input type="url" id="eventUrl" placeholder="Link (optional)">
-                    <button class="admin-btn primary" onclick="addEvent()" style="font-size:12px;">Add Event</button>
+                <div class="card-body">
+                    <div class="event-list" id="eventList">
+                        <p style="font-size:13px;color:var(--ink-light);font-style:italic;">Nothing scheduled yet — but the best conversations are often spontaneous.</p>
+                    </div>
+                    <div class="event-add-form" id="eventAddForm">
+                        <input type="text" id="eventTitle" placeholder="Event title...">
+                        <input type="date" id="eventDate">
+                        <input type="text" id="eventDesc" placeholder="Short description...">
+                        <input type="url" id="eventUrl" placeholder="Link (optional)">
+                        <button class="admin-btn primary" onclick="addEvent()" style="font-size:12px;">Add Event</button>
+                    </div>
                 </div>
             </div>
 
             <!-- 6. This Week in Philosophy -->
-            <div class="sidebar-card collapsible collapsed" id="weeklyCard">
+            <div class="sidebar-card collapsible" id="weeklyCard">
                 <h3 onclick="toggleCard(this.closest('.sidebar-card'))"><span class="icon">📰</span> This Week in Philosophy <span class="card-caret">▸</span></h3>
-                <div class="weekly-digest" id="weeklyDigest">
-                    <div class="skeleton" style="height:14px;width:90%;margin:6px 0"></div>
-                    <div class="skeleton" style="height:14px;width:70%;margin:6px 0"></div>
-                    <div class="skeleton" style="height:14px;width:82%;margin:6px 0"></div>
+                <div class="card-body">
+                    <div class="weekly-digest" id="weeklyDigest">
+                        <div class="skeleton" style="height:14px;width:90%;margin:6px 0"></div>
+                        <div class="skeleton" style="height:14px;width:70%;margin:6px 0"></div>
+                        <div class="skeleton" style="height:14px;width:82%;margin:6px 0"></div>
+                    </div>
                 </div>
             </div>
 
@@ -3025,59 +2983,47 @@
         // ============================================================
         // 8. READING GROUP
         // ============================================================
-        function getReadingChapter() {
-            const raw = localStorage.getItem('readingProgress');
-            if (!raw) return null;
-            try {
-                const val = JSON.parse(raw);
-                if (Number.isInteger(val)) return val;
-                if (Array.isArray(val) && val.length) return val[val.length - 1];
-            } catch (e) {}
-            return null;
-        }
+        const readingSchedule = [
+            { week: 1, books: ['Book I: Debts & Lessons'], analysis: 'Marcus opens with a roll call of gratitude, tracing the virtues he owes to family, teachers, and friends. It is less a diary than a genealogy of character: every good thing in him was first a gift from someone else.', question: 'Who are the people that shaped your character, and what do you owe them?' },
+            { week: 2, books: ['Book II: On the River Gran'], analysis: 'Written beside the River Gran during a military campaign, this book confronts the shortness of life and the noise of the world. The reminder that we are "tiny souls carrying a corpse" urges a return to the present and to inner discipline.', question: 'How would you live if you knew this day could be your last?' },
+            { week: 3, books: ['Book III: In Carnuntum'], analysis: 'In Carnuntum Marcus sketches the structure of a good day: rise with purpose, act with justice, accept what happens. The message is not stoic suppression but deliberate alignment between intention and duty.', question: 'What does it mean to act with purpose rather than be pulled by impulse?' },
+            { week: 4, books: ['Book IV: The Inner Citadel'], analysis: 'The mind is a citadel that no external force can enter unless admitted. Marcus distinguishes between events (which are outside us) and judgments (which are ours), locating freedom in the latter.', question: 'What is your "inner citadel," and how do you defend it?' },
+            { week: 5, books: ['Book V: In the Morning'], analysis: 'Morning is a rehearsal for the whole life. Marcus reminds himself that the day will bring the rude, the ungrateful, and the difficult, and that he is already united with them by shared reason and nature.', question: 'What should you remind yourself of every morning to live well?' },
+            { week: 6, books: ['Book VI: The Unity of All'], analysis: 'Everything is woven into one living whole. To harm another is to harm oneself; to serve the whole is to serve one\'s own nature, since we are not isolated atoms but limbs of the same body.', question: 'How does seeing yourself as part of the whole change how you treat others?' },
+            { week: 7, books: ['Book VII: On Endurance'], analysis: 'Pain, insult, and misfortune do not themselves disturb us; our opinion of them does. Marcus practices reframing hardship as an exercise in virtue and a chance to show what one has trained for.', question: 'What does true endurance look like when things go wrong?' },
+            { week: 8, books: ['Book VIII: The Nature of the Whole'], analysis: 'The universe is not random; it is governed by a rational order that includes even what we dislike. Wisdom lies in accepting this order rather than fighting it with private complaints.', question: 'Is the universe governed by reason, chaos, or something else?' },
+            { week: 9, books: ['Book IX: On Justice'], analysis: 'People act from ignorance, not malice. Marcus argues for tolerance without weakness: we can correct injustice while recognizing that the offender is a fellow human shaped by the same natural law.', question: 'How should we respond to people who irritate or harm us?' },
+            { week: 10, books: ['Book X: On the Whole'], analysis: 'The "view from above" lifts the soul out of petty concerns and shows human affairs as a brief flicker in cosmic time. From that height, fame, blame, and anxiety shrink to their proper size.', question: 'From a "view from above," what really matters in your life?' },
+            { week: 11, books: ['Book XI: On Character'], analysis: 'Character is the accumulation of small choices. Marcus studies those around him to see what habits produce dignity, kindness, and steadiness, and what habits produce vanity and irritability.', question: 'What habits reveal the true character of a person?' },
+            { week: 12, books: ['Book XII: On the Summit'], analysis: 'The final book gathers the threads into one quiet resolve: accept death, live by reason, leave nothing undone that belongs to a human being. It is a meditation on how to end as well as how to live.', question: 'If this were your final reflection, what would you want to have lived for?' }
+        ];
         function getReadingWeek() {
             const raw = localStorage.getItem('readingWeek');
             if (raw) {
                 try { const val = parseInt(raw, 10); if (val >= 1 && val <= 12) return val; } catch(e) {}
             }
-            // Default to Week 1 if no selection
             return 1;
         }
         function setReadingWeek(week) {
             localStorage.setItem('readingWeek', String(week));
-            renderReadingGroup();
+            updateReadingFocus(week);
+            renderReadingSchedule();
         }
-        function renderReadingGroup() {
-            const schedule = [
-                { week: 1, books: ['Book I: Debts & Lessons'], goal: 'Read <strong>one book this week</strong>. Reflect on the people and values that formed you.', question: 'Who are the people that shaped your character, and what do you owe them?' },
-                { week: 2, books: ['Book II: On the River Gran'], goal: 'Read <strong>one book this week</strong>. Reflect on mortality and the present moment.', question: 'How would you live if you knew this day could be your last?' },
-                { week: 3, books: ['Book III: In Carnuntum'], goal: 'Read <strong>one book this week</strong>. Reflect on purpose and deliberate action.', question: 'What does it mean to act with purpose rather than be pulled by impulse?' },
-                { week: 4, books: ['Book IV: The Inner Citadel'], goal: 'Read <strong>one book this week</strong>. Reflect on the mind as a fortress of judgment.', question: 'What is your "inner citadel," and how do you defend it?' },
-                { week: 5, books: ['Book V: In the Morning'], goal: 'Read <strong>one book this week</strong>. Reflect on morning discipline and daily renewal.', question: 'What should you remind yourself of every morning to live well?' },
-                { week: 6, books: ['Book VI: The Unity of All'], goal: 'Read <strong>one book this week</strong>. Reflect on our connection to the whole.', question: 'How does seeing yourself as part of the whole change how you treat others?' },
-                { week: 7, books: ['Book VII: On Endurance'], goal: 'Read <strong>one book this week</strong>. Reflect on pain, hardship, and resilience.', question: 'What does true endurance look like when things go wrong?' },
-                { week: 8, books: ['Book VIII: The Nature of the Whole'], goal: 'Read <strong>one book this week</strong>. Reflect on nature, reason, and cosmic order.', question: 'Is the universe governed by reason, chaos, or something else?' },
-                { week: 9, books: ['Book IX: On Justice'], goal: 'Read <strong>one book this week</strong>. Reflect on justice, tolerance, and social duty.', question: 'How should we respond to people who irritate or harm us?' },
-                { week: 10, books: ['Book X: On the Whole'], goal: 'Read <strong>one book this week</strong>. Reflect on the "view from above" and perspective.', question: 'From a "view from above," what really matters in your life?' },
-                { week: 11, books: ['Book XI: On Character'], goal: 'Read <strong>one book this week</strong>. Reflect on character, habits, and integrity.', question: 'What habits reveal the true character of a person?' },
-                { week: 12, books: ['Book XII: On the Summit'], goal: 'Read <strong>one book this week</strong>. Reflect on final lessons and the art of living.', question: 'If this were your final reflection, what would you want to have lived for?' }
-            ];
-            const allChapters = [
-                'Book I: Debts & Lessons', 'Book II: On the River Gran', 'Book III: In Carnuntum',
-                'Book IV: The Inner Citadel', 'Book V: In the Morning', 'Book VI: The Unity of All',
-                'Book VII: On Endurance', 'Book VIII: The Nature of the Whole', 'Book IX: On Justice',
-                'Book X: On the Whole', 'Book XI: On Character', 'Book XII: On the Summit'
-            ];
-            const currentWeek = getReadingWeek();
-            const focus = schedule[currentWeek - 1];
-
-            document.getElementById('readingCurrent').innerHTML = `Now reading: <strong>Meditations</strong> by Marcus Aurelius`;
-
-            document.getElementById('focusBooks').textContent = 'Week ' + currentWeek + ': ' + focus.books.join(' · ');
-            document.getElementById('focusGoal').innerHTML = focus.goal;
+        function updateReadingFocus(week) {
+            const focus = readingSchedule[week - 1];
+            if (!focus) return;
+            const focusBox = document.getElementById('readingWeekFocus');
+            if (!focusBox) return;
+            focusBox.classList.remove('focus-update');
+            document.getElementById('focusBooks').textContent = 'Week ' + week + ': ' + focus.books.join(' · ');
+            document.getElementById('focusGoal').innerHTML = focus.analysis;
             document.getElementById('focusQuestion').textContent = focus.question;
-
-            document.getElementById('readingSchedule').innerHTML = schedule.map(s => {
+            void focusBox.offsetWidth; // force reflow so the animation retriggers
+            focusBox.classList.add('focus-update');
+        }
+        function renderReadingSchedule() {
+            const currentWeek = getReadingWeek();
+            document.getElementById('readingSchedule').innerHTML = readingSchedule.map(s => {
                 const active = s.week === currentWeek ? 'active' : '';
                 return `<div class="reading-week ${active}" onclick="setReadingWeek(${s.week})" title="Click to set as current week">
                     <div class="week-number">${s.week}</div>
@@ -3087,26 +3033,12 @@
                     </div>
                 </div>`;
             }).join('');
-
-            const currentChapter = getReadingChapter();
-            document.getElementById('readingProgress').innerHTML = allChapters.map((ch, i) => {
-                const cls = (i === currentChapter) ? 'current' : '';
-                return `<span class="reading-chapter ${cls}" onclick="selectReadingChapter(${i})">${ch}</span>`;
-            }).join('');
         }
-        function selectReadingChapter(idx) {
-            const current = getReadingChapter();
-            if (current === idx) {
-                localStorage.removeItem('readingProgress');
-            } else {
-                localStorage.setItem('readingProgress', JSON.stringify(idx));
-            }
-            renderReadingGroup();
+        function renderReadingGroup() {
+            document.getElementById('readingCurrent').innerHTML = `Now reading: <strong>Meditations</strong> by Marcus Aurelius`;
+            updateReadingFocus(getReadingWeek());
+            renderReadingSchedule();
         }
-        document.getElementById('scheduleToggle').addEventListener('click', function() {
-            this.classList.toggle('collapsed');
-            document.getElementById('readingSchedule').classList.toggle('collapsed');
-        });
 
         // ============================================================
         // 10. WEEKLY DIGEST
