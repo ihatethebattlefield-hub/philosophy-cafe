@@ -2167,6 +2167,87 @@
         .add-debate-modal input:focus,
         .add-debate-modal textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
 
+        /* ---- Past Debates & Votes Portal ---- */
+        .past-portal-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-family: 'Inter', sans-serif; font-size: 11px;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            color: var(--ink-light); text-decoration: none;
+            margin-top: 12px;
+            padding: 8px 16px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 999px;
+            transition: all 0.3s ease;
+        }
+        .past-portal-link:hover { border-color: var(--gold); color: var(--gold); background: rgba(184,134,11,0.05); }
+        .past-portal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(44,36,22,0.55); z-index: 1001;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .past-portal-overlay.open { display: flex; }
+        .past-portal-modal {
+            background: var(--card-bg); border: 1px solid var(--border-subtle);
+            border-radius: 16px; width: 90vw; max-width: 720px; max-height: 80vh;
+            overflow-y: auto; padding: 28px 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            animation: modalIn 0.3s ease;
+        }
+        .past-portal-modal h3 {
+            font-family: 'Cinzel', serif; font-size: 20px; letter-spacing: 0.05em;
+            color: var(--ink); margin-bottom: 4px;
+        }
+        .past-portal-close {
+            position: absolute; top: 16px; right: 20px;
+            background: none; border: none; font-size: 20px; cursor: pointer;
+            color: var(--ink-light); padding: 4px 8px; border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .past-portal-close:hover { background: var(--gold-pale); color: var(--ink); }
+        .past-portal-tabs { display: flex; gap: 8px; margin: 16px 0 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 2px; }
+        .past-portal-tab {
+            padding: 8px 18px; border: none; background: none;
+            font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+            color: var(--ink-light); cursor: pointer;
+            border-bottom: 2px solid transparent; margin-bottom: -3px;
+            transition: all 0.3s ease;
+        }
+        .past-portal-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+        .past-portal-tab:hover { color: var(--ink); }
+        .past-portal-list { display: flex; flex-direction: column; gap: 14px; }
+        .past-portal-item {
+            background: var(--cream); border: 1px solid var(--border-subtle);
+            border-radius: 10px; padding: 16px 20px; cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .past-portal-item:hover { border-color: var(--gold-light); box-shadow: 0 2px 12px var(--shadow); }
+        .past-portal-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px; }
+        .past-portal-item-date {
+            font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.5px;
+            color: var(--ink-light); text-transform: uppercase;
+        }
+        .past-portal-item-question {
+            font-family: 'Cormorant Garamond', serif; font-size: 16px;
+            color: var(--ink); font-weight: 500; margin-bottom: 8px;
+        }
+        .past-portal-item-stats {
+            display: flex; gap: 14px; flex-wrap: wrap;
+            font-family: 'Inter', sans-serif; font-size: 11px;
+            color: var(--ink-light);
+        }
+        .past-portal-item-stats span { display: flex; align-items: center; gap: 4px; }
+        .past-portal-item-stats .stat-bar {
+            display: inline-block; width: 52px; height: 4px; border-radius: 2px;
+            background: var(--border-subtle); overflow: hidden; vertical-align: middle;
+        }
+        .past-portal-item-stats .stat-bar-fill {
+            display: block; height: 100%; border-radius: 2px; background: var(--gold);
+        }
+        .past-portal-empty {
+            text-align: center; padding: 32px 20px; color: var(--ink-light);
+            font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic;
+        }
+
         /* ---- Start Here module (gentle compass) ---- */
         .start-here {
             background: linear-gradient(135deg, var(--gold-pale), var(--cream));
@@ -2475,6 +2556,23 @@
                     </div>
                 </div>
 
+                <!-- Past Debates & Votes Portal Overlay -->
+                <div class="past-portal-overlay" id="pastPortalOverlay">
+                    <div style="position:relative;">
+                        <button class="past-portal-close" onclick="closePastPortal()" style="position:absolute;top:-12px;right:-12px;">✕</button>
+                        <div class="past-portal-modal" id="pastPortalContent">
+                            <h3>📜 Daily Archives</h3>
+                            <div class="past-portal-tabs">
+                                <button class="past-portal-tab active" onclick="switchPastTab('debate',this)">⚔️ Past Debates</button>
+                                <button class="past-portal-tab" onclick="switchPastTab('poll',this)">🗳️ Past Votes</button>
+                            </div>
+                            <div class="past-portal-list" id="pastPortalList">
+                                <div class="past-portal-empty">Loading archives…</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Thinker Modal Overlay -->
                 <div class="thinker-modal-overlay" id="thinkerModalOverlay">
                     <div class="thinker-modal" id="thinkerModal"></div>
@@ -2604,6 +2702,15 @@
                     Enter the gallery →
                 </a>
             </div>
+
+            <!-- 9. Past Debates & Votes -->
+            <div class="sidebar-card">
+                <h3><span class="icon">📜</span> Daily Archives</h3>
+                <p class="join-text" style="font-size:14px; margin-bottom:14px;">
+                    Every day brings a new debate and a new poll. Browse what the café thought yesterday, last week, and beyond.
+                </p>
+                <a href="#" class="past-portal-link" onclick="openPastPortal(); return false;">📜 Browse past debates & votes →</a>
+            </div>
         </aside>
     </div>
 
@@ -2714,18 +2821,105 @@
         }
 
         // ============================================================
+        // DAILY ROTATION — Debates & Polls
+        // ============================================================
+        function getDateString(offsetDays = 0) {
+            const d = new Date(Date.now() + offsetDays * 86400000);
+            return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        }
+        function getDayIndex() {
+            const start = new Date('2026-07-01');
+            const now = new Date();
+            return Math.floor((now - start) / 86400000);
+        }
+
+        // ---- DAILY DEBATE POOL (30 topics) ----
+        const dailyDebatePool = [
+            { question:'Is happiness the ultimate goal of life?', sideA:{name:'Aristotle (Yes)',summary:'Happiness — eudaimonia — is the highest good toward which all human action aims. A life lived according to virtue naturally leads to flourishing.'}, sideB:{name:'Kant (Not Quite)',summary:'Happiness is not the foundation of morality — duty is. A good will, acting from respect for the moral law, is the only unqualified good.'} },
+            { question:'Does free will exist?', sideA:{name:'Determinism (No)',summary:'Every event, including human decisions, is necessitated by prior causes. The feeling of choice is an illusion born from ignorance of the causal chain.'}, sideB:{name:'Libertarianism (Yes)',summary:'Humans possess agent causation — the ability to initiate new causal chains that are not wholly determined by past events and natural laws.'} },
+            { question:'Is morality objective?', sideA:{name:'Moral Realism (Yes)',summary:'Some moral truths exist independently of human opinion — just as 2+2=4, certain acts like torture are wrong regardless of what anyone believes.'}, sideB:{name:'Moral Relativism (No)',summary:'Morality is a human construction, varying across cultures and eras. No moral claim can be true in an absolute, culture-transcendent sense.'} },
+            { question:'Can artificial intelligence ever be conscious?', sideA:{name:'Computationalism (Yes)',summary:'Consciousness arises from information processing. Sufficiently complex neural architectures will inevitably produce subjective experience, just as biological brains do.'}, sideB:{name:'Biological Exceptionalism (No)',summary:'Consciousness requires biochemical embodiment. Silicon circuits can simulate intelligence but will never feel qualia — the redness of red, the pain of loss.'} },
+            { question:'Is democracy the best form of government?', sideA:{name:'Defender (Yes)',summary:'Despite its flaws, democracy uniquely protects individual rights, enables peaceful power transitions, and harnesses collective wisdom better than any alternative.'}, sideB:{name:'Skeptic (No)',summary:'Democracy elevates popularity over competence, incentivises short-term thinking, and can devolve into tyranny of the majority. Epistocracy — rule by the knowledgeable — may be superior.'} },
+            { question:'Does the universe have meaning?', sideA:{name:'Existential Affirmation (Yes)',summary:'Meaning is not discovered in the cosmos but created by each individual through authentic choices, relationships, art, and commitment to projects larger than the self.'}, sideB:{name:'Cosmic Nihilism (No)',summary:'The universe is indifferent. It offers no purpose, no telos, no narrative arc. To claim otherwise is to project human psychological needs onto a silent void.'} },
+            { question:'Is time real or an illusion?', sideA:{name:'Presentism (Real)',summary:'Only the present moment exists. The past is gone, the future is not yet. Time flows, and our experience of it corresponds to a fundamental feature of reality.'}, sideB:{name:'Eternalism (Illusion)',summary:'All moments — past, present, future — are equally real in a four-dimensional block universe. The "flow" of time is a subjective phenomenon, not a feature of physics.'} },
+            { question:'Should we fear death?', sideA:{name:'Epicurus (No)',summary:'Where death is, I am not. Where I am, death is not. Fearing non-existence is irrational — it is no more fearsome than the eternity before our birth.'}, sideB:{name:'Mortalist (Yes)',summary:'Fear of death is evolutionarily adaptive and deeply rational. It motivates us to value life, protect loved ones, and create lasting meaning in the face of finitude.'} },
+            { question:'Is human nature fundamentally good?', sideA:{name:'Rousseau (Yes)',summary:'Humans are born with innate compassion and cooperation. It is society — inequality, competition, corrupted institutions — that distorts our natural goodness.'}, sideB:{name:'Hobbes (No)',summary:'In the state of nature, life is solitary, poor, nasty, brutish, and short. Civilization and law restrain our selfish, violent instincts — they do not create them.'} },
+            { question:'Are we living in a simulation?', sideA:{name:'Simulation Hypothesis (Yes)',summary:'Given the exponential growth of computing power, a civilization capable of running ancestor simulations is inevitable. Statistically, we are almost certainly in one.'}, sideB:{name:'Base Reality (No)',summary:'The simulation argument relies on untestable assumptions about future computation. Extraordinary claims require extraordinary evidence, and none exists.'} },
+            { question:'Can money buy happiness?', sideA:{name:'Materialist (Yes)',summary:'Up to a point, wealth reduces stress, buys security, and enables experiences. Poverty is a direct cause of suffering; financial comfort removes a major obstacle to wellbeing.'}, sideB:{name:'Stoic (No)',summary:'Beyond basic needs, additional wealth brings no lasting satisfaction. The hedonic treadmill ensures that desires expand with means. True happiness comes from virtue, not possessions.'} },
+            { question:'Is the self an illusion?', sideA:{name:'Buddhist / Hume (Yes)',summary:'Look within and you will find no permanent, unchanging self — only a bundle of sensations, thoughts, and memories. The self is a narrative convenience, not a metaphysical entity.'}, sideB:{name:'Cartesian (No)',summary:'I think, therefore I am. The very act of doubting the self proves its existence. Consciousness requires a subject — an experiencer that persists through change.'} },
+            { question:'Do animals have moral rights?', sideA:{name:'Singer (Yes)',summary:'The capacity to suffer, not species membership, is the basis of moral consideration. To privilege human pain over animal pain is speciesism — no different from racism.'}, sideB:{name:'Anthropocentrist (No)',summary:'Rights belong to moral agents capable of bearing duties. Animals lack the rational capacity for reciprocal obligation. We have duties regarding animals, but they have no rights.'} },
+            { question:'Is technology making us less human?', sideA:{name:'Luddite (Yes)',summary:'Constant connectivity fragments attention, erodes deep thinking, and replaces authentic relationships with algorithmic substitutes. We are becoming tools of our tools.'}, sideB:{name:'Techno-optimist (No)',summary:'Technology extends human capability — writing expanded memory, the internet expanded knowledge, AI expands reasoning. Each tool makes us more, not less, of what we are.'} },
+            { question:'Is forgiveness always possible?', sideA:{name:'Arendt (Yes)',summary:'Forgiveness is the only way to break the chain of action and reaction. Without it, we remain prisoners of the past. It is an act of freedom, not weakness.'}, sideB:{name:'Jankélévitch (No)',summary:'The unforgivable exists — crimes so heinous that forgiveness would be a second injury to the victim. Some debts cannot be cancelled; some wrongs must be remembered.'} },
+            { question:'Should borders be open?', sideA:{name:'Cosmopolitan (Yes)',summary:'Nationality is a morally arbitrary lottery. Freedom of movement is a basic right, and borders are instruments of global inequality that lock people into poverty.'}, sideB:{name:'Communitarian (No)',summary:'Political communities have a right to self-determination, including controlling membership. Open borders would undermine the social contracts that make welfare states possible.'} },
+            { question:'Is education a right or a privilege?', sideA:{name:'Universalist (A Right)',summary:'Education is as fundamental as food and shelter — without it, a person cannot exercise autonomy or participate in democratic life. Society owes every child this foundation.'}, sideB:{name:'Contractualist (A Privilege)',summary:'Nothing is a "right" if someone else must provide it. Education is a service produced by teachers and institutions — access is determined by what one can offer in exchange.'} },
+            { question:'Can violence ever be justified?', sideA:{name:'Just War Theory (Yes)',summary:'Violence in self-defense, to prevent greater harm, or to overthrow a tyrant is not only permitted but sometimes required. Pacifism in the face of genocide is complicity.'}, sideB:{name:'Gandhian (No)',summary:'Violence begets violence. Means and ends are inseparable — you cannot reach peace through war. Nonviolent resistance is the only morally coherent path to justice.'} },
+            { question:'Do we have obligations to future generations?', sideA:{name:'Longtermist (Yes)',summary:'Future people have moral weight equal to present people. Failing to address climate change, pandemics, and existential risks is a moral catastrophe of astronomical scale.'}, sideB:{name:'Presentist (Limited)',summary:'Our duties are primarily to those we can see and interact with. Speculative obligations to hypothetical future people should not outweigh the real needs of the living.'} },
+            { question:'Is suffering necessary for a meaningful life?', sideA:{name:'Nietzschean (Yes)',summary:'What does not kill me makes me stronger. Suffering forges character, deepens empathy, and gives achievement its savor. A life without struggle would be hollow.'}, sideB:{name:'Utilitarian (No)',summary:'Suffering is intrinsically bad. A world with less suffering is better, all else being equal. We should eliminate unnecessary pain, not romanticize it as redemptive.'} },
+            { question:'Can there be justice without punishment?', sideA:{name:'Restorative Justice (Yes)',summary:'Punishment satisfies vengeance but rarely heals. Justice is about repairing harm, restoring relationships, and reintegrating offenders — not inflicting symmetrical pain.'}, sideB:{name:'Retributivist (No)',summary:'Wrongdoers deserve to suffer in proportion to their crimes. A justice system that does not punish sends the message that some violations carry no cost — undermining the moral order.'} },
+            { question:'Is love a choice or a feeling?', sideA:{name:'Voluntarist (A Choice)',summary:'Love is sustained by decisions: to show up, to forgive, to prioritize. The feeling waxes and wanes, but committed love is an act of will — a verb, not a noun.'}, sideB:{name:'Romantic (A Feeling)',summary:'Love is recognized, not decided. You cannot choose whom you love any more than you can choose what beauty moves you. Without the spark of emotion, love is mere obligation.'} },
+            { question:'Does language shape thought?', sideA:{name:'Sapir-Whorf (Yes)',summary:'The language we speak structures our perception. A richer vocabulary for an emotion makes it more salient; different grammatical structures carve reality along different joints.'}, sideB:{name:'Universalist (No)',summary:'Thought precedes and transcends language. Pre-linguistic infants, deaf non-signers, and aphasic patients all demonstrate complex cognition without linguistic scaffolding.'} },
+            { question:'Is privacy a fundamental right?', sideA:{name:'Liberal (Yes)',summary:'Without privacy there is no autonomy — no space to experiment, dissent, or simply be. The surveillance state and data capitalism are assaults on the very condition of freedom.'}, sideB:{name:'Pragmatist (No)',summary:'Privacy is a social convention, not a natural right. In an interconnected world, trading some privacy for security, convenience, and personalization is a rational choice, not a surrender.'} },
+            { question:'Should art be judged objectively?', sideA:{name:'Aesthetic Realist (Yes)',summary:'Some works display greater mastery, complexity, and emotional range than others. To call Beethoven equal to elevator music is to abandon the very idea of artistic standards.'}, sideB:{name:'Aesthetic Subjectivist (No)',summary:'Beauty is in the eye of the beholder. No amount of technical analysis can prove that a painting is "better" than another — all aesthetic judgments reduce to personal preference.'} },
+            { question:'Is civilization progress or decline?', sideA:{name:'Enlightenment (Progress)',summary:'Life expectancy, literacy, poverty reduction, and rights have all improved dramatically. Civilization has lifted billions out of suffering — the arc of history bends toward better.'}, sideB:{name:'Rousseauian (Decline)',summary:'Civilization has alienated us from nature, from authentic community, and from ourselves. Hunter-gatherers worked less, suffered less inequality, and lived more meaningful lives.'} },
+            { question:'Should euthanasia be legal?', sideA:{name:'Dignity in Dying (Yes)',summary:'Autonomy over one\'s own body includes the right to end unbearable suffering. Forcing someone to endure a painful, undignified death against their will is cruelty, not compassion.'}, sideB:{name:'Sanctity of Life (No)',summary:'Legalizing euthanasia risks a slippery slope — pressuring the vulnerable to die, devaluing disabled lives, and eroding the medical profession\'s core commitment to healing, not ending.'} },
+            { question:'Is science the only path to truth?', sideA:{name:'Scientism (Yes)',summary:'Empirical testing, peer review, and falsifiability are the only reliable truth-producing methods. Claims not testable by science — from astrology to theology — are not knowledge.'}, sideB:{name:'Pluralism (No)',summary:'Science cannot tell you why a poem moves you or whether a life was well-lived. There are truths of aesthetics, ethics, and introspection that scientific methods cannot access.'} },
+            { question:'Is nature inherently valuable?', sideA:{name:'Deep Ecology (Yes)',summary:'Nature has intrinsic value beyond its utility to humans. A forest has a right to exist for its own sake. Reducing nature to a resource is the root of ecological crisis.'}, sideB:{name:'Instrumentalism (No)',summary:'Value requires a valuer. Without human (or sentient) observers, the universe is a collection of facts, not values. We protect nature because it serves our long-term interests, not because it has "rights."'} },
+            { question:'Is friendship necessary for the good life?', sideA:{name:'Aristotle (Yes)',summary:'No one would choose to live without friends, even if they had all other goods. Friendship is not a pleasant extra — it is constitutive of the flourishing human life.'}, sideB:{name:'Stoic (Not Essential)',summary:'The sage is self-sufficient. While friendship is a preferred indifferent, it is not necessary for virtue or eudaimonia. One can live well in solitude if one lives wisely.'} }
+        ];
+
+        // ---- DAILY POLL POOL (30 questions) ----
+        const dailyPollPool = [
+            'Is free will an illusion?',
+            'Does the universe have a purpose?',
+            'Is consciousness unique to biological beings?',
+            'Should we fear artificial intelligence?',
+            'Is morality innate or learned?',
+            'Can a just society exist without religion?',
+            'Is truth absolute or relative?',
+            'Should governments censor harmful speech?',
+            'Is genetic engineering of humans ethical?',
+            'Does money corrupt democracy?',
+            'Should we colonize other planets?',
+            'Is vegetarianism a moral obligation?',
+            'Can war ever be truly just?',
+            'Is social media harmful to society?',
+            'Should voting be compulsory?',
+            'Is nationalism a force for good?',
+            'Can you be moral without empathy?',
+            'Should children be raised without religion?',
+            'Is billion-dollar wealth immoral?',
+            'Do video games cause violence?',
+            'Should universities be free for all?',
+            'Is cancel culture a threat to free speech?',
+            'Can beauty be objectively measured?',
+            'Is addiction a disease or a choice?',
+            'Should we bring extinct species back?',
+            'Is luck more important than effort in success?',
+            'Should parents have the right to homeschool?',
+            'Is the two-party political system broken?',
+            'Can psychedelics lead to genuine knowledge?',
+            'Is immortality desirable?'
+        ];
+
+        function getDailyDebate() {
+            const idx = getDayIndex() % dailyDebatePool.length;
+            return dailyDebatePool[idx];
+        }
+        function getDailyPoll() {
+            const idx = getDayIndex() % dailyPollPool.length;
+            return dailyPollPool[idx];
+        }
+
+        // ============================================================
         // 2. POLL / QUICK VOTE
         // ============================================================
         const pollData = { question:'Is free will an illusion?', agree:0, disagree:0, undecided:0 };
         async function loadPoll() {
             document.getElementById('pollQuestion').innerHTML = '<span class="skeleton" style="display:inline-block;width:60%;height:1em;"></span>';
             try {
-                const [{ data: configRows }, { data: votes }] = await Promise.all([
-                    supabase.from('poll_config').select('question').order('id', {ascending:false}).limit(1),
-                    supabase.from('poll_votes').select('option')
-                ]);
-                const q = (configRows && configRows.length > 0) ? configRows[0].question : pollData.question;
+                const q = getDailyPoll();
                 pollData.question = q;
+                const { data: votes } = await supabase.from('poll_votes').select('option');
                 const v = votes || [];
                 pollData.agree = v.filter(r => r.option === 'agree').length;
                 pollData.disagree = v.filter(r => r.option === 'disagree').length;
@@ -2907,31 +3101,19 @@
         // ============================================================
         // 7. DEBATE ARENA
         // ============================================================
-        const defaultDebate = {
-            question: 'Is happiness the ultimate goal of life?',
-            sideA: { name: 'Aristotle (Yes)', summary: 'Happiness — eudaimonia — is the highest good and the end toward which all human action aims. A life lived according to virtue naturally leads to flourishing. Every art, every inquiry, every action is directed toward some good, and the highest good is happiness.' },
-            sideB: { name: 'Kant (Not Quite)', summary: 'Happiness is not the foundation of morality — duty is. A good will, acting from respect for the moral law, is the only unqualified good. If happiness were the supreme goal, morality would reduce to prudence and self-interest.' },
-            votesA: 0, votesB: 0
-        };
         async function loadDebate() {
             document.getElementById('debateQuestion').innerHTML = '<span class="skeleton" style="display:inline-block;width:70%;height:1.1em;"></span>';
             try {
-                const { data: configRows } = await supabase.from('debate_config').select('*').eq('active', true).order('id', {ascending:false}).limit(1);
-                let d;
-                if (configRows && configRows.length > 0) {
-                    const c = configRows[0];
-                    const { data: votes } = await supabase.from('debate_votes').select('side');
-                    const v = votes || [];
-                    d = {
-                        question: c.question,
-                        sideA: { name: c.side_a_name, summary: c.side_a_summary },
-                        sideB: { name: c.side_b_name, summary: c.side_b_summary },
-                        votesA: v.filter(r => r.side === 'A').length,
-                        votesB: v.filter(r => r.side === 'B').length
-                    };
-                } else {
-                    d = defaultDebate;
-                }
+                const debate = getDailyDebate();
+                const { data: votes } = await supabase.from('debate_votes').select('side');
+                const v = votes || [];
+                const d = {
+                    question: debate.question,
+                    sideA: debate.sideA,
+                    sideB: debate.sideB,
+                    votesA: v.filter(r => r.side === 'A').length,
+                    votesB: v.filter(r => r.side === 'B').length
+                };
                 document.getElementById('debateQuestion').textContent = d.question;
                 document.getElementById('debateNameA').textContent = d.sideA.name;
                 document.getElementById('debateSummaryA').textContent = d.sideA.summary;
@@ -2944,7 +3126,7 @@
                     if (btn) btn.classList.add('voted');
                 }
                 renderDebateExplanation();
-            } catch(e) { console.warn('Debate load failed', e); document.getElementById('debateQuestion').textContent = defaultDebate.question; }
+            } catch(e) { console.warn('Debate load failed', e); document.getElementById('debateQuestion').textContent = getDailyDebate().question; }
         }
         async function voteDebate(side) {
             try {
@@ -3295,9 +3477,151 @@
         }
 
         // ============================================================
+        // DAILY SNAPSHOT — archive yesterday's results at day rollover
+        // ============================================================
+        async function checkDayRollover() {
+            const today = getDateString();
+            // Use localStorage to ensure only one snapshot per day per client
+            const lastArchived = localStorage.getItem('philoArchiveDate');
+            if (lastArchived === today) return; // Already archived for today
+            try {
+                const yesterday = getDateString(-1);
+                const yesterdayIndex = getDayIndex() - 1;
+                if (yesterdayIndex < 0) { localStorage.setItem('philoArchiveDate', today); return; }
+
+                // Check if yesterday already exists in archive
+                const { data: existing } = await supabase.from('daily_archive').select('id').eq('archive_date', yesterday).limit(1);
+                if (existing && existing.length === 0) {
+                    // Snapshot yesterday's debate
+                    const yDebate = dailyDebatePool[yesterdayIndex % dailyDebatePool.length];
+                    const { data: dbVotes } = await supabase.from('debate_votes').select('side');
+                    const v = dbVotes || [];
+                    const aVotes = v.filter(r => r.side === 'A').length;
+                    const bVotes = v.filter(r => r.side === 'B').length;
+
+                    await supabase.from('daily_archive').upsert({
+                        archive_date: yesterday,
+                        archive_type: 'debate',
+                        question: yDebate.question,
+                        data: {
+                            side_a_name: yDebate.sideA.name,
+                            side_a_summary: yDebate.sideA.summary,
+                            side_b_name: yDebate.sideB.name,
+                            side_b_summary: yDebate.sideB.summary,
+                            votes_a: aVotes, votes_b: bVotes, total: aVotes + bVotes
+                        }
+                    }, { onConflict: 'archive_date,archive_type' });
+
+                    // Snapshot yesterday's poll
+                    const yPoll = dailyPollPool[yesterdayIndex % dailyPollPool.length];
+                    const { data: pollVotes } = await supabase.from('poll_votes').select('option');
+                    const pv = pollVotes || [];
+                    const agree = pv.filter(r => r.option === 'agree').length;
+                    const disagree = pv.filter(r => r.option === 'disagree').length;
+                    const undecided = pv.filter(r => r.option === 'undecided').length;
+
+                    await supabase.from('daily_archive').upsert({
+                        archive_date: yesterday,
+                        archive_type: 'poll',
+                        question: yPoll,
+                        data: { agree, disagree, undecided, total: agree + disagree + undecided }
+                    }, { onConflict: 'archive_date,archive_type' });
+
+                    // Clear current votes for a fresh day
+                    try {
+                        await supabase.from('debate_votes').delete().not('user_id', 'is', null);
+                        await supabase.from('debate_explanations').delete().not('user_id', 'is', null);
+                        await supabase.from('poll_votes').delete().not('user_id', 'is', null);
+                    } catch(clr) { console.warn('Vote clear failed', clr); }
+                }
+            } catch(e) { console.warn('Daily snapshot failed (table may not exist yet)', e); }
+            localStorage.setItem('philoArchiveDate', today);
+        }
+
+        // ============================================================
+        // PAST DEBATES & VOTES PORTAL
+        // ============================================================
+        let pastPortalActiveTab = 'debate';
+        function openPastPortal() {
+            document.getElementById('pastPortalOverlay').classList.add('open');
+            pastPortalActiveTab = 'debate';
+            document.querySelectorAll('.past-portal-tab').forEach((t,i) => t.classList.toggle('active', i === 0));
+            loadPastPortalData('debate');
+        }
+        function closePastPortal() { document.getElementById('pastPortalOverlay').classList.remove('open'); }
+        function switchPastTab(type, el) {
+            pastPortalActiveTab = type;
+            document.querySelectorAll('.past-portal-tab').forEach(t => t.classList.remove('active'));
+            if (el) el.classList.add('active');
+            loadPastPortalData(type);
+        }
+        async function loadPastPortalData(type) {
+            const list = document.getElementById('pastPortalList');
+            list.innerHTML = '<div class="past-portal-empty">Loading archives…</div>';
+            try {
+                const { data } = await supabase.from('daily_archive')
+                    .select('*').eq('archive_type', type)
+                    .order('archive_date', { ascending: false }).limit(60);
+                if (!data || data.length === 0) {
+                    list.innerHTML = '<div class="past-portal-empty">No archived entries yet. Come back after the first day\'s debate ends!</div>';
+                    return;
+                }
+                list.innerHTML = data.map(row => {
+                    const d = row.data || {};
+                    const date = new Date(row.archive_date + 'T12:00:00');
+                    const dateStr = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+                    if (type === 'debate') {
+                        const total = (d.votes_a || 0) + (d.votes_b || 0) || 1;
+                        const pctA = ((d.votes_a || 0) / total * 100).toFixed(0);
+                        const pctB = ((d.votes_b || 0) / total * 100).toFixed(0);
+                        return `<div class="past-portal-item">
+                            <div class="past-portal-item-header">
+                                <span class="past-portal-item-date">${dateStr}</span>
+                                <span class="past-portal-item-date">${d.total || 0} votes</span>
+                            </div>
+                            <div class="past-portal-item-question">⚔️ ${row.question}</div>
+                            <div class="past-portal-item-stats">
+                                <span>🏛️ ${d.side_a_name}: <strong>${d.votes_a || 0}</strong> (${pctA}%)</span>
+                                <span>⚔️ ${d.side_b_name}: <strong>${d.votes_b || 0}</strong> (${pctB}%)</span>
+                            </div>
+                        </div>`;
+                    } else {
+                        const total = (d.agree || 0) + (d.disagree || 0) + (d.undecided || 0) || 1;
+                        const pctAgree = ((d.agree || 0) / total * 100).toFixed(0);
+                        const pctDisagree = ((d.disagree || 0) / total * 100).toFixed(0);
+                        const pctUnd = ((d.undecided || 0) / total * 100).toFixed(0);
+                        return `<div class="past-portal-item">
+                            <div class="past-portal-item-header">
+                                <span class="past-portal-item-date">${dateStr}</span>
+                                <span class="past-portal-item-date">${d.total || 0} votes</span>
+                            </div>
+                            <div class="past-portal-item-question">🗳️ ${row.question}</div>
+                            <div class="past-portal-item-stats">
+                                <span>👍 Agree: <strong>${d.agree || 0}</strong> (${pctAgree}%)</span>
+                                <span>👎 Disagree: <strong>${d.disagree || 0}</strong> (${pctDisagree}%)</span>
+                                <span>🤷 Undecided: <strong>${d.undecided || 0}</strong> (${pctUnd}%)</span>
+                            </div>
+                        </div>`;
+                    }
+                }).join('');
+            } catch(e) {
+                console.warn('Failed to load archives', e);
+                list.innerHTML = '<div class="past-portal-empty">Unable to load archives. The table may need to be created in Supabase.</div>';
+            }
+        }
+        // Close portal on overlay click or Escape
+        document.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('pastPortalOverlay')) closePastPortal();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('pastPortalOverlay').classList.contains('open')) closePastPortal();
+        });
+
+        // ============================================================
         // INIT ALL
         // ============================================================
         (async function initAll() {
+            await checkDayRollover();
             showDailyThread();
             await loadPoll();
             await renderSubmittedQuotes();
