@@ -1,4 +1,4 @@
-# Σοφία — The Philosophy Café · Publish Guide
+# φιλοσοφία (philosophía) — The Philosophy Café · Publish Guide
 
 All website files now live in the **`philosophy-cafe/`** folder. This guide shows
 how to put it online so **anyone** can visit, post a comment (by signing in with

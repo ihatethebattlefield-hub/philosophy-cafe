@@ -1,4 +1,4 @@
-// seeds.js — shared Thought Seed data and helpers for Σοφία Philosophy Café
+// seeds.js — shared Thought Seed data and helpers for φιλοσοφία (philosophía)
 const ADMIN_PASSWORD = 'sophia2026';
 
 // Supabase client (uses CDN-loaded supabase global)

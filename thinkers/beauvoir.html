@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simone de Beauvoir — Σοφία Philosophy Café</title>
+    <title>Simone de Beauvoir — φιλοσοφία (philosophía)</title>
     <link rel="stylesheet" href="../philcafe.css">
 </head>
 <body>
@@ -14,7 +14,7 @@
             <a href="../philosophycafe.html" class="nav-logo">
                 <div class="nav-logo-icon">Φ</div>
                 <div>
-                    <span class="nav-logo-text">SOPHIA</span>
+                    <span class="nav-logo-text">φιλοσοφία</span>
                     <span class="nav-logo-sub">The Philosophy Café</span>
                 </div>
             </a>
@@ -27,6 +27,11 @@
                 <li><a href="../greatminds.html" class="active">Great Minds</a></li>
                 <li><a href="../philosophycafe.html#about">About</a></li>
             </ul>
+            <div class="online-counter" id="onlineCounter" title="Visitors currently browsing">
+                <span class="dot"></span>
+                <span id="onlineCount">1</span>
+                <span>online</span>
+            </div>
             <button class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></button>
         </div>
     </nav>
@@ -110,10 +115,12 @@
     </div>
 
     <footer class="footer">
-        <p class="footer-text">Σοφία — The Philosophy Café</p>
+        <p class="footer-text">φιλοσοφία — The Philosophy Café</p>
         <p class="footer-greek">γνῶθι σεαυτόν · Know Thyself</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../seeds.js"></script>
     <script src="../page-script.js"></script>
 </body>
 </html>

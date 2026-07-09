@@ -339,7 +339,7 @@
         }
 
         /* ============================================================
-           MAIN LAYOUT
+           MAIN LAYOUT (Golden Ratio: main 1.618 · sidebar 1)
            ============================================================ */
         .main-container {
             max-width: 1120px;
@@ -348,7 +348,7 @@
             position: relative;
             z-index: 1;
             display: grid;
-            grid-template-columns: 1fr 300px;
+            grid-template-columns: 1.618fr 1fr;
             gap: 32px;
         }
 
@@ -2447,6 +2447,7 @@
     <div class="toast" id="toast"></div>
 
     <script src="seeds.js"></script>
+    <script src="page-script.js"></script>
     <script>
         // ============================================================
         // φιλοσοφία · PHILOSOPHY CAFÉ — JavaScript
@@ -2501,17 +2502,6 @@
         // every visitor through this site's GitHub Discussions. To configure
         // it (repo, repo-id, category-id, theme), see SETUP.md.
 
-        // Mobile menu
-        document.getElementById('menuToggle').addEventListener('click', function() {
-            document.getElementById('navLinks').classList.toggle('open');
-        });
-
-        // Close mobile menu on link click
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('navLinks').classList.remove('open');
-            });
-        });
 
         // ============================================================
         // THOUGHT SEEDS — Expanded for Daily Rotation (34 prompts)
@@ -3070,75 +3060,9 @@
         }
 
         // ============================================================
-        // ONLINE PRESENCE TRACKER (Supabase Realtime)
-        // ============================================================
-        let _onlineCount = 1;
-        function updateOnlineBadge(count) {
-            _onlineCount = count;
-            const el = document.getElementById('onlineCount');
-            const badge = document.getElementById('onlineCounter');
-            if (el) el.textContent = count;
-            if (badge) {
-                badge.classList.remove('warm', 'hot');
-                if (count >= 10) badge.classList.add('hot');
-                else if (count >= 4) badge.classList.add('warm');
-            }
-        }
-        async function sendHeartbeat() {
-            try {
-                // Upsert current user
-                await supabase.from('online_users').upsert({
-                    user_id: siteUserId,
-                    last_seen: new Date().toISOString()
-                });
-                // Clean up stale users (>90s) and count active
-                await supabase.from('online_users')
-                    .delete()
-                    .lt('last_seen', new Date(Date.now() - 90000).toISOString());
-                const { count, error } = await supabase
-                    .from('online_users')
-                    .select('*', { count: 'exact', head: true })
-                    .gte('last_seen', new Date(Date.now() - 90000).toISOString());
-                if (!error && count !== null) updateOnlineBadge(count);
-            } catch(e) { console.warn('Heartbeat failed', e); }
-        }
-        function initOnlinePresence() {
-            // Send heartbeat immediately
-            sendHeartbeat();
-            // Then every 30 seconds
-            setInterval(sendHeartbeat, 30000);
-            // Subscribe to Supabase Realtime for instant updates
-            try {
-                supabase
-                    .channel('online-presence')
-                    .on('postgres_changes',
-                        { event: '*', schema: 'public', table: 'online_users' },
-                        () => { sendHeartbeat(); }
-                    )
-                    .subscribe();
-            } catch(e) { console.warn('Realtime subscription failed', e); }
-            // Fallback: refresh count every 10s in case realtime misses
-            setInterval(async () => {
-                try {
-                    const { count, error } = await supabase
-                        .from('online_users')
-                        .select('*', { count: 'exact', head: true })
-                        .gte('last_seen', new Date(Date.now() - 90000).toISOString());
-                    if (!error && count !== null) updateOnlineBadge(count);
-                } catch(e) {}
-            }, 10000);
-            // Cleanup on page unload
-            window.addEventListener('beforeunload', () => {
-                supabase.from('online_users').delete().eq('user_id', siteUserId)
-                    .then(() => {}).catch(() => {});
-            });
-        }
-
-        // ============================================================
         // INIT ALL
         // ============================================================
         (async function initAll() {
-            initOnlinePresence();
             showDailyThread();
             await loadPoll();
             await renderSubmittedQuotes();

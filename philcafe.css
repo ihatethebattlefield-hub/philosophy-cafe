@@ -108,6 +108,52 @@ body::before {
 .menu-toggle { display: none; background: none; border: none; cursor: pointer; padding: 8px; color: var(--ink); }
 .menu-toggle span { display: block; width: 24px; height: 2px; background: var(--ink); margin: 5px 0; transition: 0.3s; }
 
+/* ---- Online counter ---- */
+.online-counter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--sage);
+    background: rgba(107,127,107,0.06);
+    border: 1px solid rgba(107,127,107,0.15);
+    border-radius: 20px;
+    padding: 5px 14px;
+    cursor: default;
+    transition: all 0.5s ease;
+}
+.online-counter .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--sage);
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+.online-counter.warm .dot { background: var(--gold); }
+.online-counter.warm {
+    color: var(--gold);
+    border-color: rgba(184,134,11,0.2);
+    background: rgba(184,134,11,0.06);
+}
+.online-counter.hot .dot { background: var(--wine); animation-duration: 0.8s; }
+.online-counter.hot {
+    color: var(--wine);
+    border-color: rgba(114,47,55,0.2);
+    background: rgba(114,47,55,0.06);
+}
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.75); }
+}
+@media (max-width: 500px) {
+    .online-counter { display: none; }
+}
+
+
 /* ---- Hero (page header) ---- */
 .page-hero {
     text-align: center;
