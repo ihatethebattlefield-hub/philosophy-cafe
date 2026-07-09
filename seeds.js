@@ -1,6 +1,17 @@
 // seeds.js — shared Thought Seed data and helpers for Σοφία Philosophy Café
 const ADMIN_PASSWORD = 'sophia2026';
 
+// Supabase client (uses CDN-loaded supabase global)
+var supabase = window.supabase && window.supabase.createClient(
+    'https://ljaqfubozhgzwngtbdit.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqYXFmdWJvemhnenduZ3RiZGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NTA2NzcsImV4cCI6MjA5OTEyNjY3N30.7xh3yMdF_H4BOs48KPQZml2FMVAQ1MD8ZNKcE7vfW74'
+);
+var siteUserId = (function() {
+    let id = localStorage.getItem('siteUserId');
+    if (!id) { id = 'anon_' + crypto.randomUUID(); localStorage.setItem('siteUserId', id); }
+    return id;
+})();
+
         const seedPosts = [
             { icon:'🕯️', title:'Socrates & the Unexamined Life', subtitle:'What does it mean to truly know oneself?',
               body:`<p>In the bustling agora of ancient Athens, a man with a snub nose and bare feet wandered from citizen to citizen, asking questions that seemed simple but cut to the bone. Socrates believed that the unexamined life is not worth living — that we must turn our gaze inward before we can understand anything outward.</p><p>His method was deceptively simple: ask questions. Not to win arguments, but to peel back the layers of assumption until only truth remained.</p><p class="prompt">❓ What questions would Socrates ask you today? What assumptions are you holding that deserve examination?</p>` },
@@ -73,44 +84,81 @@ const ADMIN_PASSWORD = 'sophia2026';
         ];
 
         // ---- Seed likes (9. Like/Reaction System) ----
+        let _likesCache = {}; // index -> count, fetched from supabase
+        let _userLikesCache = []; // indices this user liked
+        async function loadSeedLikes() {
+            if (!supabase) return;
+            try {
+                const { data } = await supabase.from('seed_likes').select('seed_index,user_id');
+                _likesCache = {};
+                _userLikesCache = [];
+                if (data) {
+                    data.forEach(r => {
+                        _likesCache[r.seed_index] = (_likesCache[r.seed_index] || 0) + 1;
+                        if (r.user_id === siteUserId) _userLikesCache.push(r.seed_index);
+                    });
+                }
+            } catch(e) { console.warn('Seed likes load failed', e); }
+        }
         function getSeedLikes(idx) {
-            const likes = JSON.parse(localStorage.getItem('seedLikes') || '{}');
-            return likes[idx] || { count: 0 };
+            return { count: _likesCache[idx] || 0 };
         }
         function getUserSeedLikes() {
-            return JSON.parse(localStorage.getItem('userSeedLikes') || '[]');
+            return _userLikesCache;
         }
-        function toggleSeedLike(idx) {
-            const likes = JSON.parse(localStorage.getItem('seedLikes') || '{}');
-            const userLikes = getUserSeedLikes();
-            if (!likes[idx]) likes[idx] = { count: 0 };
-            if (userLikes.includes(idx)) {
-                likes[idx].count = Math.max(0, likes[idx].count - 1);
-                const pos = userLikes.indexOf(idx);
-                if (pos > -1) userLikes.splice(pos, 1);
-            } else {
-                likes[idx].count += 1;
-                userLikes.push(idx);
-            }
-            localStorage.setItem('seedLikes', JSON.stringify(likes));
-            localStorage.setItem('userSeedLikes', JSON.stringify(userLikes));
-            renderSeeds();
+        async function toggleSeedLike(idx) {
+            if (!supabase) return;
+            try {
+                const liked = _userLikesCache.includes(idx);
+                if (liked) {
+                    await supabase.from('seed_likes').delete().eq('user_id', siteUserId).eq('seed_index', idx);
+                    const pos = _userLikesCache.indexOf(idx);
+                    if (pos > -1) _userLikesCache.splice(pos, 1);
+                    if (_likesCache[idx]) _likesCache[idx] = Math.max(0, _likesCache[idx] - 1);
+                } else {
+                    await supabase.from('seed_likes').insert({user_id: siteUserId, seed_index: idx});
+                    _userLikesCache.push(idx);
+                    _likesCache[idx] = (_likesCache[idx] || 0) + 1;
+                }
+                updateSeedLikeUI(idx);
+                if (!liked) {
+                    const btn = document.querySelector(`.seed-item[data-index="${idx}"] .seed-like-btn`);
+                    if (btn) spawnFloatingEmoji(btn);
+                }
+            } catch(e) { console.warn('Seed like toggle failed', e); }
+        }
+        function updateSeedLikeUI(idx) {
+            const btn = document.querySelector(`.seed-item[data-index="${idx}"] .seed-like-btn`);
+            if (!btn) return;
+            const likes = getSeedLikes(idx);
+            const liked = getUserSeedLikes().includes(idx);
+            btn.classList.toggle('liked', liked);
+            btn.innerHTML = `💡 ${likes.count}`;
+        }
+        function spawnFloatingEmoji(target) {
+            const el = document.createElement('div');
+            el.textContent = '💡';
+            el.style.cssText = 'position:fixed;pointer-events:none;z-index:1000;font-size:22px;opacity:0.9;';
+            const rect = target.getBoundingClientRect();
+            el.style.left = (rect.left + rect.width/2 - 12) + 'px';
+            el.style.top = (rect.top - 12) + 'px';
+            el.style.animation = 'seedFloatLike 1.2s ease forwards';
+            document.body.appendChild(el);
+            setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 1200);
         }
 
         // Render seeds with likes
-        function renderSeeds(fontFamily) {
+        async function renderSeeds(fontFamily) {
             const list = document.getElementById('seedList');
-            const saved = JSON.parse(localStorage.getItem('deletedSeeds') || '[]');
             const bodyFont = fontFamily || localStorage.getItem('seedFont') || 'Cormorant Garamond';
-            const userLikes = getUserSeedLikes();
+            if (!_likesCache || Object.keys(_likesCache).length === 0) await loadSeedLikes();
 
             list.innerHTML = '';
             seedPosts.forEach((seed, i) => {
-                if (saved.includes(i)) return;
                 const isCursive = ['Dancing Script','Great Vibes','Tangerine','Caveat','Alex Brush','Parisienne'].includes(bodyFont);
                 const bodySize = isCursive ? '22px' : '17px';
                 const likes = getSeedLikes(i);
-                const liked = userLikes.includes(i);
+                const liked = _userLikesCache.includes(i);
                 const li = document.createElement('li');
                 li.className = 'seed-item';
                 li.setAttribute('data-index', i);
@@ -131,21 +179,11 @@ const ADMIN_PASSWORD = 'sophia2026';
                             </div>
                         </div>
                     </details>
-                    <button class="seed-delete" onclick="event.stopPropagation();deleteSeed(${i})" title="Remove this seed">✕</button>
                 `;
                 list.appendChild(li);
             });
         }
 
         function changeSeedFont(font) { localStorage.setItem('seedFont', font); renderSeeds(font); }
-        function deleteSeed(idx) {
-            const saved = JSON.parse(localStorage.getItem('deletedSeeds') || '[]');
-            if (!saved.includes(idx)) saved.push(idx);
-            localStorage.setItem('deletedSeeds', JSON.stringify(saved));
-            const el = document.querySelector(`.seed-item[data-index="${idx}"]`);
-            if (el) { el.classList.add('removing'); setTimeout(() => renderSeeds(), 500); }
-        }
-        function restoreAllSeeds() { localStorage.removeItem('deletedSeeds'); renderSeeds(); }
 
         // ============================================================
-        
