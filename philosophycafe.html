@@ -2964,7 +2964,7 @@
                     supabase.from('poll_votes').select('option'),
                     supabase.from('debate_config').select('*').eq('active',true).order('id',{ascending:false}).limit(1),
                     supabase.from('debate_votes').select('side'),
-                    supabase.from('submitted_quotes').select('quote_text,author').order('created_at',{ascending:false}).limit(3),
+                    supabase.from('submitted_quotes').select('quote_text,author').order('created_at',{ascending:false}).limit(1),
                     supabase.from('seed_likes').select('seed_index')
                 ]);
                 const poll = pollCfg && pollCfg.length ? pollCfg[0] : null;
@@ -3004,8 +3004,8 @@
                     })()}
                 </div>
                 <div class="digest-section">
-                    <div class="digest-label">✍️ Recent Quotes</div>
-                    ${q.map(r => `<li>"${r.quote_text}" — ${r.author}</li>`).join('') || '<p style="font-size:11px;">No quotes submitted yet.</p>'}
+                    <div class="digest-label">✍️ Recent Quote</div>
+                    ${q.length ? `<li>"${q[0].quote_text}" — ${q[0].author}</li>` : '<p style="font-size:11px;">No quotes submitted yet.</p>'}
                 </div>
                 `;
             } catch(e) { console.warn('Weekly digest load failed', e); }
