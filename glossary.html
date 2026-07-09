@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary — Σοφία Philosophy Café</title>
+    <link rel="stylesheet" href="philcafe.css">
+    <style>
+        .glossary-search {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto 28px;
+            display: block;
+            padding: 12px 18px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            color: var(--ink);
+            background: var(--cream);
+            transition: all 0.3s ease;
+        }
+        .glossary-search:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .glossary-count {
+            text-align: center;
+            font-size: 12px;
+            color: var(--ink-light);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+        .glossary-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        .glossary-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 16px 18px;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+        .glossary-item:hover {
+            border-color: var(--gold);
+            box-shadow: 0 8px 24px var(--shadow);
+            transform: translateY(-2px);
+        }
+        .glossary-item.open { border-color: var(--gold); }
+        .glossary-term {
+            font-family: 'Cinzel', serif;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .glossary-term::after {
+            content: '+';
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            color: var(--gold);
+            opacity: 0.7;
+            transition: transform 0.3s ease;
+        }
+        .glossary-item.open .glossary-term::after { transform: rotate(45deg); }
+        .glossary-def {
+            font-size: 14px;
+            color: var(--ink-light);
+            line-height: 1.7;
+            margin-top: 10px;
+            display: none;
+        }
+        .glossary-item.open .glossary-def { display: block; }
+        .empty-state { text-align: center; color: var(--ink-light); font-style: italic; padding: 30px; }
+        @media (max-width: 700px) {
+            .glossary-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="philosophycafe.html" class="nav-logo">
+                <div class="nav-logo-icon">Φ</div>
+                <div>
+                    <span class="nav-logo-text">SOPHIA</span>
+                    <span class="nav-logo-sub">The Philosophy Café</span>
+                </div>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="philosophycafe.html#feed">Discourse</a></li>
+                <li><a href="compose.html">Compose</a></li>
+                <li><a href="library.html">Library</a></li>
+                <li><a href="thought-seeds.html">Seeds</a></li>
+                <li><a href="glossary.html" class="active">Glossary</a></li>
+                <li><a href="philosophycafe.html#about">About</a></li>
+            </ul>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <header class="page-hero">
+        <a href="philosophycafe.html" class="back-link">← Back to the Café</a>
+        <div class="page-ornament">✦ Φ ✦</div>
+        <h1>Glossary</h1>
+        <div class="dates">A lexicon of philosophical terms</div>
+        <div class="school">From the abstract to the everyday</div>
+        <div class="page-divider"></div>
+    </header>
+
+    <div class="page-container wide">
+        <input type="text" class="glossary-search" id="glossarySearch" placeholder="Search terms (e.g. epistemology, Tao, categorical imperative...)" oninput="filterGlossary()">
+        <div class="glossary-count" id="glossaryCount"></div>
+        <div class="glossary-list" id="glossaryList"></div>
+    </div>
+
+    <footer class="footer">
+        <p class="footer-text">Σοφία — The Philosophy Café</p>
+        <p class="footer-greek">γνῶθι σεαυτόν · Know Thyself</p>
+    </footer>
+
+    <script src="page-script.js"></script>
+    <script>
+        const glossaryTerms = [
+            { term:'A Priori', def:'Knowledge that is independent of experience — known through reason alone. Contrast with a posteriori.' },
+            { term:'Absurdism', def:'The philosophy of Albert Camus: the conflict between humanity\'s search for meaning and the universe\'s silent indifference.' },
+            { term:'Categorical Imperative', def:'Kant\'s supreme moral principle: act only on that maxim which you can will to become a universal law.' },
+            { term:'Cogito Ergo Sum', def:'"I think, therefore I am" — Descartes\' foundational certainty after doubting everything else.' },
+            { term:'Dao (Tao)', def:'The ineffable Way that underlies all of reality in Daoist philosophy. Cannot be named, only lived.' },
+            { term:'Deontology', def:'Ethics based on duty and rules rather than consequences. Associated with Kant.' },
+            { term:'Determinism', def:'The view that all events, including human choices, are causally determined by prior states.' },
+            { term:'Dialectic', def:'Hegel\'s process of thesis-antithesis-synthesis through which ideas and history evolve.' },
+            { term:'Dualism', def:'The view that mind and body are fundamentally distinct substances. Associated with Descartes.' },
+            { term:'Empiricism', def:'The theory that all knowledge comes from sensory experience. Key figures: Locke, Hume, Berkeley.' },
+            { term:'Epistemology', def:'The branch of philosophy concerned with knowledge — what it is, how we get it, and its limits.' },
+            { term:'Eudaimonia', def:'Aristotle\'s concept of the good life: flourishing, well-being, living in accordance with virtue.' },
+            { term:'Existentialism', def:'Philosophy emphasizing individual freedom, choice, and the creation of meaning in an absurd universe.' },
+            { term:'Golden Mean', def:'Aristotle\'s idea that virtue lies at a midpoint between excess and deficiency.' },
+            { term:'Hedonism', def:'The ethical view that pleasure is the highest good. Often misunderstood; Epicurus taught modest pleasures.' },
+            { term:'Idealism', def:'The metaphysical view that reality is fundamentally mental or idea-based (as opposed to material).' },
+            { term:'Materialism', def:'The view that only matter exists and all phenomena (including consciousness) are physical.' },
+            { term:'Metaphysics', def:'The branch of philosophy concerned with the nature of reality: being, existence, time, causation.' },
+            { term:'Nihilism', def:'The rejection of all moral, religious, and metaphysical beliefs, often accompanied by a sense of meaninglessness.' },
+            { term:'Ontology', def:'The study of being and existence — what kinds of things exist and what it means to exist.' },
+            { term:'Phenomenology', def:'The study of conscious experience from the first-person perspective. Associated with Husserl, Heidegger, Merleau-Ponty.' },
+            { term:'Rationalism', def:'The view that reason, not sensory experience, is the primary source of knowledge. Key figures: Descartes, Spinoza, Leibniz.' },
+            { term:'Skepticism', def:'The philosophical attitude of doubting knowledge claims. Can be global (everything) or local (specific domains).' },
+            { term:'Stoicism', def:'Hellenistic philosophy teaching virtue, self-control, and acceptance of what we cannot change.' },
+            { term:'Tabula Rasa', def:'"Blank slate" — Locke\'s idea that the mind at birth has no innate ideas; all knowledge comes from experience.' },
+            { term:'Teleology', def:'The explanation of things in terms of their purpose or end goal. Aristotle\'s final cause.' },
+            { term:'Übermensch', def:'Nietzsche\'s "Overman" — the ideal human who creates their own values beyond good and evil.' },
+            { term:'Utilitarianism', def:'Ethical theory that the right action maximizes overall happiness. Key figures: Bentham, Mill.' },
+            { term:'Veil of Ignorance', def:'Rawls\' thought experiment: design a just society without knowing your own social position.' },
+            { term:'Wu Wei', def:'Daoist principle of "effortless action" — acting in harmony with the Dao without forcing or striving.' }
+        ];
+
+        function renderGlossary(filter) {
+            const list = document.getElementById('glossaryList');
+            const count = document.getElementById('glossaryCount');
+            const q = (filter || '').toLowerCase().trim();
+            const filtered = q ? glossaryTerms.filter(g => g.term.toLowerCase().includes(q) || g.def.toLowerCase().includes(q)) : glossaryTerms;
+            count.textContent = `${filtered.length} term${filtered.length === 1 ? '' : 's'}`;
+            list.innerHTML = filtered.map(g =>
+                `<div class="glossary-item" onclick="this.classList.toggle('open')">
+                    <div class="glossary-term">${g.term}</div>
+                    <div class="glossary-def">${g.def}</div>
+                </div>`
+            ).join('') || '<div class="empty-state">No matching terms.</div>';
+        }
+        function filterGlossary() { renderGlossary(document.getElementById('glossarySearch').value); }
+
+        renderGlossary('');
+    </script>
+</body>
+</html>
