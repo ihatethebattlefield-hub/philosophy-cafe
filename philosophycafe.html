@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Σοφία — The Philosophy Café</title>
+    <title>φιλοσοφία (philosophía) — The Philosophy Café</title>
     <style>
         /* ============================================================
-           PHILOSOPHY CAFÉ — A Place for Thought
+           φιλοσοφία — PHILOSOPHY CAFÉ — A Place for Thought
            ============================================================ */
 
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
@@ -272,6 +272,10 @@
         }
 
         .hero h1 .greek {
+            color: var(--gold);
+            font-style: italic;
+        }
+        .greek {
             color: var(--gold);
             font-style: italic;
         }
@@ -1858,11 +1862,148 @@
             color: var(--ink-light);
             margin-bottom: 16px;
         }
+        .reading-week-focus {
+            background: linear-gradient(135deg, var(--gold-pale) 0%, #faf6ec 100%);
+            border: 1px solid rgba(184,134,11,0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .reading-week-focus .week-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .reading-week-focus .week-books {
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .reading-week-focus .week-goal {
+            font-size: 13px;
+            color: var(--ink-light);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .reading-week-focus .week-goal strong {
+            color: var(--ink);
+            font-weight: 600;
+        }
+        .reading-week-focus .week-question {
+            font-size: 14px;
+            font-style: italic;
+            color: var(--ink);
+            padding: 10px 12px;
+            background: var(--cream);
+            border-radius: 8px;
+            border-left: 3px solid var(--gold);
+        }
+        .reading-week-focus .week-question-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 9px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+            font-style: normal;
+        }
+        .reading-schedule-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink);
+            font-weight: 600;
+            margin: 16px 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        .reading-schedule-title::after {
+            content: '▼';
+            font-size: 10px;
+            color: var(--ink-light);
+            transition: transform 0.3s ease;
+        }
+        .reading-schedule-title.collapsed::after { transform: rotate(-90deg); }
+        .reading-schedule {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 600px;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        .reading-schedule.collapsed { max-height: 0; }
+        .reading-week {
+            display: flex;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .reading-week:hover { border-color: var(--gold-light); background: rgba(184,134,11,0.03); }
+        .reading-week.active {
+            border-color: var(--gold);
+            background: var(--gold-pale);
+        }
+        .reading-week .week-number {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--parchment-dark);
+            color: var(--ink-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .reading-week.active .week-number {
+            background: var(--gold);
+            color: var(--cream);
+        }
+        .reading-week .week-content { flex: 1; min-width: 0; }
+        .reading-week .week-content .week-books {
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 3px;
+        }
+        .reading-week .week-content .week-goal-short {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            color: var(--ink-light);
+            line-height: 1.4;
+        }
+        .reading-week .week-content .week-question-short {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            color: var(--ink-light);
+            font-style: italic;
+            line-height: 1.4;
+            margin-top: 3px;
+        }
         .reading-progress {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 16px;
+            margin: 16px 0;
         }
         .reading-chapter {
             padding: 6px 14px;
@@ -1877,16 +2018,6 @@
         }
         .reading-chapter.done { background: var(--sage-light); color: #fff; border-color: var(--sage-light); }
         .reading-chapter.current { background: var(--gold-pale); color: var(--gold); border-color: var(--gold); font-weight: 600; }
-        .reading-question {
-            font-size: 15px;
-            font-style: italic;
-            color: var(--ink);
-            padding: 12px 16px;
-            background: var(--cream);
-            border-radius: 8px;
-            border-left: 3px solid var(--gold);
-            margin-bottom: 8px;
-        }
         .reading-join {
             display: inline-flex;
             align-items: center;
@@ -2027,7 +2158,7 @@
             <div class="nav-logo">
                 <div class="nav-logo-icon">Φ</div>
                 <div>
-                    <span class="nav-logo-text">SOPHIA</span>
+                    <span class="nav-logo-text">φιλοσοφία</span>
                     <span class="nav-logo-sub">The Philosophy Café</span>
                 </div>
             </div>
@@ -2054,8 +2185,8 @@
     <!-- Hero -->
     <header class="hero">
         <div class="hero-ornament">◆ ◇ ◆</div>
-        <h1>Σοφία — <span class="greek">Sophia</span></h1>
-        <p class="hero-tagline">Where minds meet &amp; ideas breathe</p>
+        <h1>φιλοσοφία — <span class="greek">Philosophía</span></h1>
+        <p class="hero-tagline">Agora of the mind — where thoughts breathe &amp; wisdom awakens</p>
         <div class="hero-divider"></div>
         <p class="hero-quote">
             The unexamined life is not worth living — yet the examined life,
@@ -2072,7 +2203,7 @@
                  REPO_ID and CATEGORY_ID with your own (see SETUP.md). -->
             <section class="discourse">
                 <div class="discourse-intro">
-                    <h2 class="discourse-title">The Discourse</h2>
+                    <h2 class="discourse-title">λόγος · The Discourse</h2>
                     <p class="discourse-sub">
                         A shared table of minds. Post a thought, reply to another,
                         and watch the conversation unfold. Sign in with GitHub to join —
@@ -2142,10 +2273,20 @@
 
                 <!-- 8. Reading Group -->
                 <div class="reading-group" id="readingGroup">
-                    <h3>📖 Reading Group</h3>
+                    <h3>📖 Reading Group <span style="font-family:'Inter',sans-serif;font-size:10px;font-weight:400;color:var(--ink-light);letter-spacing:1px;">· μελέτη</span></h3>
                     <p class="reading-current" id="readingCurrent"></p>
+                    <div class="reading-week-focus" id="readingWeekFocus">
+                        <div class="week-label">This Week's Focus</div>
+                        <div class="week-books" id="focusBooks"></div>
+                        <div class="week-goal" id="focusGoal"></div>
+                        <div class="week-question">
+                            <span class="week-question-label">The Big Question</span>
+                            <span id="focusQuestion"></span>
+                        </div>
+                    </div>
+                    <div class="reading-schedule-title" id="scheduleToggle">Full 12-Week Schedule</div>
+                    <div class="reading-schedule" id="readingSchedule"></div>
                     <div class="reading-progress" id="readingProgress"></div>
-                    <div class="reading-question" id="readingQuestion"></div>
                     <a class="reading-join" href="#giscusWidget">Join the Discussion</a>
                 </div>
 
@@ -2297,7 +2438,7 @@
 
     <!-- Footer -->
     <footer class="footer" id="about">
-        <p class="footer-text">Σοφία — The Philosophy Café</p>
+        <p class="footer-text">φιλοσοφία — The Philosophy Café</p>
         <p class="footer-greek">γνῶθι σεαυτόν · Know Thyself</p>
         <button class="admin-trigger" id="adminTrigger" onclick="toggleAdmin()" title="Admin" style="margin-top:10px;">🔑</button>
     </footer>
@@ -2308,12 +2449,12 @@
     <script src="seeds.js"></script>
     <script>
         // ============================================================
-        // PHILOSOPHY CAFÉ — JavaScript
+        // φιλοσοφία · PHILOSOPHY CAFÉ — JavaScript
         // ============================================================
 
         // ---- Floating particles ----
         const particlesContainer = document.getElementById('particles');
-        const symbols = ['Φ', 'Σ', 'Ψ', 'Ω', 'Δ', '∞', '∵', '∴', '⊕', '⊗', '∀', '∃', '◊', '†', '‡'];
+        const symbols = ['Φ', 'Σ', 'Ψ', 'Ω', 'Δ', 'λ', 'π', 'θ', 'φ', 'α', 'ε', 'μ', '∞', '∴', '⊕'];
         for (let i = 0; i < 35; i++) {
             const p = document.createElement('span');
             p.className = 'particle';
@@ -2750,15 +2891,64 @@
             } catch (e) {}
             return null;
         }
+        function getReadingWeek() {
+            const raw = localStorage.getItem('readingWeek');
+            if (raw) {
+                try { const val = parseInt(raw, 10); if (val >= 1 && val <= 12) return val; } catch(e) {}
+            }
+            // Default to Week 1 if no selection
+            return 1;
+        }
+        function setReadingWeek(week) {
+            localStorage.setItem('readingWeek', String(week));
+            renderReadingGroup();
+        }
         function renderReadingGroup() {
-            const book = { title:'Meditations', author:'Marcus Aurelius', chapters:['Book I: Debts & Lessons','Book II: On the River Gran','Book III: In Carnuntum','Book IV: The Inner Citadel','Book V: In the Morning','Book VI: The Unity of All','Book VII: On Endurance','Book VIII: The Nature of the Whole','Book IX: On Justice','Book X: On the Whole','Book XI: On Character','Book XII: On the Summit'], question:'What does it mean to live "according to nature"? How does Aurelius reconcile his duty as emperor with his Stoic ideals of simplicity and detachment?' };
-            document.getElementById('readingCurrent').innerHTML = `Now reading: <strong>${book.title}</strong> by ${book.author}`;
-            const current = getReadingChapter();
-            document.getElementById('readingProgress').innerHTML = book.chapters.map((ch, i) => {
-                const cls = (i === current) ? 'current' : '';
+            const schedule = [
+                { week: 1, books: ['Book I: Debts & Lessons'], goal: 'Read <strong>one book this week</strong>. Reflect on the people and values that formed you.', question: 'Who are the people that shaped your character, and what do you owe them?' },
+                { week: 2, books: ['Book II: On the River Gran'], goal: 'Read <strong>one book this week</strong>. Reflect on mortality and the present moment.', question: 'How would you live if you knew this day could be your last?' },
+                { week: 3, books: ['Book III: In Carnuntum'], goal: 'Read <strong>one book this week</strong>. Reflect on purpose and deliberate action.', question: 'What does it mean to act with purpose rather than be pulled by impulse?' },
+                { week: 4, books: ['Book IV: The Inner Citadel'], goal: 'Read <strong>one book this week</strong>. Reflect on the mind as a fortress of judgment.', question: 'What is your "inner citadel," and how do you defend it?' },
+                { week: 5, books: ['Book V: In the Morning'], goal: 'Read <strong>one book this week</strong>. Reflect on morning discipline and daily renewal.', question: 'What should you remind yourself of every morning to live well?' },
+                { week: 6, books: ['Book VI: The Unity of All'], goal: 'Read <strong>one book this week</strong>. Reflect on our connection to the whole.', question: 'How does seeing yourself as part of the whole change how you treat others?' },
+                { week: 7, books: ['Book VII: On Endurance'], goal: 'Read <strong>one book this week</strong>. Reflect on pain, hardship, and resilience.', question: 'What does true endurance look like when things go wrong?' },
+                { week: 8, books: ['Book VIII: The Nature of the Whole'], goal: 'Read <strong>one book this week</strong>. Reflect on nature, reason, and cosmic order.', question: 'Is the universe governed by reason, chaos, or something else?' },
+                { week: 9, books: ['Book IX: On Justice'], goal: 'Read <strong>one book this week</strong>. Reflect on justice, tolerance, and social duty.', question: 'How should we respond to people who irritate or harm us?' },
+                { week: 10, books: ['Book X: On the Whole'], goal: 'Read <strong>one book this week</strong>. Reflect on the "view from above" and perspective.', question: 'From a "view from above," what really matters in your life?' },
+                { week: 11, books: ['Book XI: On Character'], goal: 'Read <strong>one book this week</strong>. Reflect on character, habits, and integrity.', question: 'What habits reveal the true character of a person?' },
+                { week: 12, books: ['Book XII: On the Summit'], goal: 'Read <strong>one book this week</strong>. Reflect on final lessons and the art of living.', question: 'If this were your final reflection, what would you want to have lived for?' }
+            ];
+            const allChapters = [
+                'Book I: Debts & Lessons', 'Book II: On the River Gran', 'Book III: In Carnuntum',
+                'Book IV: The Inner Citadel', 'Book V: In the Morning', 'Book VI: The Unity of All',
+                'Book VII: On Endurance', 'Book VIII: The Nature of the Whole', 'Book IX: On Justice',
+                'Book X: On the Whole', 'Book XI: On Character', 'Book XII: On the Summit'
+            ];
+            const currentWeek = getReadingWeek();
+            const focus = schedule[currentWeek - 1];
+
+            document.getElementById('readingCurrent').innerHTML = `Now reading: <strong>Meditations</strong> by Marcus Aurelius`;
+
+            document.getElementById('focusBooks').textContent = 'Week ' + currentWeek + ': ' + focus.books.join(' · ');
+            document.getElementById('focusGoal').innerHTML = focus.goal;
+            document.getElementById('focusQuestion').textContent = focus.question;
+
+            document.getElementById('readingSchedule').innerHTML = schedule.map(s => {
+                const active = s.week === currentWeek ? 'active' : '';
+                return `<div class="reading-week ${active}" onclick="setReadingWeek(${s.week})" title="Click to set as current week">
+                    <div class="week-number">${s.week}</div>
+                    <div class="week-content">
+                        <div class="week-books">${s.books.join(' · ')}</div>
+                        <div class="week-question-short">${s.question}</div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            const currentChapter = getReadingChapter();
+            document.getElementById('readingProgress').innerHTML = allChapters.map((ch, i) => {
+                const cls = (i === currentChapter) ? 'current' : '';
                 return `<span class="reading-chapter ${cls}" onclick="selectReadingChapter(${i})">${ch}</span>`;
             }).join('');
-            document.getElementById('readingQuestion').textContent = '💬 ' + book.question;
         }
         function selectReadingChapter(idx) {
             const current = getReadingChapter();
@@ -2769,6 +2959,10 @@
             }
             renderReadingGroup();
         }
+        document.getElementById('scheduleToggle').addEventListener('click', function() {
+            this.classList.toggle('collapsed');
+            document.getElementById('readingSchedule').classList.toggle('collapsed');
+        });
 
         // ============================================================
         // 10. WEEKLY DIGEST
