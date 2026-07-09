@@ -985,6 +985,53 @@
             font-style: italic;
             max-width: 60ch;
         }
+        .discourse-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .discourse-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            background: var(--card-bg);
+            color: var(--ink);
+            border: 1px solid var(--border-subtle);
+            border-radius: 999px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .discourse-toggle-btn:hover {
+            border-color: var(--gold-light);
+            background: rgba(184,134,11,0.06);
+            color: var(--gold);
+        }
+        .discourse-toggle-btn::before {
+            content: '▾';
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+        .discourse-toggle-btn.collapsed::before {
+            content: '▸';
+        }
+        .discourse-comments-body {
+            overflow: hidden;
+            max-height: 20000px;
+            opacity: 1;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+        }
+        .discourse-comments-body.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
         .giscus-comments {
             background: var(--card-bg);
             border: 1px solid var(--border-subtle);
@@ -2320,7 +2367,7 @@
                 <p class="start-here-sub">No rush. Choose one thread and follow it as far as you like.</p>
                 <div class="start-here-actions">
                     <button class="start-here-btn" onclick="document.getElementById('dailyThread').scrollIntoView({behavior:'smooth'})">✦ Read today's prompt</button>
-                    <button class="start-here-btn" onclick="document.getElementById('giscusWidget').scrollIntoView({behavior:'smooth'})">💬 Join the discussion</button>
+                    <button class="start-here-btn" onclick="toggleDiscourseComments(true); document.getElementById('giscusWidget').scrollIntoView({behavior:'smooth'})">💬 Join the discussion</button>
                     <button class="start-here-btn" onclick="showRandomThinker()">🎲 Meet a philosopher</button>
                 </div>
             </div>
@@ -2330,7 +2377,10 @@
                  REPO_ID and CATEGORY_ID with your own (see SETUP.md). -->
             <section class="discourse">
                 <div class="discourse-intro">
-                    <h2 class="discourse-title">λόγος · The Discourse</h2>
+                    <div class="discourse-title-row">
+                        <h2 class="discourse-title">λόγος · The Discourse</h2>
+                        <button class="discourse-toggle-btn" id="discourseToggleBtn" onclick="toggleDiscourseComments()">Hide Discussion</button>
+                    </div>
                     <p class="discourse-sub">
                         A shared table of minds. Post a thought, reply to another,
                         and watch the conversation unfold. Sign in with GitHub to join —
@@ -2346,7 +2396,7 @@
                     <div class="daily-thread-title" id="dailyTitle"></div>
                     <div class="daily-thread-subtitle" id="dailySubtitle"></div>
                     <div class="daily-thread-body" id="dailyBody"></div>
-                    <button class="daily-thread-jump" onclick="document.getElementById('giscusWidget').scrollIntoView({behavior:'smooth'})">Join the Discussion ↓</button>
+                    <button class="daily-thread-jump" onclick="toggleDiscourseComments(true); document.getElementById('giscusWidget').scrollIntoView({behavior:'smooth'})">Join the Discussion ↓</button>
                 </div>
 
                 <!-- Admin Password Modal -->
@@ -2413,7 +2463,7 @@
                         </div>
                     </div>
                     <div class="reading-schedule" id="readingSchedule"></div>
-                    <a class="reading-join" href="#giscusWidget">Join the Discussion</a>
+                    <a class="reading-join" href="#giscusWidget" onclick="toggleDiscourseComments(true)">Join the Discussion</a>
                 </div>
 
                 <!-- Admin Debug -- add debate form overlay -->
@@ -2437,18 +2487,20 @@
                     <div class="thinker-modal" id="thinkerModal"></div>
                 </div>
 
-                <!-- Giscus onboarding note -->
-                <div class="giscus-onboarding">
-                    <p><strong>Join the conversation.</strong> To share a thought here, sign in with your GitHub account using the button at the top of the discussion below. No GitHub account yet? Creating one is <strong>free and takes about a minute</strong> — and whatever you write becomes part of the café for everyone who visits.</p>
-                </div>
+                <div class="discourse-comments-body" id="discourseCommentsBody">
+                    <!-- Giscus onboarding note -->
+                    <div class="giscus-onboarding">
+                        <p><strong>Join the conversation.</strong> To share a thought here, sign in with your GitHub account using the button at the top of the discussion below. No GitHub account yet? Creating one is <strong>free and takes about a minute</strong> — and whatever you write becomes part of the café for everyone who visits.</p>
+                    </div>
 
-                <div class="giscus-comments" id="giscusWidget">
-                    <div class="giscus-placeholder" id="giscusPlaceholder">
-                        <div class="giscus-placeholder-icon">💬</div>
-                        <p class="giscus-placeholder-text">The discussion is just a click away.</p>
-                        <button class="giscus-load-btn" id="giscusLoadBtn" onclick="loadGiscus()">
-                            <span id="giscusBtnText">Load Comments</span>
-                        </button>
+                    <div class="giscus-comments" id="giscusWidget">
+                        <div class="giscus-placeholder" id="giscusPlaceholder">
+                            <div class="giscus-placeholder-icon">💬</div>
+                            <p class="giscus-placeholder-text">The discussion is just a click away.</p>
+                            <button class="giscus-load-btn" id="giscusLoadBtn" onclick="loadGiscus()">
+                                <span id="giscusBtnText">Load Comments</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -3228,6 +3280,23 @@
         }
         initGiscusObserver();
 
+        function toggleDiscourseComments(forceOpen) {
+            const body = document.getElementById('discourseCommentsBody');
+            const btn = document.getElementById('discourseToggleBtn');
+            if (!body || !btn) return;
+            const willCollapse = forceOpen === true ? false : !body.classList.contains('collapsed');
+            if (willCollapse) {
+                body.classList.add('collapsed');
+                btn.classList.add('collapsed');
+                btn.textContent = 'Show Discussion';
+            } else {
+                body.classList.remove('collapsed');
+                btn.classList.remove('collapsed');
+                btn.textContent = 'Hide Discussion';
+                // If giscus is already loaded but was hidden, nudge it to recalculate its height.
+                window.dispatchEvent(new Event('resize'));
+            }
+        }
 
         // ============================================================
         // INIT ALL
