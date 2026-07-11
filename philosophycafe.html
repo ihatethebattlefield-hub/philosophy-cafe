@@ -1487,7 +1487,7 @@
             margin-bottom: 0;
         }
         .admin-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
-        .admin-error { color: var(--wine); font-size: 13px; margin: 0 0 16px; padding: 10px 12px; border-radius: 8px; background: rgba(122,62,62,0.07); display: none; line-height: 1.45; }
+        .admin-error { color: var(--wine); font-size: 13px; margin: 0 0 16px; padding: 10px 12px; border-radius: 8px; background: rgba(122,62,62,0.07); display: none; line-height: 1.45; white-space: pre-line; overflow-wrap: anywhere; }
         .admin-btn-row { display: flex; gap: 12px; margin-top: 20px; }
         .admin-btn {
             flex: 1;
@@ -3981,14 +3981,67 @@
                 showUserError('Your profile could not be loaded. Please run the updated user account migration in Supabase.');
             }
         }
-        function showUserError(msg) { const el = document.getElementById('userAuthError'); el.textContent = msg; el.style.display = 'block'; }
+        function showUserError(msg) { const el = document.getElementById('userAuthError'); el.textContent = String(msg || 'Something went wrong. Please try again.'); el.style.display = 'block'; }
         function clearUserError() { const el = document.getElementById('userAuthError'); el.textContent = ''; el.style.display = 'none'; }
+        function errorValueToText(value) {
+            if (value == null) return '';
+            if (typeof value === 'string') return value.trim();
+            if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+            try {
+                const json = JSON.stringify(value);
+                return json && json !== '{}' ? json : '';
+            } catch (_) {
+                return String(value) === '[object Object]' ? '' : String(value);
+            }
+        }
+        function authErrorInfo(error) {
+            const candidates = error && typeof error === 'object'
+                ? [error.message, error.error_description, error.msg, error.error, error.details, error.hint, error.reason]
+                : [error];
+            let message = candidates.map(errorValueToText).find(Boolean) || '';
+            const code = errorValueToText(error && (error.code || error.error_code || error.name));
+            const status = errorValueToText(error && (error.status || error.statusCode));
+            if (message === '{}' || message === '[]') message = '';
+            return { message, code, status };
+        }
         function readableAuthError(error) {
-            const message = error && error.message ? error.message : String(error || '');
+            const info = authErrorInfo(error);
+            const message = info.message;
             if (/failed to fetch|network|load failed/i.test(message)) {
                 return 'The café could not reach Supabase. Check your internet connection, then try again.';
             }
-            return message || 'Something went wrong. Please try again.';
+            if (/smtp|confirmation email|sending.*email|email.*send/i.test(message)) {
+                return 'The verification email could not be sent. Recheck the SMTP sender address, Gmail username, and Google app password in Supabase.';
+            }
+            if (/rate limit|too many requests/i.test(message)) {
+                return 'Too many verification attempts. Wait a few minutes, then try again.';
+            }
+            if (/already registered|already exists/i.test(message)) {
+                return 'This email already has an account. Use Back to sign in, or test with another email address.';
+            }
+            return message || 'Supabase returned an empty error response.';
+        }
+        async function reportAuthError(stage, error) {
+            const info = authErrorInfo(error);
+            console.error('[Philosophy Café auth error]', {
+                stage,
+                message: info.message,
+                code: info.code,
+                status: info.status,
+                originalError: error
+            });
+            let connectionNote = '';
+            try {
+                const { error: sessionError } = await supabase.auth.getSession();
+                if (sessionError) connectionNote = '\nSession check: ' + readableAuthError(sessionError);
+            } catch (sessionCheckError) {
+                connectionNote = '\nSession check: Supabase is unreachable from this browser.';
+            }
+            const metadata = [info.code && ('Code: ' + info.code), info.status && ('HTTP: ' + info.status)].filter(Boolean).join(' · ');
+            const nextStep = !info.message
+                ? '\nOpen Supabase → Authentication → Audit Logs and inspect the newest failed request.'
+                : '';
+            showUserError(readableAuthError(error) + (metadata ? '\n' + metadata : '') + '\nStage: ' + stage + connectionNote + nextStep);
         }
         function setAuthBusy(buttonId, busy, busyText) {
             const button = document.getElementById(buttonId);
@@ -4046,7 +4099,7 @@
                     }
                 }
             } catch(e) {
-                showUserError(readableAuthError(e));
+                await reportAuthError(userMode === 'signin' ? 'SIGN_IN' : 'SIGN_UP_SEND_CODE', e);
             } finally {
                 setAuthBusy('userSubmitBtn', false);
             }
@@ -4068,7 +4121,7 @@
                 currentUser = data.user;
                 await finishUserLogin('Email verified. Welcome to the café!');
             } catch(e) {
-                showUserError(readableAuthError(e));
+                await reportAuthError('VERIFY_SIGNUP_CODE', e);
             } finally {
                 setAuthBusy('verifyOtpBtn', false);
             }
@@ -4082,7 +4135,7 @@
                 if (error) throw error;
                 showToast('A new verification code was sent.', 'success');
             } catch(e) {
-                showUserError(readableAuthError(e));
+                await reportAuthError('RESEND_SIGNUP_CODE', e);
             }
         }
 
