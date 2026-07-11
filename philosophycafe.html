@@ -89,12 +89,12 @@
         }
 
         .nav-inner {
-            max-width: 1200px;
+            max-width: 1480px;
             margin: 0 auto;
-            padding: 0 40px;
+            padding: 0 clamp(20px, 3vw, 48px);
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: clamp(18px, 2vw, 34px);
             height: 70px;
         }
 
@@ -102,6 +102,7 @@
             display: flex;
             align-items: center;
             gap: 14px;
+            flex: 0 0 auto;
         }
 
         .nav-logo-icon {
@@ -146,8 +147,10 @@
 
         .nav-links {
             display: flex;
-            gap: 24px;
+            align-items: center;
+            gap: clamp(14px, 1.6vw, 26px);
             list-style: none;
+            margin-left: auto;
         }
 
         .nav-links a {
@@ -1053,7 +1056,7 @@
         /* ============================================================
            RESPONSIVE
            ============================================================ */
-        @media (max-width: 900px) {
+        @media (max-width: 1180px) {
             .main-container {
                 grid-template-columns: 1fr;
                 padding: 0 20px 60px;
@@ -1065,12 +1068,15 @@
             .nav-links.open {
                 display: flex;
                 flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
                 position: absolute;
                 top: 70px;
                 left: 0;
                 right: 0;
                 background: var(--parchment);
-                padding: 20px;
+                padding: 24px;
+                margin: 0;
                 border-bottom: 1px solid var(--border-subtle);
                 box-shadow: 0 10px 30px var(--shadow);
             }
@@ -1434,17 +1440,21 @@
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(4px);
+            padding: 20px;
         }
         .admin-modal-overlay.open { display: flex; }
         .admin-modal {
             background: var(--card-bg);
             border: 1px solid var(--border-subtle);
-            border-radius: 14px;
-            padding: 32px;
-            max-width: 380px;
-            width: 90%;
+            border-radius: 18px;
+            padding: 34px;
+            max-width: 440px;
+            width: 100%;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
             box-shadow: 0 20px 60px var(--shadow-lg);
             animation: modalIn 0.3s ease;
+            position: relative;
         }
         @keyframes modalIn {
             from { opacity: 0; transform: translateY(-20px) scale(0.95); }
@@ -1460,8 +1470,9 @@
         .admin-modal .admin-subtitle {
             font-size: 14px;
             color: var(--ink-light);
-            margin-bottom: 18px;
+            margin-bottom: 22px;
             font-style: italic;
+            line-height: 1.5;
         }
         .admin-input {
             width: 100%;
@@ -1473,11 +1484,11 @@
             color: var(--ink);
             background: var(--cream);
             transition: border-color 0.3s ease;
-            margin-bottom: 12px;
+            margin-bottom: 0;
         }
         .admin-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
-        .admin-error { color: var(--wine); font-size: 13px; margin-bottom: 8px; display: none; }
-        .admin-btn-row { display: flex; gap: 10px; }
+        .admin-error { color: var(--wine); font-size: 13px; margin: 0 0 16px; padding: 10px 12px; border-radius: 8px; background: rgba(122,62,62,0.07); display: none; line-height: 1.45; }
+        .admin-btn-row { display: flex; gap: 12px; margin-top: 20px; }
         .admin-btn {
             flex: 1;
             padding: 10px 16px;
@@ -1494,6 +1505,48 @@
         .admin-btn.primary:hover { background: var(--gold); }
         .admin-btn.secondary { background: var(--cream); color: var(--ink-light); border: 1px solid var(--border-subtle); }
         .admin-btn.secondary:hover { border-color: var(--ink-light); }
+        .admin-btn:disabled { cursor: wait; opacity: 0.58; }
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 34px;
+            height: 34px;
+            border: 1px solid transparent;
+            border-radius: 50%;
+            background: transparent;
+            color: var(--ink-light);
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .modal-close:hover { border-color: var(--border-subtle); color: var(--ink); background: var(--cream); }
+        .auth-form { display: grid; gap: 14px; }
+        .auth-label { display: grid; gap: 6px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-light); }
+        .auth-switch { margin: 18px 0 0; text-align: center; font-size: 13px; color: var(--ink-light); }
+        .auth-switch a { color: var(--ink); text-underline-offset: 3px; }
+        .otp-note { padding: 12px 14px; border: 1px solid var(--border-subtle); border-radius: 10px; background: var(--cream); color: var(--ink-light); font-size: 13px; line-height: 1.5; }
+        .otp-code { text-align: center; font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; letter-spacing: 8px; font-variant-numeric: tabular-nums; }
+        .account-email { margin: -10px 0 24px; color: var(--ink-light); font-size: 14px; overflow-wrap: anywhere; }
+        .user-field { display: grid; gap: 8px; margin: 0; }
+        .user-field label { margin: 0; }
+        .profile-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+        .profile-actions .admin-btn { width: 100%; }
+        .activity-summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
+        .activity-stat { padding: 12px; border: 1px solid var(--border-subtle); border-radius: 10px; background: var(--cream); }
+        .activity-stat strong { display: block; font-family: 'Cinzel', serif; font-size: 20px; color: var(--ink); }
+        .activity-stat span { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-light); }
+        .activity-list { display: grid; gap: 8px; }
+        .activity-row { display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); }
+        .activity-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: var(--gold-pale); }
+        .activity-copy { min-width: 0; font-size: 14px; line-height: 1.35; }
+        .activity-date { font-family: 'Inter', sans-serif; font-size: 10px; color: var(--ink-light); white-space: nowrap; }
+
+        @media (max-width: 520px) {
+            .admin-modal { padding: 28px 22px; }
+            .admin-btn-row, .profile-actions { grid-template-columns: 1fr; display: grid; }
+            .activity-row { grid-template-columns: 34px 1fr; }
+            .activity-date { grid-column: 2; }
+        }
 
         /* Responsive for seeds */
         @media (max-width: 600px) {
@@ -2716,29 +2769,48 @@
                 </div>
 
                 <!-- User Account Modal (register / login / profile) -->
-                <div class="admin-modal-overlay" id="userModal">
+                <div class="admin-modal-overlay" id="userModal" role="dialog" aria-modal="true" aria-labelledby="userModalTitle">
                     <div class="admin-modal">
+                        <button class="modal-close" onclick="closeUserModal()" aria-label="Close account dialog">×</button>
                         <h3 id="userModalTitle">Join the Café</h3>
                         <p class="admin-subtitle" id="userSubtitle">Sign in or create an account to track your contributions.</p>
                         <div id="userAuthError" class="admin-error" style="display:none;"></div>
-                        <div id="userLoginForm">
-                            <input type="email" class="admin-input" id="userEmail" placeholder="Email..." style="margin-bottom:6px;">
-                            <input type="password" class="admin-input" id="userPassword" placeholder="Password..." onkeydown="if(event.key==='Enter')userSubmit()">
+                        <div id="userLoginForm" class="auth-form">
+                            <label class="auth-label">Email
+                                <input type="email" class="admin-input" id="userEmail" placeholder="you@example.com" autocomplete="email">
+                            </label>
+                            <label class="auth-label">Password
+                                <input type="password" class="admin-input" id="userPassword" placeholder="At least 6 characters" autocomplete="current-password" onkeydown="if(event.key==='Enter')userSubmit()">
+                            </label>
                             <div class="admin-btn-row">
                                 <button class="admin-btn secondary" onclick="closeUserModal()">Cancel</button>
                                 <button class="admin-btn primary" id="userSubmitBtn" onclick="userSubmit()">Sign In</button>
                             </div>
-                            <p style="font-size:11px;color:var(--ink-light);margin-top:10px;text-align:center;">
-                                <a href="#" id="userToggleLink" onclick="userToggleMode();return false;" style="color:var(--ink);text-decoration:underline;">Create an account</a>
+                            <p class="auth-switch">
+                                <a href="#" id="userToggleLink" onclick="userToggleMode();return false;">Create an account</a>
                             </p>
                         </div>
+
+                        <div id="userOtpForm" class="auth-form" style="display:none;">
+                            <p class="otp-note">We sent a six-digit verification code to <strong id="otpEmail"></strong>. Enter it below to finish creating your account.</p>
+                            <label class="auth-label">Verification code
+                                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" class="admin-input otp-code" id="userOtp" placeholder="000000" onkeydown="if(event.key==='Enter')verifySignupCode()">
+                            </label>
+                            <div class="admin-btn-row">
+                                <button class="admin-btn secondary" onclick="backToSignup()">Back</button>
+                                <button class="admin-btn primary" id="verifyOtpBtn" onclick="verifySignupCode()">Verify &amp; Create Account</button>
+                            </div>
+                            <p class="auth-switch">Didn't receive it? <a href="#" onclick="resendSignupCode();return false;">Send a new code</a></p>
+                        </div>
+
                         <div id="userAccountView" style="display:none;">
+                            <p class="account-email" id="accountEmail"></p>
                             <div class="user-field">
                                 <label>Display name</label>
-                                <input type="text" class="admin-input" id="displayName" placeholder="Your name">
-                                <button class="admin-btn secondary" onclick="saveDisplayName()" style="margin-top:8px;">Save name</button>
+                                <input type="text" class="admin-input" id="displayName" placeholder="Your name" maxlength="50" autocomplete="nickname">
+                                <button class="admin-btn secondary" id="saveNameBtn" onclick="saveDisplayName()">Save name</button>
                             </div>
-                            <div class="admin-btn-row">
+                            <div class="profile-actions">
                                 <button class="admin-btn secondary" onclick="openMyActivity()">📚 My Activity</button>
                                 <button class="admin-btn primary" onclick="userSignOut()">Sign Out</button>
                             </div>
@@ -2747,10 +2819,11 @@
                 </div>
 
                 <!-- My Activity Modal -->
-                <div class="admin-modal-overlay" id="activityModal">
+                <div class="admin-modal-overlay" id="activityModal" role="dialog" aria-modal="true" aria-labelledby="activityTitle">
                     <div class="admin-modal" style="max-width:460px;">
-                        <h3>My Activity</h3>
-                        <p class="admin-subtitle">Everything you've contributed, stored in the café's database.</p>
+                        <button class="modal-close" onclick="closeActivityModal()" aria-label="Close activity dialog">×</button>
+                        <h3 id="activityTitle">My Activity</h3>
+                        <p class="admin-subtitle">A simple timeline of your recent contributions.</p>
                         <div id="activityContent" style="max-height:55vh;overflow-y:auto;text-align:left;"></div>
                         <div class="admin-btn-row" style="margin-top:14px;">
                             <button class="admin-btn secondary" onclick="closeActivityModal()">Close</button>
@@ -3790,11 +3863,13 @@
             if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
                 await checkAdminStatus();
                 applyAdminUI();
-                await ensureUserProfile();
+                try { await ensureUserProfile(); }
+                catch (e) { console.warn('Profile initialization failed:', e); }
                 applyUserUI();
                 await refreshVoteStates();
             } else if (event === 'SIGNED_OUT') {
                 isAdmin = false;
+                currentDisplayName = '';
                 applyAdminUI();
                 applyUserUI();
                 await refreshVoteStates();
@@ -3835,9 +3910,15 @@
         // USER ACCOUNTS — register / login / profile / activity
         // ============================================================
         let userMode = 'signin';
+        let pendingSignupEmail = '';
+        let currentDisplayName = '';
 
         async function initUserAuth() {
             await refreshCurrentUser();
+            if (currentUser) {
+                try { await ensureUserProfile(); }
+                catch (e) { console.warn('Profile initialization failed:', e); }
+            }
             applyUserUI();
         }
 
@@ -3857,96 +3938,215 @@
         }
         function setUserLoginMode() {
             document.getElementById('userLoginForm').style.display = 'block';
+            document.getElementById('userOtpForm').style.display = 'none';
             document.getElementById('userAccountView').style.display = 'none';
+            const password = document.getElementById('userPassword');
             if (userMode === 'signin') {
                 document.getElementById('userModalTitle').textContent = 'Join the Café';
                 document.getElementById('userSubtitle').textContent = 'Sign in to track your contributions.';
                 document.getElementById('userSubmitBtn').textContent = 'Sign In';
                 document.getElementById('userToggleLink').textContent = 'Create an account';
+                password.autocomplete = 'current-password';
             } else {
                 document.getElementById('userModalTitle').textContent = 'Create Account';
-                document.getElementById('userSubtitle').textContent = 'Pick an email and password to join.';
-                document.getElementById('userSubmitBtn').textContent = 'Sign Up';
+                document.getElementById('userSubtitle').textContent = 'Create your password, then verify the code sent to your email.';
+                document.getElementById('userSubmitBtn').textContent = 'Send Verification Code';
                 document.getElementById('userToggleLink').textContent = 'Back to sign in';
+                password.autocomplete = 'new-password';
             }
             document.getElementById('userAuthError').style.display = 'none';
         }
         function showUserAccountView() {
             document.getElementById('userLoginForm').style.display = 'none';
+            document.getElementById('userOtpForm').style.display = 'none';
             document.getElementById('userAccountView').style.display = 'block';
-            document.getElementById('userModalTitle').textContent = currentUser ? (currentUser.email || 'Your Account') : 'Your Account';
+            document.getElementById('userModalTitle').textContent = 'Your Account';
+            document.getElementById('userSubtitle').textContent = 'Manage your café identity and recent activity.';
+            document.getElementById('accountEmail').textContent = currentUser ? (currentUser.email || '') : '';
+            document.getElementById('userAuthError').style.display = 'none';
             loadDisplayName();
         }
         async function loadDisplayName() {
             const dn = document.getElementById('displayName');
             if (!currentUser) return;
             try {
-                const { data } = await supabase.from('user_profiles').select('display_name').eq('id', currentUser.id).single();
-                dn.value = (data && data.display_name) ? data.display_name : (currentUser.email ? currentUser.email.split('@')[0] : '');
-            } catch(e) { dn.value = currentUser.email ? currentUser.email.split('@')[0] : ''; }
+                const { data, error } = await supabase.from('user_profiles').select('display_name').eq('id', currentUser.id).maybeSingle();
+                if (error) throw error;
+                currentDisplayName = (data && data.display_name) ? data.display_name : (currentUser.email ? currentUser.email.split('@')[0] : '');
+                dn.value = currentDisplayName;
+                applyUserUI();
+            } catch(e) {
+                currentDisplayName = currentUser.email ? currentUser.email.split('@')[0] : '';
+                dn.value = currentDisplayName;
+                showUserError('Your profile could not be loaded. Please run the updated user account migration in Supabase.');
+            }
         }
         function showUserError(msg) { const el = document.getElementById('userAuthError'); el.textContent = msg; el.style.display = 'block'; }
+        function clearUserError() { const el = document.getElementById('userAuthError'); el.textContent = ''; el.style.display = 'none'; }
+        function readableAuthError(error) {
+            const message = error && error.message ? error.message : String(error || '');
+            if (/failed to fetch|network|load failed/i.test(message)) {
+                return 'The café could not reach Supabase. Check your internet connection, then try again.';
+            }
+            return message || 'Something went wrong. Please try again.';
+        }
+        function setAuthBusy(buttonId, busy, busyText) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+            if (busy) {
+                button.dataset.label = button.textContent;
+                button.textContent = busyText;
+                button.disabled = true;
+            } else {
+                button.textContent = button.dataset.label || button.textContent;
+                button.disabled = false;
+            }
+        }
+
+        async function finishUserLogin(message) {
+            await refreshCurrentUser();
+            if (!currentUser) throw new Error('Your session could not be created. Please sign in again.');
+            try { await ensureUserProfile(); }
+            catch (e) { console.warn('The account session is active, but the profile could not be initialized:', e); }
+            applyUserUI();
+            await refreshVoteStates();
+            document.getElementById('userModal').classList.remove('open');
+            showToast(message, 'success');
+        }
 
         async function userSubmit() {
             const email = document.getElementById('userEmail').value.trim();
             const password = document.getElementById('userPassword').value;
             if (!email || !password) { showUserError('Please enter email and password.'); return; }
             if (userMode === 'signup' && password.length < 6) { showUserError('Password must be at least 6 characters.'); return; }
+            if (!supabase) { showUserError('Supabase did not load. Refresh the page and try again.'); return; }
+            clearUserError();
+            setAuthBusy('userSubmitBtn', true, userMode === 'signin' ? 'Signing In…' : 'Sending…');
             try {
                 if (userMode === 'signin') {
-                    const { error } = await supabase.auth.signInWithPassword({ email, password });
-                    if (error) { showUserError(error.message); return; }
+                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    currentUser = data.user;
+                    await finishUserLogin('Welcome back!');
                 } else {
                     const { data, error } = await supabase.auth.signUp({ email, password });
-                    if (error) { showUserError(error.message); return; }
-                    if (data.user && data.user.identities && data.user.identities.length === 0) {
-                        showUserError('An account with this email already exists.'); return;
+                    if (error) throw error;
+                    if (data.session) {
+                        currentUser = data.user;
+                        await finishUserLogin('Your account is ready. Welcome to the café!');
+                    } else {
+                        pendingSignupEmail = email;
+                        document.getElementById('otpEmail').textContent = email;
+                        document.getElementById('userLoginForm').style.display = 'none';
+                        document.getElementById('userOtpForm').style.display = 'grid';
+                        document.getElementById('userModalTitle').textContent = 'Check Your Email';
+                        document.getElementById('userSubtitle').textContent = 'One final step to enter the café.';
+                        document.getElementById('userOtp').value = '';
+                        setTimeout(() => document.getElementById('userOtp').focus(), 50);
                     }
                 }
-                document.getElementById('userModal').classList.remove('open');
-                await refreshCurrentUser();
-                await ensureUserProfile();
-                applyUserUI();
-                await refreshVoteStates();
-                showToast(userMode === 'signup' ? 'Welcome to the café!' : 'Welcome back!', 'success');
-            } catch(e) { showUserError('Network error. Please try again.'); }
+            } catch(e) {
+                showUserError(readableAuthError(e));
+            } finally {
+                setAuthBusy('userSubmitBtn', false);
+            }
+        }
+
+        function backToSignup() {
+            userMode = 'signup';
+            setUserLoginMode();
+        }
+
+        async function verifySignupCode() {
+            const token = document.getElementById('userOtp').value.replace(/\s/g, '');
+            if (!/^\d{6}$/.test(token)) { showUserError('Enter the six-digit code from your email.'); return; }
+            clearUserError();
+            setAuthBusy('verifyOtpBtn', true, 'Verifying…');
+            try {
+                const { data, error } = await supabase.auth.verifyOtp({ email: pendingSignupEmail, token, type: 'email' });
+                if (error) throw error;
+                currentUser = data.user;
+                await finishUserLogin('Email verified. Welcome to the café!');
+            } catch(e) {
+                showUserError(readableAuthError(e));
+            } finally {
+                setAuthBusy('verifyOtpBtn', false);
+            }
+        }
+
+        async function resendSignupCode() {
+            if (!pendingSignupEmail) return;
+            clearUserError();
+            try {
+                const { error } = await supabase.auth.resend({ type: 'signup', email: pendingSignupEmail });
+                if (error) throw error;
+                showToast('A new verification code was sent.', 'success');
+            } catch(e) {
+                showUserError(readableAuthError(e));
+            }
         }
 
         async function userSignOut() {
-            try { await supabase.auth.signOut(); } catch(e) {}
-            currentUser = null;
-            document.getElementById('userModal').classList.remove('open');
-            applyUserUI();
-            await refreshVoteStates();
-            showToast('Signed out.', 'success');
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                currentUser = null;
+                currentDisplayName = '';
+                document.getElementById('userModal').classList.remove('open');
+                applyUserUI();
+                await refreshVoteStates();
+                showToast('Signed out.', 'success');
+            } catch(e) {
+                showUserError(readableAuthError(e));
+            }
         }
 
         async function ensureUserProfile() {
             if (!currentUser) return;
             const suggested = currentUser.email ? currentUser.email.split('@')[0] : 'Philosopher';
-            try {
-                const { data } = await supabase.from('user_profiles').select('id').eq('id', currentUser.id).single();
-                if (!data) { await supabase.from('user_profiles').insert({ id: currentUser.id, display_name: suggested }); }
-            } catch(e) {
-                try { await supabase.from('user_profiles').upsert({ id: currentUser.id, display_name: suggested }); } catch(_) {}
+            const { data, error } = await supabase.from('user_profiles').select('id,display_name').eq('id', currentUser.id).maybeSingle();
+            if (error) throw error;
+            if (!data) {
+                const { error: insertError } = await supabase.from('user_profiles').insert({ id: currentUser.id, display_name: suggested });
+                if (insertError) throw insertError;
+                currentDisplayName = suggested;
+            } else {
+                currentDisplayName = data.display_name || suggested;
             }
         }
 
         async function saveDisplayName() {
             if (!currentUser) return;
             const name = document.getElementById('displayName').value.trim() || (currentUser.email ? currentUser.email.split('@')[0] : 'Philosopher');
+            const button = document.getElementById('saveNameBtn');
+            button.disabled = true;
+            button.textContent = 'Saving…';
+            clearUserError();
             try {
-                await supabase.from('user_profiles').upsert({ id: currentUser.id, display_name: name });
+                const { error } = await supabase.from('user_profiles').upsert(
+                    { id: currentUser.id, display_name: name },
+                    { onConflict: 'id' }
+                );
+                if (error) throw error;
+                currentDisplayName = name;
+                _profileCache[currentUser.id] = name;
+                applyUserUI();
+                button.textContent = 'Saved ✓';
                 showToast('Name saved.', 'success');
-                closeUserModal();
-            } catch(e) { showToast('Failed to save name.', 'error'); }
+                setTimeout(() => { button.textContent = 'Save name'; }, 1400);
+            } catch(e) {
+                button.textContent = 'Save name';
+                showUserError('Name was not saved: ' + readableAuthError(e));
+            } finally {
+                button.disabled = false;
+            }
         }
 
         function applyUserUI() {
             const btn = document.getElementById('userTrigger');
             const act = document.getElementById('activityTrigger');
             if (isLoggedIn()) {
-                const name = currentUser.email ? currentUser.email.split('@')[0] : '👤';
+                const name = currentDisplayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Member');
                 btn.innerHTML = '👤 <span class="uname">' + escapeHtml(name) + '</span>';
                 btn.title = 'Account';
                 if (act) act.style.display = 'inline-flex';
@@ -3985,35 +4185,41 @@
 
         // ---- My Activity modal ----
         async function openMyActivity() {
+            if (!currentUser) { toggleUserModal(); return; }
             closeUserModal();
             const content = document.getElementById('activityContent');
-            content.innerHTML = '<div class="skeleton" style="height:14px;width:80%;margin:6px 0"></div>';
+            content.innerHTML = '<div class="skeleton" style="height:72px;width:100%;margin:6px 0"></div>';
             document.getElementById('activityModal').classList.add('open');
-            const uid = activeUserId();
+            const uid = currentUser.id;
             try {
-                const [{ data: pollVotes }, { data: debateVotes }, { data: quotes }, { data: likes }] = await Promise.all([
-                    supabase.from('poll_votes').select('option,created_at').eq('user_id', uid).order('created_at',{ascending:false}),
-                    supabase.from('debate_votes').select('side,created_at').eq('user_id', uid).order('created_at',{ascending:false}),
-                    supabase.from('submitted_quotes').select('quote_text,author,created_at').eq('user_id', uid).order('created_at',{ascending:false}),
-                    supabase.from('seed_likes').select('seed_index,created_at').eq('user_id', uid).order('created_at',{ascending:false})
+                const results = await Promise.all([
+                    supabase.from('poll_votes').select('option,created_at').eq('user_id', uid).order('created_at',{ascending:false}).limit(25),
+                    supabase.from('debate_votes').select('side,created_at').eq('user_id', uid).order('created_at',{ascending:false}).limit(25),
+                    supabase.from('submitted_quotes').select('quote_text,author,created_at').eq('user_id', uid).order('created_at',{ascending:false}).limit(25),
+                    supabase.from('seed_likes').select('seed_index,created_at').eq('user_id', uid).order('created_at',{ascending:false}).limit(25)
                 ]);
+                const failed = results.find(result => result.error);
+                if (failed) throw failed.error;
+                const [pollVotes, debateVotes, quotes, likes] = results.map(result => result.data || []);
                 const optLabel = { agree:'Agree', disagree:'Disagree', undecided:'Undecided' };
-                let html = '';
-                if (pollVotes && pollVotes.length) {
-                    html += '<h4 class="activity-h">🗳️ Poll Votes</h4>' + pollVotes.map(v => `<div class="activity-item">Voted <b>${optLabel[v.option] || v.option}</b></div>`).join('');
-                }
-                if (debateVotes && debateVotes.length) {
-                    html += '<h4 class="activity-h">⚔️ Debate Votes</h4>' + debateVotes.map(v => `<div class="activity-item">Voted for side <b>${escapeHtml(v.side)}</b></div>`).join('');
-                }
-                if (quotes && quotes.length) {
-                    html += '<h4 class="activity-h">💬 Quotes Submitted</h4>' + quotes.map(q => `<div class="activity-item">"${escapeHtml(q.quote_text)}" <span class="sq-author">— ${escapeHtml(q.author)}</span></div>`).join('');
-                }
-                if (likes && likes.length) {
-                    html += '<h4 class="activity-h">🌱 Seeds Liked</h4>' + likes.map(l => `<div class="activity-item">Liked seed #${escapeHtml(String(l.seed_index))}</div>`).join('');
-                }
-                content.innerHTML = html || '<p style="color:var(--ink-light);font-style:italic;">No activity yet. Vote, debate, or submit a quote to get started.</p>';
+                const timeline = [
+                    ...pollVotes.map(v => ({ icon:'🗳️', text:'Poll vote: ' + (optLabel[v.option] || v.option), date:v.created_at })),
+                    ...debateVotes.map(v => ({ icon:'⚔️', text:'Debate vote: side ' + v.side, date:v.created_at })),
+                    ...quotes.map(q => ({ icon:'💬', text:'Submitted “' + q.quote_text + '” — ' + q.author, date:q.created_at })),
+                    ...likes.map(l => ({ icon:'🌱', text:'Liked thought seed #' + l.seed_index, date:l.created_at }))
+                ].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).slice(0, 30);
+                const summary = `
+                    <div class="activity-summary">
+                        <div class="activity-stat"><strong>${pollVotes.length + debateVotes.length}</strong><span>Votes</span></div>
+                        <div class="activity-stat"><strong>${quotes.length + likes.length}</strong><span>Quotes &amp; likes</span></div>
+                    </div>`;
+                const rows = timeline.map(item => {
+                    const date = item.date ? new Intl.DateTimeFormat(undefined, { month:'short', day:'numeric' }).format(new Date(item.date)) : '';
+                    return `<div class="activity-row"><span class="activity-icon">${item.icon}</span><span class="activity-copy">${escapeHtml(item.text)}</span><time class="activity-date">${escapeHtml(date)}</time></div>`;
+                }).join('');
+                content.innerHTML = timeline.length ? summary + '<div class="activity-list">' + rows + '</div>' : '<p style="color:var(--ink-light);font-style:italic;">No activity yet. Vote, debate, or submit a quote to get started.</p>';
             } catch(e) {
-                content.innerHTML = '<p style="color:var(--ink-light);">Could not load activity.</p>';
+                content.innerHTML = '<p style="color:var(--wine);">Could not load activity: ' + escapeHtml(readableAuthError(e)) + '</p>';
             }
         }
         function closeActivityModal() { document.getElementById('activityModal').classList.remove('open'); }

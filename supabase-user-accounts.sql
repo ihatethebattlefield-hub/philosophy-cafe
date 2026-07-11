@@ -10,8 +10,29 @@
 CREATE TABLE IF NOT EXISTS user_profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     display_name TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+-- Create a profile automatically after the email code is verified.
+CREATE OR REPLACE FUNCTION public.handle_new_cafe_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = public
+AS $$
+BEGIN
+    INSERT INTO public.user_profiles (id, display_name)
+    VALUES (NEW.id, COALESCE(NULLIF(NEW.raw_user_meta_data->>'display_name', ''), split_part(NEW.email, '@', 1)))
+    ON CONFLICT (id) DO NOTHING;
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_cafe_user_created ON auth.users;
+CREATE TRIGGER on_cafe_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.handle_new_cafe_user();
 
 -- ============================================================
 -- 2. BROADEN RLS — allow logged-in (authenticated) users to
@@ -90,4 +111,16 @@ GRANT SELECT, INSERT, DELETE ON seed_likes TO anon, authenticated;
 --   - Users can sign up / sign in (Email provider, already enabled).
 --   - Logged-in users' votes/quotes are tied to their real account.
 --   - Admins can see who voted via the voter lists on each card.
+--
+-- REQUIRED DASHBOARD SETTINGS FOR THE SIX-DIGIT SIGN-UP CODE:
+--   1. Authentication -> Providers -> Email:
+--      Enable Email and Confirm email.
+--   2. Authentication -> Email Templates -> Confirm signup:
+--      Include {{ .Token }} in the subject/body instead of relying only
+--      on {{ .ConfirmationURL }}. Example body:
+--      <h2>Your Philosophy Cafe verification code</h2>
+--      <p>Enter this six-digit code to finish creating your account:</p>
+--      <p style="font-size:32px;letter-spacing:8px"><strong>{{ .Token }}</strong></p>
+--   3. Configure custom SMTP before production. Supabase's default SMTP
+--      only sends to pre-authorized project-team addresses.
 -- ============================================================

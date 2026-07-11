@@ -3,7 +3,16 @@
 // Supabase client (uses CDN-loaded supabase global)
 var supabase = window.supabase && window.supabase.createClient(
     'https://ljaqfubozhgzwngtbdit.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqYXFmdWJvemhnenduZ3RiZGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NTA2NzcsImV4cCI6MjA5OTEyNjY3N30.7xh3yMdF_H4BOs48KPQZml2FMVAQ1MD8ZNKcE7vfW74'
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqYXFmdWJvemhnenduZ3RiZGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NTA2NzcsImV4cCI6MjA5OTEyNjY3N30.7xh3yMdF_H4BOs48KPQZml2FMVAQ1MD8ZNKcE7vfW74',
+    {
+        auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+            storage: window.localStorage,
+            storageKey: 'philosophy-cafe-auth'
+        }
+    }
 );
 var siteUserId = (function() {
     let id = localStorage.getItem('siteUserId');
@@ -19,9 +28,13 @@ function activeUserId() { return currentUser ? currentUser.id : siteUserId; }
 async function refreshCurrentUser() {
     if (!supabase) { currentUser = null; return; }
     try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) throw error;
         currentUser = session ? session.user : null;
-    } catch(e) { currentUser = null; }
+    } catch(e) {
+        console.warn('Unable to restore the Supabase session:', e);
+        currentUser = null;
+    }
 }
 
         const seedPosts = [
