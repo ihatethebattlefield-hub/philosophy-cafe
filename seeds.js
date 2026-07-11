@@ -11,6 +11,19 @@ var siteUserId = (function() {
     return id;
 })();
 
+// Current logged-in Supabase auth user (null when browsing anonymously)
+var currentUser = null;
+function isLoggedIn() { return !!currentUser; }
+// Use the real account id when signed in, otherwise the anon id
+function activeUserId() { return currentUser ? currentUser.id : siteUserId; }
+async function refreshCurrentUser() {
+    if (!supabase) { currentUser = null; return; }
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        currentUser = session ? session.user : null;
+    } catch(e) { currentUser = null; }
+}
+
         const seedPosts = [
             { icon:'🕯️', title:'Socrates & the Unexamined Life', subtitle:'What does it mean to truly know oneself?',
               body:`<p>In the bustling agora of ancient Athens, a man with a snub nose and bare feet wandered from citizen to citizen, asking questions that seemed simple but cut to the bone. Socrates believed that the unexamined life is not worth living — that we must turn our gaze inward before we can understand anything outward.</p><p>His method was deceptively simple: ask questions. Not to win arguments, but to peel back the layers of assumption until only truth remained.</p><p class="prompt">❓ What questions would Socrates ask you today? What assumptions are you holding that deserve examination?</p>` },
@@ -82,6 +95,31 @@ var siteUserId = (function() {
               body:`<p>Zhuangzi dreamed he was a butterfly, fluttering happily. When he woke, he could not tell: was he Zhuangzi who had dreamed of being a butterfly, or a butterfly now dreaming he was Zhuangzi? The boundary between self and world, dream and waking, is not as firm as we think.</p><p>Perhaps transformation is the only constant.</p><p class="prompt">❓ If this moment were a dream, would you live it differently?</p>` }
         ];
 
+const thinkersDB = [
+            { emoji:'🕯️', name:'Socrates', years:'c. 470–399 BCE', bio:'The father of Western philosophy. Never wrote a word — his method of questioning lives on in every classroom debate. He was sentenced to death for "corrupting the youth" by teaching them to ask too many questions.', quote:'The only true wisdom is in knowing you know nothing.', school:'Greek / Ethics' },
+            { emoji:'🏛️', name:'Plato', years:'c. 428–348 BCE', bio:'Student of Socrates, teacher of Aristotle. His Theory of Forms argues that the visible world is but a shadow of a higher, eternal reality. The Allegory of the Cave remains one of philosophy\'s most powerful images.', quote:'The measure of a man is what he does with power.', school:'Greek / Idealism' },
+            { emoji:'🏺', name:'Aristotle', years:'384–322 BCE', bio:'Tutor to Alexander the Great and founder of the Lyceum. Wrote on everything from logic to biology to poetry. His virtue ethics — the golden mean between extremes — still shapes moral philosophy today.', quote:'We are what we repeatedly do. Excellence, then, is not an act, but a habit.', school:'Greek / Virtue Ethics' },
+            { emoji:'🧠', name:'René Descartes', years:'1596–1650', bio:'French philosopher and mathematician. His method of radical doubt led to the foundational insight "I think, therefore I am." He split mind from body in a way philosophy is still wrestling with.', quote:'I think, therefore I am.', school:'French / Rationalism' },
+            { emoji:'⚖️', name:'Immanuel Kant', years:'1724–1804', bio:'German philosopher who reframed ethics around duty and reason. His categorical imperative asks: what if everyone acted on your principle? The starry sky above and the moral law within.', quote:'Act only according to that maxim whereby you can at the same time will that it should become a universal law.', school:'German / Deontology' },
+            { emoji:'🌿', name:'Friedrich Nietzsche', years:'1844–1900', bio:'German philologist turned philosopher. Proclaimed the death of God, diagnosed nihilism, and called for the creation of new values. The Übermensch is not a tyrant — but an artist of the self.', quote:'He who has a why to live can bear almost any how.', school:'German / Existentialism' },
+            { emoji:'🎭', name:'Albert Camus', years:'1913–1960', bio:'French-Algerian writer and philosopher. He argued that life is absurd — but that we must rebel against that absurdity with joy and defiance. Sisyphus, he insisted, must be imagined happy.', quote:'In the midst of winter, I found there was, within me, an invincible summer.', school:'French / Absurdism' },
+            { emoji:'🌌', name:'Simone de Beauvoir', years:'1908–1986', bio:'French existentialist and feminist philosopher. Her insight that "one is not born, but rather becomes, a woman" rewired feminism. Freedom, she argued, is a burden we cannot escape — only embrace.', quote:'One is not born, but rather becomes, a woman.', school:'French / Existentialism & Feminism' },
+            { emoji:'🗽', name:'Jean-Paul Sartre', years:'1905–1980', bio:'French existentialist who argued that existence precedes essence — we exist first and define ourselves through action. Radical freedom comes with radical responsibility. We are condemned to be free.', quote:'Man is condemned to be free.', school:'French / Existentialism' },
+            { emoji:'🌸', name:'Laozi', years:'c. 6th century BCE', bio:'Legendary founder of Daoism. The Tao Te Ching teaches the way of water — soft, yielding, yet unstoppable. Wu wei — effortless action — is the path of the sage.', quote:'The journey of a thousand miles begins with one step.', school:'Chinese / Daoism' },
+            { emoji:'🐉', name:'Confucius', years:'551–479 BCE', bio:'Chinese philosopher whose ethical system shaped East Asian civilization for two millennia. He taught that virtue is cultivated through ritual, learning, and right relationships — not born, but built.', quote:'It does not matter how slowly you go as long as you do not stop.', school:'Chinese / Confucianism' },
+            { emoji:'🦋', name:'Zhuangzi', years:'c. 369–286 BCE', bio:'Daoist philosopher of playful profundity. His butterfly dream questions the boundary between dream and reality. His writing is full of humor, paradox, and the joy of uncertainty.', quote:'I dreamed I was a butterfly. Now I do not know whether I was then a man dreaming I was a butterfly, or whether I am now a butterfly dreaming I am a man.', school:'Chinese / Daoism' },
+            { emoji:'💀', name:'Marcus Aurelius', years:'121–180 CE', bio:'Roman emperor and Stoic philosopher. His Meditations, written in a tent during military campaigns, are an intimate guide to self-discipline, resilience, and inner peace.', quote:'You have power over your mind — not outside events. Realize this, and you will find strength.', school:'Roman / Stoicism' },
+            { emoji:'🪞', name:'David Hume', years:'1711–1776', bio:'Scottish empiricist and skeptic. He argued that causality is just a mental habit, that the self is a bundle of perceptions, and that reason is the slave of the passions.', quote:'A wise man proportions his belief to the evidence.', school:'Scottish / Empiricism' },
+            { emoji:'🔮', name:'Baruch Spinoza', years:'1632–1677', bio:'Dutch-Jewish philosopher excommunicated for heresy. He identified God with Nature — Deus sive Natura — and argued that everything follows necessarily from the divine substance.', quote:'The highest activity a human being can attain is learning for understanding, because to understand is to be free.', school:'Dutch / Rationalism' },
+            { emoji:'🎪', name:'Arthur Schopenhauer', years:'1788–1860', bio:'German pessimist philosopher. He saw the world as driven by a blind, striving Will. Art and asceticism offer temporary escape from suffering. His influence extends to Freud, Wagner, and Tolstoy.', quote:'Talent hits a target no one else can hit; Genius hits a target no one else can see.', school:'German / Pessimism' },
+            { emoji:'🕊️', name:'Hannah Arendt', years:'1906–1975', bio:'German-American political philosopher. She coined "the banality of evil" covering Eichmann\'s trial. Her work on totalitarianism, action, and thinking remains urgently relevant.', quote:'The sad truth is that most evil is done by people who never make up their minds to be good or evil.', school:'German-American / Political Philosophy' },
+            { emoji:'⚡', name:'Michel Foucault', years:'1926–1984', bio:'French philosopher-historian who analyzed the relationship between power and knowledge. His studies of prisons, madness, and sexuality revealed how institutions shape what counts as truth.', quote:'I don\'t feel that it is necessary to know exactly what I am. The main interest in life and work is to become someone else that you were not in the beginning.', school:'French / Post-Structuralism' },
+            { emoji:'🌓', name:'Søren Kierkegaard', years:'1813–1855', bio:'Danish philosopher, father of existentialism. He argued that truth is subjective and that faith requires a leap — not a rational conclusion. Anxiety and despair are the price of freedom.', quote:'Life can only be understood backwards; but it must be lived forwards.', school:'Danish / Existentialism' },
+            { emoji:'🧘', name:'Siddhartha Gautama (Buddha)', years:'c. 563–483 BCE', bio:'Indian spiritual teacher whose insights on suffering, impermanence, and the illusion of self form the foundation of Buddhist philosophy. The Middle Way avoids both indulgence and asceticism.', quote:'Peace comes from within. Do not seek it without.', school:'Indian / Buddhism' },
+            { emoji:'🔔', name:'Emmanuel Levinas', years:'1906–1995', bio:'French-Lithuanian philosopher who placed ethics before ontology. The encounter with the face of the Other, he argued, imposes an infinite responsibility that precedes all philosophy.', quote:'The face of the Other calls me to responsibility.', school:'French-Lithuanian / Ethics' },
+            { emoji:'📜', name:'John Rawls', years:'1921–2002', bio:'American political philosopher who revived social contract theory. His "veil of ignorance" thought experiment asks us to design a just society without knowing our own place in it.', quote:'Justice is the first virtue of social institutions, as truth is of systems of thought.', school:'American / Political Philosophy' }
+        ]
+
         // ---- Seed likes (9. Like/Reaction System) ----
         let _likesCache = {}; // index -> count, fetched from supabase
         let _userLikesCache = []; // indices this user liked
@@ -94,7 +132,7 @@ var siteUserId = (function() {
                 if (data) {
                     data.forEach(r => {
                         _likesCache[r.seed_index] = (_likesCache[r.seed_index] || 0) + 1;
-                        if (r.user_id === siteUserId) _userLikesCache.push(r.seed_index);
+                        if (r.user_id === activeUserId()) _userLikesCache.push(r.seed_index);
                     });
                 }
             } catch(e) { console.warn('Seed likes load failed', e); }
@@ -110,12 +148,12 @@ var siteUserId = (function() {
             try {
                 const liked = _userLikesCache.includes(idx);
                 if (liked) {
-                    await supabase.from('seed_likes').delete().eq('user_id', siteUserId).eq('seed_index', idx);
+                    await supabase.from('seed_likes').delete().eq('user_id', activeUserId()).eq('seed_index', idx);
                     const pos = _userLikesCache.indexOf(idx);
                     if (pos > -1) _userLikesCache.splice(pos, 1);
                     if (_likesCache[idx]) _likesCache[idx] = Math.max(0, _likesCache[idx] - 1);
                 } else {
-                    await supabase.from('seed_likes').insert({user_id: siteUserId, seed_index: idx});
+                    await supabase.from('seed_likes').insert({user_id: activeUserId(), seed_index: idx});
                     _userLikesCache.push(idx);
                     _likesCache[idx] = (_likesCache[idx] || 0) + 1;
                 }

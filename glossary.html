@@ -107,9 +107,8 @@
                 <span id="onlineCount">1</span>
                 <span>online</span>
             </div>
-            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
-                <span></span><span></span><span></span>
-            </button>
+                        <button class="search-trigger" id="searchTrigger" onclick="openSearch()" title="Search (Ctrl+K / /)" aria-label="Search">🔍</button>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
         </div>
     </nav>
 
@@ -136,6 +135,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="seeds.js"></script>
     <script src="page-script.js"></script>
+    <script src="search.js"></script>
     <script>
         const glossaryTerms = [
             { term:'A Priori', def:'Knowledge that is independent of experience — known through reason alone. Contrast with a posteriori.' },
@@ -170,14 +170,14 @@
             { term:'Wu Wei', def:'Daoist principle of "effortless action" — acting in harmony with the Dao without forcing or striving.' }
         ];
 
-        function renderGlossary(filter) {
+        function renderGlossary(filter, openTerm) {
             const list = document.getElementById('glossaryList');
             const count = document.getElementById('glossaryCount');
             const q = (filter || '').toLowerCase().trim();
             const filtered = q ? glossaryTerms.filter(g => g.term.toLowerCase().includes(q) || g.def.toLowerCase().includes(q)) : glossaryTerms;
             count.textContent = `${filtered.length} term${filtered.length === 1 ? '' : 's'}`;
             list.innerHTML = filtered.map(g =>
-                `<div class="glossary-item" onclick="this.classList.toggle('open')">
+                `<div class="glossary-item${openTerm && g.term === openTerm ? ' open' : ''}" data-term="${g.term.replace(/"/g, '&quot;')}" onclick="this.classList.toggle('open')">
                     <div class="glossary-term">${g.term}</div>
                     <div class="glossary-def">${g.def}</div>
                 </div>`
@@ -185,7 +185,33 @@
         }
         function filterGlossary() { renderGlossary(document.getElementById('glossarySearch').value); }
 
-        renderGlossary('');
+        const urlTerm = new URLSearchParams(window.location.search).get('term');
+        renderGlossary('', urlTerm);
+        if (urlTerm) {
+            setTimeout(() => {
+                document.querySelectorAll('.glossary-item').forEach(el => {
+                    if (el.getAttribute('data-term') === urlTerm) {
+                        el.scrollIntoView({ behavior:'smooth', block:'center' });
+                    }
+                });
+            }, 300);
+        }
     </script>
+
+<!-- Search Modal -->
+<div class="search-overlay" id="searchOverlay">
+    <div class="search-modal">
+        <div class="search-header">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search thinkers, thought seeds, glossary terms..." autocomplete="off">
+            <button class="search-close" onclick="closeSearch()" aria-label="Close search">✕</button>
+        </div>
+        <div class="search-results" id="searchResults">
+            <p class="search-hint">Type to search thinkers, thought seeds, and glossary terms by title.</p>
+        </div>
+        <div class="search-footer">
+            <span>↑↓ navigate</span><span>⏎ open</span><span>Esc close</span>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -59,7 +59,8 @@
                 <span id="onlineCount">1</span>
                 <span>online</span>
             </div>
-            <button class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></button>
+                        <button class="search-trigger" id="searchTrigger" onclick="openSearch()" title="Search (Ctrl+K / /)" aria-label="Search">🔍</button>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
         </div>
     </nav>
 
@@ -396,6 +397,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="seeds.js"></script>
     <script src="page-script.js"></script>
+    <script src="search.js"></script>
     <script>
         function filterThinkers() {
             const grid = document.getElementById('thinkerGrid');
@@ -413,5 +415,21 @@
         }
         filterThinkers();
     </script>
+
+<!-- Search Modal -->
+<div class="search-overlay" id="searchOverlay">
+    <div class="search-modal">
+        <div class="search-header">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search thinkers, thought seeds, glossary terms..." autocomplete="off">
+            <button class="search-close" onclick="closeSearch()" aria-label="Close search">✕</button>
+        </div>
+        <div class="search-results" id="searchResults">
+            <p class="search-hint">Type to search thinkers, thought seeds, and glossary terms by title.</p>
+        </div>
+        <div class="search-footer">
+            <span>↑↓ navigate</span><span>⏎ open</span><span>Esc close</span>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -2617,10 +2617,9 @@
                 <span id="onlineCount">1</span>
                 <span>online</span>
             </div>
-            <button class="search-trigger" id="searchTrigger" onclick="openSearch()" title="Search" aria-label="Search">🔍</button>
-            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
-                <span></span><span></span><span></span>
-            </button>
+            <button class="search-trigger" id="searchTrigger" onclick="openSearch()" title="Search (Ctrl+K / /)" aria-label="Search">🔍</button>
+            <button class="user-trigger" id="userTrigger" onclick="toggleUserModal()" title="Sign in">👤</button>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
         </div>
     </nav>
 
@@ -2686,7 +2685,7 @@
                 <div class="search-overlay" id="searchOverlay">
                     <div class="search-modal">
                         <div class="search-header">
-                            <input type="text" class="search-input" id="searchInput" placeholder="Search thinkers, ideas, seeds..." autocomplete="off" onkeydown="if(event.key==='Escape')closeSearch()">
+                            <input type="text" class="search-input" id="searchInput" placeholder="Search thinkers, thought seeds, glossary terms..." autocomplete="off">
                             <button class="search-close" onclick="closeSearch()" aria-label="Close search">✕</button>
                         </div>
                         <div class="search-results" id="searchResults">
@@ -2716,6 +2715,49 @@
                     </div>
                 </div>
 
+                <!-- User Account Modal (register / login / profile) -->
+                <div class="admin-modal-overlay" id="userModal">
+                    <div class="admin-modal">
+                        <h3 id="userModalTitle">Join the Café</h3>
+                        <p class="admin-subtitle" id="userSubtitle">Sign in or create an account to track your contributions.</p>
+                        <div id="userAuthError" class="admin-error" style="display:none;"></div>
+                        <div id="userLoginForm">
+                            <input type="email" class="admin-input" id="userEmail" placeholder="Email..." style="margin-bottom:6px;">
+                            <input type="password" class="admin-input" id="userPassword" placeholder="Password..." onkeydown="if(event.key==='Enter')userSubmit()">
+                            <div class="admin-btn-row">
+                                <button class="admin-btn secondary" onclick="closeUserModal()">Cancel</button>
+                                <button class="admin-btn primary" id="userSubmitBtn" onclick="userSubmit()">Sign In</button>
+                            </div>
+                            <p style="font-size:11px;color:var(--ink-light);margin-top:10px;text-align:center;">
+                                <a href="#" id="userToggleLink" onclick="userToggleMode();return false;" style="color:var(--ink);text-decoration:underline;">Create an account</a>
+                            </p>
+                        </div>
+                        <div id="userAccountView" style="display:none;">
+                            <div class="user-field">
+                                <label>Display name</label>
+                                <input type="text" class="admin-input" id="displayName" placeholder="Your name">
+                                <button class="admin-btn secondary" onclick="saveDisplayName()" style="margin-top:8px;">Save name</button>
+                            </div>
+                            <div class="admin-btn-row">
+                                <button class="admin-btn secondary" onclick="openMyActivity()">📚 My Activity</button>
+                                <button class="admin-btn primary" onclick="userSignOut()">Sign Out</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Activity Modal -->
+                <div class="admin-modal-overlay" id="activityModal">
+                    <div class="admin-modal" style="max-width:460px;">
+                        <h3>My Activity</h3>
+                        <p class="admin-subtitle">Everything you've contributed, stored in the café's database.</p>
+                        <div id="activityContent" style="max-height:55vh;overflow-y:auto;text-align:left;"></div>
+                        <div class="admin-btn-row" style="margin-top:14px;">
+                            <button class="admin-btn secondary" onclick="closeActivityModal()">Close</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 7. Debate Arena -->
                 <div class="debate-arena" id="debateArena">
                     <div class="debate-header">⚔️ Debate Arena</div>
@@ -2734,6 +2776,7 @@
                     </div>
                     <p class="debate-hint">Tap a side to cast your vote — you can change your mind anytime. The tallies appear once you've voted.</p>
                     <div class="debate-results" id="debateResults"></div>
+                    <div class="voter-list" id="debateVoters"></div>
                     <div class="debate-explanation" id="debateExplanation" style="display:none;">
                         <div class="debate-explanation-form" id="debateExplanationForm">
                             <textarea id="debateExplanationText" placeholder="Why did you choose this side? (optional)"></textarea>
@@ -2871,6 +2914,7 @@
                     </button>
                 </div>
                 <button class="poll-reset" onclick="resetPoll()">Change my vote</button>
+                <div class="voter-list" id="pollVoters"></div>
             </div>
 
             <!-- 3. Random Philosopher -->
@@ -2963,6 +3007,7 @@
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
             <button class="admin-trigger" id="adminTrigger" onclick="toggleAdmin()" title="Admin" style="margin-top:10px;">🔑</button>
             <button class="admin-trigger" onclick="exportMyData()" title="Export my data (GDPR)" style="margin-top:10px;">📤 Export Data</button>
+            <button class="admin-trigger" id="activityTrigger" onclick="openMyActivity()" title="My Activity" style="margin-top:10px;display:none;">📚 Activity</button>
         </div>
     </footer>
 
@@ -2971,6 +3016,7 @@
 
     <script src="seeds.js"></script>
     <script src="page-script.js"></script>
+    <script src="search.js"></script>
     <script>
         // ============================================================
         // φιλοσοφία · PHILOSOPHY CAFÉ — JavaScript
@@ -3173,32 +3219,39 @@
             try {
                 const q = getDailyPoll();
                 pollData.question = q.question;
-                const { data: votes } = await supabase.from('poll_votes').select('option');
+                const { data: votes } = await supabase.from('poll_votes').select('option,user_id');
                 const v = votes || [];
                 pollData.agree = v.filter(r => r.option === 'agree').length;
                 pollData.disagree = v.filter(r => r.option === 'disagree').length;
                 pollData.undecided = v.filter(r => r.option === 'undecided').length;
                 document.getElementById('pollQuestion').textContent = q.question;
                 updatePollBars();
-                const { data: myVotes } = await supabase.from('poll_votes').select('option').eq('user_id', siteUserId);
+                const { data: myVotes } = await supabase.from('poll_votes').select('option').eq('user_id', activeUserId());
                 if (myVotes && myVotes.length > 0) {
                     const btnId = 'poll' + myVotes[0].option.charAt(0).toUpperCase() + myVotes[0].option.slice(1);
                     document.getElementById(btnId).classList.add('voted');
+                }
+                if (isAdmin && votes) {
+                    await loadProfileMap(votes.map(r => r.user_id));
+                    const optLabel = { agree:'Agree', disagree:'Disagree', undecided:'Undecided' };
+                    document.getElementById('pollVoters').innerHTML = votes.map(r =>
+                        `<span class="voter-chip">${escapeHtml(displayNameFor(r.user_id))}: <b>${optLabel[r.option] || r.option}</b></span>`
+                    ).join('');
                 }
             } catch(e) { console.warn('Poll load failed', e); document.getElementById('pollQuestion').textContent = pollData.question; }
         }
         async function castPollVote(option) {
             try {
-                const { data: myVotes } = await supabase.from('poll_votes').select('option').eq('user_id', siteUserId);
+                const { data: myVotes } = await supabase.from('poll_votes').select('option').eq('user_id', activeUserId());
                 const myVote = (myVotes && myVotes.length > 0) ? myVotes[0].option : null;
                 ['agree','disagree','undecided'].forEach(o => {
                     document.getElementById('poll'+o.charAt(0).toUpperCase()+o.slice(1)).classList.remove('voted');
                 });
                 if (myVote && myVote === option) return; // same vote, do nothing
                 if (myVote) {
-                    await supabase.from('poll_votes').delete().eq('user_id', siteUserId);
+                    await supabase.from('poll_votes').delete().eq('user_id', activeUserId());
                 }
-                await supabase.from('poll_votes').insert({user_id: siteUserId, option: option});
+                await supabase.from('poll_votes').insert({user_id: activeUserId(), option: option});
                 document.getElementById('poll'+option.charAt(0).toUpperCase()+option.slice(1)).classList.add('voted');
                 await loadPoll();
                 renderWeeklyDigest();
@@ -3206,7 +3259,7 @@
         }
         function resetPoll() {
             ['agree','disagree','undecided'].forEach(o => document.getElementById('poll'+o.charAt(0).toUpperCase()+o.slice(1)).classList.remove('voted'));
-            supabase.from('poll_votes').delete().eq('user_id', siteUserId).then(() => { loadPoll(); renderWeeklyDigest(); });
+            supabase.from('poll_votes').delete().eq('user_id', activeUserId()).then(() => { loadPoll(); renderWeeklyDigest(); });
         }
         function updatePollBars() {
             const total = pollData.agree + pollData.disagree + pollData.undecided || 1;
@@ -3221,30 +3274,7 @@
         // ============================================================
         // 3. RANDOM PHILOSOPHER GENERATOR
         // ============================================================
-        const thinkersDB = [
-            { emoji:'🕯️', name:'Socrates', years:'c. 470–399 BCE', bio:'The father of Western philosophy. Never wrote a word — his method of questioning lives on in every classroom debate. He was sentenced to death for "corrupting the youth" by teaching them to ask too many questions.', quote:'The only true wisdom is in knowing you know nothing.', school:'Greek / Ethics' },
-            { emoji:'🏛️', name:'Plato', years:'c. 428–348 BCE', bio:'Student of Socrates, teacher of Aristotle. His Theory of Forms argues that the visible world is but a shadow of a higher, eternal reality. The Allegory of the Cave remains one of philosophy\'s most powerful images.', quote:'The measure of a man is what he does with power.', school:'Greek / Idealism' },
-            { emoji:'🏺', name:'Aristotle', years:'384–322 BCE', bio:'Tutor to Alexander the Great and founder of the Lyceum. Wrote on everything from logic to biology to poetry. His virtue ethics — the golden mean between extremes — still shapes moral philosophy today.', quote:'We are what we repeatedly do. Excellence, then, is not an act, but a habit.', school:'Greek / Virtue Ethics' },
-            { emoji:'🧠', name:'René Descartes', years:'1596–1650', bio:'French philosopher and mathematician. His method of radical doubt led to the foundational insight "I think, therefore I am." He split mind from body in a way philosophy is still wrestling with.', quote:'I think, therefore I am.', school:'French / Rationalism' },
-            { emoji:'⚖️', name:'Immanuel Kant', years:'1724–1804', bio:'German philosopher who reframed ethics around duty and reason. His categorical imperative asks: what if everyone acted on your principle? The starry sky above and the moral law within.', quote:'Act only according to that maxim whereby you can at the same time will that it should become a universal law.', school:'German / Deontology' },
-            { emoji:'🌿', name:'Friedrich Nietzsche', years:'1844–1900', bio:'German philologist turned philosopher. Proclaimed the death of God, diagnosed nihilism, and called for the creation of new values. The Übermensch is not a tyrant — but an artist of the self.', quote:'He who has a why to live can bear almost any how.', school:'German / Existentialism' },
-            { emoji:'🎭', name:'Albert Camus', years:'1913–1960', bio:'French-Algerian writer and philosopher. He argued that life is absurd — but that we must rebel against that absurdity with joy and defiance. Sisyphus, he insisted, must be imagined happy.', quote:'In the midst of winter, I found there was, within me, an invincible summer.', school:'French / Absurdism' },
-            { emoji:'🌌', name:'Simone de Beauvoir', years:'1908–1986', bio:'French existentialist and feminist philosopher. Her insight that "one is not born, but rather becomes, a woman" rewired feminism. Freedom, she argued, is a burden we cannot escape — only embrace.', quote:'One is not born, but rather becomes, a woman.', school:'French / Existentialism & Feminism' },
-            { emoji:'🗽', name:'Jean-Paul Sartre', years:'1905–1980', bio:'French existentialist who argued that existence precedes essence — we exist first and define ourselves through action. Radical freedom comes with radical responsibility. We are condemned to be free.', quote:'Man is condemned to be free.', school:'French / Existentialism' },
-            { emoji:'🌸', name:'Laozi', years:'c. 6th century BCE', bio:'Legendary founder of Daoism. The Tao Te Ching teaches the way of water — soft, yielding, yet unstoppable. Wu wei — effortless action — is the path of the sage.', quote:'The journey of a thousand miles begins with one step.', school:'Chinese / Daoism' },
-            { emoji:'🐉', name:'Confucius', years:'551–479 BCE', bio:'Chinese philosopher whose ethical system shaped East Asian civilization for two millennia. He taught that virtue is cultivated through ritual, learning, and right relationships — not born, but built.', quote:'It does not matter how slowly you go as long as you do not stop.', school:'Chinese / Confucianism' },
-            { emoji:'🦋', name:'Zhuangzi', years:'c. 369–286 BCE', bio:'Daoist philosopher of playful profundity. His butterfly dream questions the boundary between dream and reality. His writing is full of humor, paradox, and the joy of uncertainty.', quote:'I dreamed I was a butterfly. Now I do not know whether I was then a man dreaming I was a butterfly, or whether I am now a butterfly dreaming I am a man.', school:'Chinese / Daoism' },
-            { emoji:'💀', name:'Marcus Aurelius', years:'121–180 CE', bio:'Roman emperor and Stoic philosopher. His Meditations, written in a tent during military campaigns, are an intimate guide to self-discipline, resilience, and inner peace.', quote:'You have power over your mind — not outside events. Realize this, and you will find strength.', school:'Roman / Stoicism' },
-            { emoji:'🪞', name:'David Hume', years:'1711–1776', bio:'Scottish empiricist and skeptic. He argued that causality is just a mental habit, that the self is a bundle of perceptions, and that reason is the slave of the passions.', quote:'A wise man proportions his belief to the evidence.', school:'Scottish / Empiricism' },
-            { emoji:'🔮', name:'Baruch Spinoza', years:'1632–1677', bio:'Dutch-Jewish philosopher excommunicated for heresy. He identified God with Nature — Deus sive Natura — and argued that everything follows necessarily from the divine substance.', quote:'The highest activity a human being can attain is learning for understanding, because to understand is to be free.', school:'Dutch / Rationalism' },
-            { emoji:'🎪', name:'Arthur Schopenhauer', years:'1788–1860', bio:'German pessimist philosopher. He saw the world as driven by a blind, striving Will. Art and asceticism offer temporary escape from suffering. His influence extends to Freud, Wagner, and Tolstoy.', quote:'Talent hits a target no one else can hit; Genius hits a target no one else can see.', school:'German / Pessimism' },
-            { emoji:'🕊️', name:'Hannah Arendt', years:'1906–1975', bio:'German-American political philosopher. She coined "the banality of evil" covering Eichmann\'s trial. Her work on totalitarianism, action, and thinking remains urgently relevant.', quote:'The sad truth is that most evil is done by people who never make up their minds to be good or evil.', school:'German-American / Political Philosophy' },
-            { emoji:'⚡', name:'Michel Foucault', years:'1926–1984', bio:'French philosopher-historian who analyzed the relationship between power and knowledge. His studies of prisons, madness, and sexuality revealed how institutions shape what counts as truth.', quote:'I don\'t feel that it is necessary to know exactly what I am. The main interest in life and work is to become someone else that you were not in the beginning.', school:'French / Post-Structuralism' },
-            { emoji:'🌓', name:'Søren Kierkegaard', years:'1813–1855', bio:'Danish philosopher, father of existentialism. He argued that truth is subjective and that faith requires a leap — not a rational conclusion. Anxiety and despair are the price of freedom.', quote:'Life can only be understood backwards; but it must be lived forwards.', school:'Danish / Existentialism' },
-            { emoji:'🧘', name:'Siddhartha Gautama (Buddha)', years:'c. 563–483 BCE', bio:'Indian spiritual teacher whose insights on suffering, impermanence, and the illusion of self form the foundation of Buddhist philosophy. The Middle Way avoids both indulgence and asceticism.', quote:'Peace comes from within. Do not seek it without.', school:'Indian / Buddhism' },
-            { emoji:'🔔', name:'Emmanuel Levinas', years:'1906–1995', bio:'French-Lithuanian philosopher who placed ethics before ontology. The encounter with the face of the Other, he argued, imposes an infinite responsibility that precedes all philosophy.', quote:'The face of the Other calls me to responsibility.', school:'French-Lithuanian / Ethics' },
-            { emoji:'📜', name:'John Rawls', years:'1921–2002', bio:'American political philosopher who revived social contract theory. His "veil of ignorance" thought experiment asks us to design a just society without knowing our own place in it.', quote:'Justice is the first virtue of social institutions, as truth is of systems of thought.', school:'American / Political Philosophy' }
-        ];
+        
 
         function showRandomThinker() {
             const idx = Math.floor(Math.random() * thinkersDB.length);
@@ -3273,7 +3303,7 @@
             const author = document.getElementById('quoteAuthor').value.trim();
             if (!text || !author) { showToast('Please fill in both quote and author.', 'error'); return; }
             try {
-                await supabase.from('submitted_quotes').insert({user_id: siteUserId, quote_text: text, author: author});
+                await supabase.from('submitted_quotes').insert({user_id: activeUserId(), quote_text: text, author: author});
                 document.getElementById('quoteText').value = '';
                 document.getElementById('quoteAuthor').value = '';
                 await renderSubmittedQuotes();
@@ -3284,15 +3314,19 @@
         async function renderSubmittedQuotes() {
             document.getElementById('submittedQuotes').innerHTML = '<div class="skeleton" style="height:14px;width:90%;margin:6px 0"></div><div class="skeleton" style="height:14px;width:70%;margin:6px 0"></div>';
             try {
-                const { data: quotes } = await supabase.from('submitted_quotes').select('id,quote_text,author,created_at').order('created_at', {ascending:false}).limit(20);
+                const { data: quotes } = await supabase.from('submitted_quotes').select('id,quote_text,author,user_id,created_at').order('created_at', {ascending:false}).limit(20);
                 const container = document.getElementById('submittedQuotes');
                 if (!quotes || quotes.length === 0) { container.innerHTML = '<p style="font-size:13px;color:var(--ink-light);font-style:italic;">Be the first to submit a quote. What words have stayed with you?</p>'; return; }
-                container.innerHTML = quotes.map(q =>
-                    `<div class="submitted-quote-item">
-                        <span>"${escapeHtml(q.quote_text)}"<span class="sq-author">— ${escapeHtml(q.author)}</span></span>
+                await loadProfileMap(quotes.map(q => q.user_id));
+                container.innerHTML = quotes.map(q => {
+                    const realUser = q.user_id && q.user_id.indexOf('anon_') !== 0;
+                    const submitter = realUser ? displayNameFor(q.user_id) : null;
+                    const byline = (submitter && submitter !== 'Member') ? ` <span class="sq-author" style="color:var(--gold);font-style:italic;">· ${escapeHtml(submitter)}</span>` : '';
+                    return `<div class="submitted-quote-item">
+                        <span>"${escapeHtml(q.quote_text)}"<span class="sq-author">— ${escapeHtml(q.author)}</span>${byline}</span>
                         <button class="quote-delete" onclick="deleteQuote('${escapeHtml(String(q.id))}')" title="Delete quote" aria-label="Delete quote">🗑️</button>
-                    </div>`
-                ).join('');
+                    </div>`;
+                }).join('');
             } catch(e) { console.warn('Quotes load failed', e); document.getElementById('submittedQuotes').innerHTML = '<p style="font-size:13px;color:var(--ink-light);font-style:italic;">Be the first to submit a quote. What words have stayed with you?</p>'; }
         }
         async function deleteQuote(id) {
@@ -3363,7 +3397,7 @@
             document.getElementById('debateQuestion').innerHTML = '<span class="skeleton" style="display:inline-block;width:70%;height:1.1em;"></span>';
             try {
                 const debate = getDailyDebate();
-                const { data: votes } = await supabase.from('debate_votes').select('side');
+                const { data: votes } = await supabase.from('debate_votes').select('side,user_id');
                 const v = votes || [];
                 const d = {
                     question: debate.question,
@@ -3378,28 +3412,34 @@
                 document.getElementById('debateNameB').textContent = d.sideB.name;
                 document.getElementById('debateSummaryB').textContent = d.sideB.summary;
                 updateDebateResults(d);
-                const { data: myVotes } = await supabase.from('debate_votes').select('side').eq('user_id', siteUserId);
+                const { data: myVotes } = await supabase.from('debate_votes').select('side').eq('user_id', activeUserId());
                 if (myVotes && myVotes.length > 0) {
                     const btn = myVotes[0].side === 'A' ? document.querySelector('#debateSideA .debate-vote-btn') : document.querySelector('#debateSideB .debate-vote-btn');
                     if (btn) btn.classList.add('voted');
+                }
+                if (isAdmin && votes) {
+                    await loadProfileMap(votes.map(r => r.user_id));
+                    document.getElementById('debateVoters').innerHTML = votes.map(r =>
+                        `<span class="voter-chip">${escapeHtml(displayNameFor(r.user_id))}: <b>Side ${escapeHtml(r.side)}</b></span>`
+                    ).join('');
                 }
                 renderDebateExplanation();
             } catch(e) { console.warn('Debate load failed', e); document.getElementById('debateQuestion').textContent = getDailyDebate().question; }
         }
         async function voteDebate(side) {
             try {
-                const { data: myVotes } = await supabase.from('debate_votes').select('side').eq('user_id', siteUserId);
+                const { data: myVotes } = await supabase.from('debate_votes').select('side').eq('user_id', activeUserId());
                 const myVote = (myVotes && myVotes.length > 0) ? myVotes[0].side : null;
                 document.querySelectorAll('.debate-vote-btn').forEach(b => b.classList.remove('voted'));
                 if (myVote === side) {
-                    await supabase.from('debate_votes').delete().eq('user_id', siteUserId);
-                    const { data: expls } = await supabase.from('debate_explanations').select('id').eq('user_id', siteUserId).eq('side', side);
+                    await supabase.from('debate_votes').delete().eq('user_id', activeUserId());
+                    const { data: expls } = await supabase.from('debate_explanations').select('id').eq('user_id', activeUserId()).eq('side', side);
                     if (expls && expls.length > 0) {
-                        await supabase.from('debate_explanations').delete().eq('user_id', siteUserId).eq('side', side);
+                        await supabase.from('debate_explanations').delete().eq('user_id', activeUserId()).eq('side', side);
                     }
                 } else {
-                    if (myVote) await supabase.from('debate_votes').delete().eq('user_id', siteUserId);
-                    await supabase.from('debate_votes').insert({user_id: siteUserId, side: side});
+                    if (myVote) await supabase.from('debate_votes').delete().eq('user_id', activeUserId());
+                    await supabase.from('debate_votes').insert({user_id: activeUserId(), side: side});
                     const btn = side === 'A' ? document.querySelector('#debateSideA .debate-vote-btn') : document.querySelector('#debateSideB .debate-vote-btn');
                     if (btn) btn.classList.add('voted');
                 }
@@ -3416,14 +3456,14 @@
         }
         async function getDebateExplanations() {
             try {
-                const { data } = await supabase.from('debate_explanations').select('side,explanation').eq('user_id', siteUserId);
+                const { data } = await supabase.from('debate_explanations').select('side,explanation').eq('user_id', activeUserId());
                 const result = {};
                 if (data) data.forEach(r => { result[r.side] = r.explanation; });
                 return result;
             } catch(e) { return {}; }
         }
         async function renderDebateExplanation() {
-            const { data: myVotes } = await supabase.from('debate_votes').select('side').eq('user_id', siteUserId);
+            const { data: myVotes } = await supabase.from('debate_votes').select('side').eq('user_id', activeUserId());
             const myVote = (myVotes && myVotes.length > 0) ? myVotes[0].side : null;
             const container = document.getElementById('debateExplanation');
             const form = document.getElementById('debateExplanationForm');
@@ -3448,7 +3488,7 @@
             }
         }
         async function submitDebateExplanation() {
-            const { data: myVotes } = await supabase.from('debate_votes').select('side').eq('user_id', siteUserId);
+            const { data: myVotes } = await supabase.from('debate_votes').select('side').eq('user_id', activeUserId());
             const myVote = (myVotes && myVotes.length > 0) ? myVotes[0].side : null;
             if (!myVote) return;
             const textarea = document.getElementById('debateExplanationText');
@@ -3456,7 +3496,7 @@
             if (!text) return;
             try {
                 await supabase.from('debate_explanations').upsert(
-                    {user_id: siteUserId, side: myVote, explanation: text, updated_at: new Date().toISOString()},
+                    {user_id: activeUserId(), side: myVote, explanation: text, updated_at: new Date().toISOString()},
                     {onConflict: 'user_id,side'}
                 );
                 renderDebateExplanation();
@@ -3464,11 +3504,11 @@
             } catch(e) { console.warn('Explanation save failed', e); showToast('Failed to save.', 'error'); }
         }
         async function deleteDebateExplanation() {
-            const { data: myVotes } = await supabase.from('debate_votes').select('side').eq('user_id', siteUserId);
+            const { data: myVotes } = await supabase.from('debate_votes').select('side').eq('user_id', activeUserId());
             const myVote = (myVotes && myVotes.length > 0) ? myVotes[0].side : null;
             if (!myVote) return;
             try {
-                await supabase.from('debate_explanations').delete().eq('user_id', siteUserId).eq('side', myVote);
+                await supabase.from('debate_explanations').delete().eq('user_id', activeUserId()).eq('side', myVote);
                 renderDebateExplanation();
             } catch(e) { console.warn('Explanation delete failed', e); }
         }
@@ -3746,25 +3786,31 @@
 
         // Listen for auth state changes
         supabase.auth.onAuthStateChange(async (event, session) => {
+            currentUser = session ? session.user : null;
             if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
                 await checkAdminStatus();
                 applyAdminUI();
+                await ensureUserProfile();
+                applyUserUI();
+                await refreshVoteStates();
             } else if (event === 'SIGNED_OUT') {
                 isAdmin = false;
                 applyAdminUI();
+                applyUserUI();
+                await refreshVoteStates();
             }
         });
 
         // ---- GDPR Data Export ----
         async function exportMyData() {
             try {
-                const exports = { exported_at: new Date().toISOString(), user_id: siteUserId };
+                const exports = { exported_at: new Date().toISOString(), user_id: activeUserId() };
                 const [{ data: pollVotes }, { data: debateVotes }, { data: explanations }, { data: quotes }, { data: likes }] = await Promise.all([
-                    supabase.from('poll_votes').select('*').eq('user_id', siteUserId),
-                    supabase.from('debate_votes').select('*').eq('user_id', siteUserId),
-                    supabase.from('debate_explanations').select('*').eq('user_id', siteUserId),
-                    supabase.from('submitted_quotes').select('*').eq('user_id', siteUserId),
-                    supabase.from('seed_likes').select('*').eq('user_id', siteUserId)
+                    supabase.from('poll_votes').select('*').eq('user_id', activeUserId()),
+                    supabase.from('debate_votes').select('*').eq('user_id', activeUserId()),
+                    supabase.from('debate_explanations').select('*').eq('user_id', activeUserId()),
+                    supabase.from('submitted_quotes').select('*').eq('user_id', activeUserId()),
+                    supabase.from('seed_likes').select('*').eq('user_id', activeUserId())
                 ]);
                 exports.poll_votes = pollVotes || [];
                 exports.debate_votes = debateVotes || [];
@@ -3784,6 +3830,195 @@
                 showToast('Export failed. Please try again.', 'error');
             }
         }
+
+        // ============================================================
+        // USER ACCOUNTS — register / login / profile / activity
+        // ============================================================
+        let userMode = 'signin';
+
+        async function initUserAuth() {
+            await refreshCurrentUser();
+            applyUserUI();
+        }
+
+        function toggleUserModal() {
+            if (isLoggedIn()) { showUserAccountView(); }
+            else { userMode = 'signin'; setUserLoginMode(); }
+            document.getElementById('userModal').classList.add('open');
+            setTimeout(() => { const e = document.getElementById('userEmail'); if (e) e.focus(); }, 100);
+        }
+        function closeUserModal() { document.getElementById('userModal').classList.remove('open'); }
+        document.getElementById('userModal').addEventListener('click', function(e) { if (e.target === this) closeUserModal(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && document.getElementById('userModal').classList.contains('open')) closeUserModal(); });
+
+        function userToggleMode() {
+            userMode = (userMode === 'signin') ? 'signup' : 'signin';
+            setUserLoginMode();
+        }
+        function setUserLoginMode() {
+            document.getElementById('userLoginForm').style.display = 'block';
+            document.getElementById('userAccountView').style.display = 'none';
+            if (userMode === 'signin') {
+                document.getElementById('userModalTitle').textContent = 'Join the Café';
+                document.getElementById('userSubtitle').textContent = 'Sign in to track your contributions.';
+                document.getElementById('userSubmitBtn').textContent = 'Sign In';
+                document.getElementById('userToggleLink').textContent = 'Create an account';
+            } else {
+                document.getElementById('userModalTitle').textContent = 'Create Account';
+                document.getElementById('userSubtitle').textContent = 'Pick an email and password to join.';
+                document.getElementById('userSubmitBtn').textContent = 'Sign Up';
+                document.getElementById('userToggleLink').textContent = 'Back to sign in';
+            }
+            document.getElementById('userAuthError').style.display = 'none';
+        }
+        function showUserAccountView() {
+            document.getElementById('userLoginForm').style.display = 'none';
+            document.getElementById('userAccountView').style.display = 'block';
+            document.getElementById('userModalTitle').textContent = currentUser ? (currentUser.email || 'Your Account') : 'Your Account';
+            loadDisplayName();
+        }
+        async function loadDisplayName() {
+            const dn = document.getElementById('displayName');
+            if (!currentUser) return;
+            try {
+                const { data } = await supabase.from('user_profiles').select('display_name').eq('id', currentUser.id).single();
+                dn.value = (data && data.display_name) ? data.display_name : (currentUser.email ? currentUser.email.split('@')[0] : '');
+            } catch(e) { dn.value = currentUser.email ? currentUser.email.split('@')[0] : ''; }
+        }
+        function showUserError(msg) { const el = document.getElementById('userAuthError'); el.textContent = msg; el.style.display = 'block'; }
+
+        async function userSubmit() {
+            const email = document.getElementById('userEmail').value.trim();
+            const password = document.getElementById('userPassword').value;
+            if (!email || !password) { showUserError('Please enter email and password.'); return; }
+            if (userMode === 'signup' && password.length < 6) { showUserError('Password must be at least 6 characters.'); return; }
+            try {
+                if (userMode === 'signin') {
+                    const { error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) { showUserError(error.message); return; }
+                } else {
+                    const { data, error } = await supabase.auth.signUp({ email, password });
+                    if (error) { showUserError(error.message); return; }
+                    if (data.user && data.user.identities && data.user.identities.length === 0) {
+                        showUserError('An account with this email already exists.'); return;
+                    }
+                }
+                document.getElementById('userModal').classList.remove('open');
+                await refreshCurrentUser();
+                await ensureUserProfile();
+                applyUserUI();
+                await refreshVoteStates();
+                showToast(userMode === 'signup' ? 'Welcome to the café!' : 'Welcome back!', 'success');
+            } catch(e) { showUserError('Network error. Please try again.'); }
+        }
+
+        async function userSignOut() {
+            try { await supabase.auth.signOut(); } catch(e) {}
+            currentUser = null;
+            document.getElementById('userModal').classList.remove('open');
+            applyUserUI();
+            await refreshVoteStates();
+            showToast('Signed out.', 'success');
+        }
+
+        async function ensureUserProfile() {
+            if (!currentUser) return;
+            const suggested = currentUser.email ? currentUser.email.split('@')[0] : 'Philosopher';
+            try {
+                const { data } = await supabase.from('user_profiles').select('id').eq('id', currentUser.id).single();
+                if (!data) { await supabase.from('user_profiles').insert({ id: currentUser.id, display_name: suggested }); }
+            } catch(e) {
+                try { await supabase.from('user_profiles').upsert({ id: currentUser.id, display_name: suggested }); } catch(_) {}
+            }
+        }
+
+        async function saveDisplayName() {
+            if (!currentUser) return;
+            const name = document.getElementById('displayName').value.trim() || (currentUser.email ? currentUser.email.split('@')[0] : 'Philosopher');
+            try {
+                await supabase.from('user_profiles').upsert({ id: currentUser.id, display_name: name });
+                showToast('Name saved.', 'success');
+                closeUserModal();
+            } catch(e) { showToast('Failed to save name.', 'error'); }
+        }
+
+        function applyUserUI() {
+            const btn = document.getElementById('userTrigger');
+            const act = document.getElementById('activityTrigger');
+            if (isLoggedIn()) {
+                const name = currentUser.email ? currentUser.email.split('@')[0] : '👤';
+                btn.innerHTML = '👤 <span class="uname">' + escapeHtml(name) + '</span>';
+                btn.title = 'Account';
+                if (act) act.style.display = 'inline-flex';
+            } else {
+                btn.innerHTML = '👤';
+                btn.title = 'Sign in';
+                if (act) act.style.display = 'none';
+            }
+        }
+
+        // Re-render vote/quote states after login/logout (ids may change)
+        async function refreshVoteStates() {
+            try { await loadPoll(); } catch(e) {}
+            try { await loadDebate(); } catch(e) {}
+            try { await renderSubmittedQuotes(); } catch(e) {}
+        }
+
+        // ---- Profile cache: map user_id -> display_name ----
+        let _profileCache = {};
+        async function loadProfileMap(ids) {
+            const missing = [...new Set(ids)].filter(id => id && !(id in _profileCache));
+            if (missing.length === 0) return;
+            try {
+                const { data } = await supabase.from('user_profiles').select('id,display_name').in('id', missing);
+                if (data) data.forEach(p => { _profileCache[p.id] = p.display_name; });
+            } catch(e) {}
+            missing.forEach(id => { if (!(id in _profileCache)) _profileCache[id] = null; });
+        }
+        function displayNameFor(userId) {
+            if (!userId) return 'Anonymous';
+            if (userId.indexOf('anon_') === 0) return 'Anonymous';
+            const n = _profileCache[userId];
+            if (n) return n;
+            return 'Member';
+        }
+
+        // ---- My Activity modal ----
+        async function openMyActivity() {
+            closeUserModal();
+            const content = document.getElementById('activityContent');
+            content.innerHTML = '<div class="skeleton" style="height:14px;width:80%;margin:6px 0"></div>';
+            document.getElementById('activityModal').classList.add('open');
+            const uid = activeUserId();
+            try {
+                const [{ data: pollVotes }, { data: debateVotes }, { data: quotes }, { data: likes }] = await Promise.all([
+                    supabase.from('poll_votes').select('option,created_at').eq('user_id', uid).order('created_at',{ascending:false}),
+                    supabase.from('debate_votes').select('side,created_at').eq('user_id', uid).order('created_at',{ascending:false}),
+                    supabase.from('submitted_quotes').select('quote_text,author,created_at').eq('user_id', uid).order('created_at',{ascending:false}),
+                    supabase.from('seed_likes').select('seed_index,created_at').eq('user_id', uid).order('created_at',{ascending:false})
+                ]);
+                const optLabel = { agree:'Agree', disagree:'Disagree', undecided:'Undecided' };
+                let html = '';
+                if (pollVotes && pollVotes.length) {
+                    html += '<h4 class="activity-h">🗳️ Poll Votes</h4>' + pollVotes.map(v => `<div class="activity-item">Voted <b>${optLabel[v.option] || v.option}</b></div>`).join('');
+                }
+                if (debateVotes && debateVotes.length) {
+                    html += '<h4 class="activity-h">⚔️ Debate Votes</h4>' + debateVotes.map(v => `<div class="activity-item">Voted for side <b>${escapeHtml(v.side)}</b></div>`).join('');
+                }
+                if (quotes && quotes.length) {
+                    html += '<h4 class="activity-h">💬 Quotes Submitted</h4>' + quotes.map(q => `<div class="activity-item">"${escapeHtml(q.quote_text)}" <span class="sq-author">— ${escapeHtml(q.author)}</span></div>`).join('');
+                }
+                if (likes && likes.length) {
+                    html += '<h4 class="activity-h">🌱 Seeds Liked</h4>' + likes.map(l => `<div class="activity-item">Liked seed #${escapeHtml(String(l.seed_index))}</div>`).join('');
+                }
+                content.innerHTML = html || '<p style="color:var(--ink-light);font-style:italic;">No activity yet. Vote, debate, or submit a quote to get started.</p>';
+            } catch(e) {
+                content.innerHTML = '<p style="color:var(--ink-light);">Could not load activity.</p>';
+            }
+        }
+        function closeActivityModal() { document.getElementById('activityModal').classList.remove('open'); }
+        document.getElementById('activityModal').addEventListener('click', function(e) { if (e.target === this) closeActivityModal(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && document.getElementById('activityModal').classList.contains('open')) closeActivityModal(); });
 
         // ============================================================
         // TOAST UTILITY
@@ -4124,137 +4359,6 @@
         });
 
         // ============================================================
-        // SEARCH — site-wide client-side search
-        // ============================================================
-        let searchIndex = [];
-        let searchActiveIdx = -1;
-
-        function buildSearchIndex() {
-            searchIndex = [];
-            // Thinkers
-            thinkersDB.forEach(t => {
-                searchIndex.push({ type:'thinker', icon:t.emoji, title:t.name, sub:t.school + ' · ' + t.years, keywords:t.name + ' ' + t.bio + ' ' + t.quote + ' ' + t.school, link:null, action: () => { closeSearch(); showRandomThinkerById(thinkersDB.indexOf(t)); } });
-            });
-            // Thought Seeds
-            if (typeof seedPosts !== 'undefined') {
-                seedPosts.forEach((s, i) => {
-                    searchIndex.push({ type:'seed', icon:s.icon, title:s.title, sub:s.subtitle, keywords:s.title + ' ' + s.subtitle, link:'thought-seeds.html', action: null });
-                });
-            }
-            // Pages
-            searchIndex.push(
-                { type:'page', icon:'🏛️', title:'Library', sub:'Curated resources & readings', keywords:'library resources books articles', link:'library.html', action:null },
-                { type:'page', icon:'📖', title:'Glossary', sub:'Philosophical terms A–Z', keywords:'glossary terms definitions', link:'glossary.html', action:null },
-                { type:'page', icon:'🧠', title:'Great Minds', sub:'Directory of philosophers', keywords:'great minds philosophers thinkers', link:'greatminds.html', action:null },
-                { type:'page', icon:'✍️', title:'Compose', sub:'Writing exercises & reflections', keywords:'compose writing exercises reflect', link:'compose.html', action:null },
-                { type:'page', icon:'🌱', title:'Thought Seeds', sub:'Philosophical seeds for contemplation', keywords:'seeds thoughts contemplation philosophy', link:'thought-seeds.html', action:null },
-                { type:'page', icon:'💬', title:'Discourse', sub:'Daily debates, votes & conversation', keywords:'discourse debate vote poll conversation', link:'philosophycafe.html#feed', action:null },
-                { type:'page', icon:'📊', title:'Past Debates & Votes', sub:'Browse searchable archives', keywords:'past archives history debates votes', link:null, action: () => { closeSearch(); setTimeout(() => openPastPortal(), 200); } }
-            );
-            // Reading group
-            if (typeof readingSchedule !== 'undefined') {
-                readingSchedule.forEach(s => {
-                    searchIndex.push({ type:'reading', icon:'📚', title:'Reading Group Week '+s.week, sub:s.books.join(', '), keywords:s.books.join(' ') + ' ' + s.analysis + ' ' + s.question, link:null, action: null });
-                });
-            }
-        }
-
-        function openSearch() {
-            if (!searchIndex.length) buildSearchIndex();
-            document.getElementById('searchOverlay').classList.add('open');
-            document.getElementById('searchInput').value = '';
-            document.getElementById('searchResults').innerHTML = '<p class="search-hint">Type to search across philosophers, thought seeds, glossary terms, and more.</p>';
-            searchActiveIdx = -1;
-            setTimeout(() => document.getElementById('searchInput').focus(), 100);
-        }
-        function closeSearch() {
-            document.getElementById('searchOverlay').classList.remove('open');
-            searchActiveIdx = -1;
-        }
-
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const q = e.target.value.trim().toLowerCase();
-            const container = document.getElementById('searchResults');
-            if (!q) {
-                container.innerHTML = '<p class="search-hint">Type to search across philosophers, thought seeds, glossary terms, and more.</p>';
-                searchActiveIdx = -1;
-                return;
-            }
-            const results = searchIndex.filter(item =>
-                item.title.toLowerCase().includes(q) ||
-                (item.sub && item.sub.toLowerCase().includes(q)) ||
-                (item.keywords && item.keywords.toLowerCase().includes(q))
-            ).slice(0, 20);
-
-            if (!results.length) {
-                container.innerHTML = '<p class="search-no-results">No results for "' + escapeHtml(q) + '" — try a different term.</p>';
-                searchActiveIdx = -1;
-                return;
-            }
-            let lastType = '';
-            let html = '';
-            results.forEach((r, i) => {
-                if (r.type !== lastType) {
-                    const labels = { thinker:'Thinkers', seed:'Thought Seeds', page:'Pages', reading:'Reading Group' };
-                    html += '<div class="search-result-group">' + (labels[r.type] || r.type) + '</div>';
-                    lastType = r.type;
-                }
-                html += '<div class="search-result-item" data-idx="' + i + '" onclick="selectSearchResult(' + i + ')">' +
-                    '<span class="search-result-icon">' + r.icon + '</span>' +
-                    '<span class="search-result-text"><div class="search-result-title">' + escapeHtml(r.title) + '</div><div class="search-result-sub">' + escapeHtml(r.sub || '') + '</div></span>' +
-                    '</div>';
-            });
-            container.innerHTML = html;
-            searchActiveIdx = -1;
-        });
-
-        document.getElementById('searchInput').addEventListener('keydown', function(e) {
-            const items = document.querySelectorAll('.search-result-item');
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                if (items.length === 0) return;
-                searchActiveIdx = Math.min(searchActiveIdx + 1, items.length - 1);
-                items.forEach((el, i) => el.classList.toggle('active', i === searchActiveIdx));
-                items[searchActiveIdx]?.scrollIntoView({ block:'nearest' });
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                if (items.length === 0) return;
-                searchActiveIdx = Math.max(searchActiveIdx - 1, 0);
-                items.forEach((el, i) => el.classList.toggle('active', i === searchActiveIdx));
-                items[searchActiveIdx]?.scrollIntoView({ block:'nearest' });
-            } else if (e.key === 'Enter' && searchActiveIdx >= 0) {
-                e.preventDefault();
-                selectSearchResult(searchActiveIdx);
-            }
-        });
-
-        function showRandomThinkerById(idx) {
-            const t = thinkersDB[idx];
-            if (!t) return;
-            const modal = document.getElementById('thinkerModal');
-            modal.innerHTML = '<span class="thinker-emoji">' + t.emoji + '</span><h3>' + escapeHtml(t.name) + '</h3><p class="thinker-years">' + escapeHtml(t.years) + ' · ' + escapeHtml(t.school) + '</p><p class="thinker-bio">' + escapeHtml(t.bio) + '</p><div class="thinker-quote">"' + escapeHtml(t.quote) + '"<div class="thinker-quote-author">— ' + escapeHtml(t.name) + '</div></div><button class="close-btn" onclick="closeThinkerModal()">Close</button><button class="reroll-btn" onclick="showRandomThinker()">✦ Another</button>';
-            document.getElementById('thinkerModalOverlay').classList.add('open');
-        }
-
-        function selectSearchResult(idx) {
-            const results = searchIndex.filter(item => {
-                const q = document.getElementById('searchInput').value.trim().toLowerCase();
-                return item.title.toLowerCase().includes(q) || (item.sub && item.sub.toLowerCase().includes(q)) || (item.keywords && item.keywords.toLowerCase().includes(q));
-            }).slice(0, 20);
-            const r = results[idx];
-            if (!r) return;
-            if (r.action) { r.action(); return; }
-            if (r.link) { closeSearch(); window.location.href = r.link; return; }
-            closeSearch();
-        }
-
-        document.getElementById('searchOverlay').addEventListener('click', function(e) { if (e.target === this) closeSearch(); });
-        document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
-            if (e.key === '/' && document.activeElement === document.body) { e.preventDefault(); openSearch(); }
-        });
-
-        // ============================================================
         // INIT ALL
         // ============================================================
         (async function initAll() {
@@ -4266,7 +4370,8 @@
             await loadDebate();
             renderReadingGroup();
             await renderWeeklyDigest();
-            // Restore admin state from Supabase Auth session
+            // Restore user + admin state from Supabase Auth session
+            await initUserAuth();
             await checkAdminStatus();
             if (isAdmin) {
                 document.getElementById('adminTrigger').classList.add('active');
