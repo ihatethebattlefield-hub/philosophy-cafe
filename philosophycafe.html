@@ -2792,9 +2792,10 @@
                         </div>
 
                         <div id="userOtpForm" class="auth-form" style="display:none;">
-                            <p class="otp-note">We sent a six-digit verification code to <strong id="otpEmail"></strong>. Enter it below to finish creating your account.</p>
+                            <p class="otp-note">We sent a verification code to <strong id="otpEmail"></strong>. Enter it below to finish creating your account.</p>
                             <label class="auth-label">Verification code
-                                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" class="admin-input otp-code" id="userOtp" placeholder="000000" onkeydown="if(event.key==='Enter')verifySignupCode()">
+                                <input type="text" inputmode="numeric" pattern="[0-9]*" minlength="6" maxlength="8" autocomplete="one-time-code" class="admin-input otp-code" id="userOtp" placeholder="00000000" aria-describedby="otpLengthHint" onkeydown="if(event.key==='Enter')verifySignupCode()">
+                                <span id="otpLengthHint" style="font-size:12px;letter-spacing:0;text-transform:none;">Enter the 6–8 digit code exactly as shown in the email.</span>
                             </label>
                             <div class="admin-btn-row">
                                 <button class="admin-btn secondary" onclick="backToSignup()">Back</button>
@@ -4112,7 +4113,7 @@
 
         async function verifySignupCode() {
             const token = document.getElementById('userOtp').value.replace(/\s/g, '');
-            if (!/^\d{6}$/.test(token)) { showUserError('Enter the six-digit code from your email.'); return; }
+            if (!/^\d{6,8}$/.test(token)) { showUserError('Enter the 6–8 digit code exactly as shown in your email.'); return; }
             clearUserError();
             setAuthBusy('verifyOtpBtn', true, 'Verifying…');
             try {
