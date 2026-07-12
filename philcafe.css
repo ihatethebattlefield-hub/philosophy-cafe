@@ -270,23 +270,25 @@ body::before {
 .particles { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
 .particle {
     position: absolute;
-    font-size: 14px;
-    opacity: 0.18;
-    color: var(--gold);
-    text-shadow: 0 0 14px rgba(184, 134, 11, 0.22);
-    animation: float 22s infinite ease-in-out;
-    will-change: transform, opacity;
+    left: 0;
+    top: 0;
+    display: grid;
+    place-items: center;
+    width: var(--particle-size, 36px);
+    height: var(--particle-size, 36px);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: calc(var(--particle-size, 36px) * 0.82);
+    font-weight: 600;
+    line-height: 1;
+    color: rgba(149, 105, 13, 0.42);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8), 0 5px 16px rgba(184,134,11,0.16);
+    filter: drop-shadow(0 1px 1px rgba(55,40,18,0.08));
+    transform-origin: center;
+    will-change: transform;
+    user-select: none;
 }
 @media (prefers-reduced-motion: reduce) {
-    .particle { animation: none; opacity: 0.12; }
-}
-@keyframes float {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.14; }
-    15% { transform: translate(25px, -45px) rotate(7deg); opacity: 0.28; }
-    35% { transform: translate(-20px, -25px) rotate(-5deg); opacity: 0.18; }
-    55% { transform: translate(35px, -60px) rotate(9deg); opacity: 0.28; }
-    75% { transform: translate(-30px, -35px) rotate(-6deg); opacity: 0.18; }
-    90% { transform: translate(15px, -15px) rotate(3deg); opacity: 0.24; }
+    .particle { color: rgba(149, 105, 13, 0.18); }
 }
 
 /* ---- Library / Compose grid ---- */

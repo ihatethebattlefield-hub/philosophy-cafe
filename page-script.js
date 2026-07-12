@@ -1,21 +1,80 @@
 // Shared script for all Philosophy Café pages
 
-// Floating philosophy symbols
+// Floating philosophy symbols with lightweight elastic collision physics
 (function () {
     const container = document.getElementById('particles');
     if (!container) return;
     const symbols = ['Φ', 'Σ', 'Ψ', 'Ω', 'Δ', 'λ', 'π', 'θ', 'φ', 'α', 'ε', 'μ', '∞', '∴', '⊕'];
-    for (let i = 0; i < 30; i++) {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const bodies = [];
+    const count = Math.min(24, Math.max(14, Math.round(window.innerWidth / 70)));
+
+    for (let i = 0; i < count; i++) {
         const p = document.createElement('span');
         p.className = 'particle';
         p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-        p.style.left = Math.random() * 100 + '%';
-        p.style.top = Math.random() * 100 + '%';
-        p.style.animationDelay = (Math.random() * 20) + 's';
-        p.style.animationDuration = (15 + Math.random() * 25) + 's';
-        p.style.fontSize = (16 + Math.random() * 28) + 'px';
+        const radius = 14 + Math.random() * 13;
+        p.style.setProperty('--particle-size', `${radius * 2}px`);
         container.appendChild(p);
+        bodies.push({
+            el: p, radius, mass: radius * radius,
+            x: radius + Math.random() * Math.max(1, innerWidth - radius * 2),
+            y: radius + Math.random() * Math.max(1, innerHeight - radius * 2),
+            vx: (Math.random() - 0.5) * 25,
+            vy: (Math.random() - 0.5) * 25,
+            angle: Math.random() * 360,
+            spin: (Math.random() - 0.5) * 9
+        });
     }
+
+    // Separate any initially overlapping symbols before animation begins.
+    for (let pass = 0; pass < 8; pass++) resolveCollisions(false);
+
+    let previous = performance.now();
+    function resolveCollisions(applyImpulse = true) {
+        for (let i = 0; i < bodies.length; i++) for (let j = i + 1; j < bodies.length; j++) {
+            const a = bodies[i], b = bodies[j];
+            let dx = b.x - a.x, dy = b.y - a.y;
+            const minDistance = a.radius + b.radius;
+            let distance = Math.hypot(dx, dy);
+            if (distance >= minDistance) continue;
+            if (distance < 0.001) { dx = 1; dy = 0; distance = 1; }
+            const nx = dx / distance, ny = dy / distance;
+            const overlap = minDistance - distance;
+            const totalMass = a.mass + b.mass;
+            a.x -= nx * overlap * (b.mass / totalMass);
+            a.y -= ny * overlap * (b.mass / totalMass);
+            b.x += nx * overlap * (a.mass / totalMass);
+            b.y += ny * overlap * (a.mass / totalMass);
+            if (!applyImpulse) continue;
+            const relativeNormalSpeed = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+            if (relativeNormalSpeed >= 0) continue;
+            const restitution = 0.92;
+            const impulse = -(1 + restitution) * relativeNormalSpeed / (1 / a.mass + 1 / b.mass);
+            a.vx -= impulse * nx / a.mass; a.vy -= impulse * ny / a.mass;
+            b.vx += impulse * nx / b.mass; b.vy += impulse * ny / b.mass;
+            const tangentSpeed = (b.vx - a.vx) * -ny + (b.vy - a.vy) * nx;
+            a.spin -= tangentSpeed * 0.035; b.spin += tangentSpeed * 0.035;
+        }
+    }
+
+    function frame(now) {
+        const dt = Math.min((now - previous) / 1000, 0.032);
+        previous = now;
+        if (!reducedMotion.matches) {
+            bodies.forEach(body => {
+                body.x += body.vx * dt; body.y += body.vy * dt; body.angle += body.spin * dt;
+                if (body.x < body.radius) { body.x = body.radius; body.vx = Math.abs(body.vx) * 0.94; }
+                if (body.x > innerWidth - body.radius) { body.x = innerWidth - body.radius; body.vx = -Math.abs(body.vx) * 0.94; }
+                if (body.y < body.radius) { body.y = body.radius; body.vy = Math.abs(body.vy) * 0.94; }
+                if (body.y > innerHeight - body.radius) { body.y = innerHeight - body.radius; body.vy = -Math.abs(body.vy) * 0.94; }
+            });
+            resolveCollisions();
+        }
+        bodies.forEach(body => body.el.style.transform = `translate3d(${body.x - body.radius}px, ${body.y - body.radius}px, 0) rotate(${body.angle}deg)`);
+        requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
 })();
 
 // Mobile menu toggle
