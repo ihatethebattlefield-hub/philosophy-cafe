@@ -1177,6 +1177,45 @@
             border-radius: 14px;
             padding: 22px;
             box-shadow: 0 8px 30px var(--shadow);
+            overflow: hidden;
+        }
+        .giscus-comments.composer-only {
+            max-height: 360px;
+        }
+        .giscus-comments.history-expanded {
+            max-height: none;
+            overflow: visible;
+        }
+        .giscus-history-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 14px;
+        }
+        .giscus-history-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 999px;
+            background: var(--card-bg);
+            color: var(--ink-light);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.7px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .giscus-history-toggle:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: var(--gold-pale);
+        }
+        .giscus-history-toggle::before { content: '▸'; }
+        .giscus-history-toggle[aria-expanded="true"]::before { content: '▾'; }
+        @media (max-width: 600px) {
+            .giscus-comments { padding: 14px; }
+            .giscus-comments.composer-only { max-height: 390px; }
         }
         .giscus-placeholder {
             text-align: center;
@@ -1702,20 +1741,6 @@
         .poll-btn .bar.undecided { background: var(--gold); }
         .poll-label { position: relative; z-index: 1; }
         .poll-vote-count { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--ink-light); margin-left: auto; position: relative; z-index: 1; }
-        .poll-reset {
-            font-family: 'Inter', sans-serif;
-            font-size: 10px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--ink-light);
-            background: none;
-            border: none;
-            cursor: pointer;
-            opacity: 0.5;
-            transition: opacity 0.3s ease;
-        }
-        .poll-reset:hover { opacity: 1; }
-
         /* ============================================================
            3. RANDOM PHILOSOPHER MODAL
            ============================================================ */
@@ -2850,7 +2875,6 @@
                     </div>
                     <p class="debate-hint">Tap a side to cast your vote — you can change your mind anytime. The tallies appear once you've voted.</p>
                     <div class="debate-results" id="debateResults"></div>
-                    <div class="voter-list" id="debateVoters"></div>
                     <div class="debate-explanation" id="debateExplanation" style="display:none;">
                         <div class="debate-explanation-form" id="debateExplanationForm">
                             <textarea id="debateExplanationText" placeholder="Why did you choose this side? (optional)"></textarea>
@@ -2943,12 +2967,15 @@
                         <p><strong>Join the conversation.</strong> To share a thought here, sign in with your GitHub account using the button at the top of the discussion below. No GitHub account yet? Creating one is <strong>free and takes about a minute</strong> — and whatever you write becomes part of the café for everyone who visits.</p>
                     </div>
 
-                    <div class="giscus-comments" id="giscusWidget">
+                    <div class="giscus-comments composer-only" id="giscusWidget">
                         <div class="giscus-placeholder" id="giscusPlaceholder">
                             <div class="giscus-placeholder-icon">💬</div>
                             <p class="giscus-placeholder-text">Loading the discussion…</p>
                             <div class="giscus-loader" id="giscusLoader" style="display:none;"></div>
                         </div>
+                    </div>
+                    <div class="giscus-history-controls">
+                        <button class="giscus-history-toggle" id="giscusHistoryToggle" type="button" aria-expanded="false" onclick="toggleGiscusHistory()">Show previous discussion posts</button>
                     </div>
                 </div>
             </section>
@@ -2987,8 +3014,6 @@
                         <span class="poll-vote-count" id="pollCountUndecided">0</span>
                     </button>
                 </div>
-                <button class="poll-reset" onclick="resetPoll()">Change my vote</button>
-                <div class="voter-list" id="pollVoters"></div>
             </div>
 
             <!-- 3. Random Philosopher -->
@@ -3305,13 +3330,6 @@
                     const btnId = 'poll' + myVotes[0].option.charAt(0).toUpperCase() + myVotes[0].option.slice(1);
                     document.getElementById(btnId).classList.add('voted');
                 }
-                if (isAdmin && votes) {
-                    await loadProfileMap(votes.map(r => r.user_id));
-                    const optLabel = { agree:'Agree', disagree:'Disagree', undecided:'Undecided' };
-                    document.getElementById('pollVoters').innerHTML = votes.map(r =>
-                        `<span class="voter-chip">${escapeHtml(displayNameFor(r.user_id))}: <b>${optLabel[r.option] || r.option}</b></span>`
-                    ).join('');
-                }
             } catch(e) { console.warn('Poll load failed', e); document.getElementById('pollQuestion').textContent = pollData.question; }
         }
         async function castPollVote(option) {
@@ -3330,10 +3348,6 @@
                 await loadPoll();
                 renderWeeklyDigest();
             } catch(e) { console.warn('Poll vote failed', e); showToast('Vote failed, please try again.', 'error'); }
-        }
-        function resetPoll() {
-            ['agree','disagree','undecided'].forEach(o => document.getElementById('poll'+o.charAt(0).toUpperCase()+o.slice(1)).classList.remove('voted'));
-            supabase.from('poll_votes').delete().eq('user_id', activeUserId()).then(() => { loadPoll(); renderWeeklyDigest(); });
         }
         function updatePollBars() {
             const total = pollData.agree + pollData.disagree + pollData.undecided || 1;
@@ -3490,12 +3504,6 @@
                 if (myVotes && myVotes.length > 0) {
                     const btn = myVotes[0].side === 'A' ? document.querySelector('#debateSideA .debate-vote-btn') : document.querySelector('#debateSideB .debate-vote-btn');
                     if (btn) btn.classList.add('voted');
-                }
-                if (isAdmin && votes) {
-                    await loadProfileMap(votes.map(r => r.user_id));
-                    document.getElementById('debateVoters').innerHTML = votes.map(r =>
-                        `<span class="voter-chip">${escapeHtml(displayNameFor(r.user_id))}: <b>Side ${escapeHtml(r.side)}</b></span>`
-                    ).join('');
                 }
                 renderDebateExplanation();
             } catch(e) { console.warn('Debate load failed', e); document.getElementById('debateQuestion').textContent = getDailyDebate().question; }
@@ -4316,7 +4324,7 @@
             script.setAttribute('data-strict', '0');
             script.setAttribute('data-reactions-enabled', '1');
             script.setAttribute('data-emit-metadata', '0');
-            script.setAttribute('data-input-position', 'bottom');
+            script.setAttribute('data-input-position', 'top');
             script.setAttribute('data-theme', 'https://ihatethebattlefield-hub.github.io/philosophy-cafe/giscus-theme.css');
             script.setAttribute('data-lang', 'en');
             script.crossOrigin = 'anonymous';
@@ -4355,6 +4363,18 @@
                 // If giscus is already loaded but was hidden, nudge it to recalculate its height.
                 window.dispatchEvent(new Event('resize'));
             }
+        }
+        function toggleGiscusHistory() {
+            const widget = document.getElementById('giscusWidget');
+            const button = document.getElementById('giscusHistoryToggle');
+            if (!widget || !button) return;
+            const expand = !widget.classList.contains('history-expanded');
+            widget.classList.toggle('history-expanded', expand);
+            widget.classList.toggle('composer-only', !expand);
+            button.setAttribute('aria-expanded', String(expand));
+            button.textContent = expand ? 'Hide previous discussion posts' : 'Show previous discussion posts';
+            window.dispatchEvent(new Event('resize'));
+            if (!expand) widget.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         function joinDiscussion() {
             toggleDiscourseComments(true);
