@@ -7,13 +7,13 @@
     const symbols = ['Φ', 'Σ', 'Ψ', 'Ω', 'Δ', 'λ', 'π', 'θ', 'φ', 'α', 'ε', 'μ', '∞', '∴', '⊕'];
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const bodies = [];
-    const count = Math.min(24, Math.max(14, Math.round(window.innerWidth / 70)));
+    const count = Math.min(38, Math.max(26, Math.round(window.innerWidth / 38)));
 
     for (let i = 0; i < count; i++) {
         const p = document.createElement('span');
         p.className = 'particle';
         p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-        const radius = 14 + Math.random() * 13;
+        const radius = 10 + Math.random() * 10;
         const direction = Math.random() * Math.PI * 2;
         const speed = 22 + Math.random() * 30;
         p.style.setProperty('--particle-size', `${radius * 2}px`);
