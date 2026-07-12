@@ -6,21 +6,24 @@
     <title>Glossary — φιλοσοφία (philosophía)</title>
     <link rel="stylesheet" href="philcafe.css">
     <style>
-        .glossary-search {
-            width: 100%;
-            max-width: 520px;
+        .glossary-search-launch {
+            width: min(100%, 620px);
             margin: 0 auto 28px;
-            display: block;
-            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
             border: 1px solid var(--border-subtle);
-            border-radius: 10px;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 16px;
-            color: var(--ink);
-            background: var(--cream);
+            border-radius: 999px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: var(--ink-light);
+            background: var(--card-bg);
+            cursor: pointer;
             transition: all 0.3s ease;
         }
-        .glossary-search:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .glossary-search-launch:hover { border-color: var(--gold); box-shadow: 0 8px 24px var(--shadow); color: var(--ink); }
+        .glossary-search-launch .shortcut { margin-left: auto; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
         .glossary-count {
             text-align: center;
             font-size: 12px;
@@ -31,15 +34,22 @@
         }
         .glossary-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 16px;
+            align-items: stretch;
         }
         .glossary-item {
+            width: 100%;
+            min-width: 0;
             background: var(--card-bg);
             border: 1px solid var(--border-subtle);
             border-radius: 12px;
             padding: 16px 18px;
             cursor: pointer;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            appearance: none;
             transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
         }
         .glossary-item:hover {
@@ -47,7 +57,7 @@
             box-shadow: 0 8px 24px var(--shadow);
             transform: translateY(-2px);
         }
-        .glossary-item.open { border-color: var(--gold); }
+        .glossary-item.open { border-color: var(--gold); grid-column: 1 / -1; }
         .glossary-term {
             font-family: 'Cinzel', serif;
             font-size: 15px;
@@ -70,12 +80,19 @@
         .glossary-def {
             font-size: 14px;
             color: var(--ink-light);
-            line-height: 1.7;
-            margin-top: 10px;
-            display: none;
+            line-height: 1.45;
+            margin-top: 0;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.28s ease, opacity 0.2s ease, margin-top 0.28s ease;
         }
-        .glossary-item.open .glossary-def { display: block; }
+        .glossary-item.open .glossary-def { max-height: 80px; opacity: 1; margin-top: 10px; }
         .empty-state { text-align: center; color: var(--ink-light); font-style: italic; padding: 30px; }
+        #searchResults .search-result-item { width: 100%; border: 0; background: transparent; text-align: left; }
+        @media (max-width: 980px) {
+            .glossary-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
         @media (max-width: 700px) {
             .glossary-list { grid-template-columns: 1fr; }
         }
@@ -122,9 +139,27 @@
     </header>
 
     <div class="page-container wide">
-        <input type="text" class="glossary-search" id="glossarySearch" placeholder="Search terms (e.g. epistemology, Tao, categorical imperative...)" oninput="filterGlossary()">
+        <button type="button" class="glossary-search-launch" onclick="openSearch()" aria-label="Search the philosophy glossary">
+            <span>⌕</span><span>Search the glossary…</span><span class="shortcut">⌘ K</span>
+        </button>
         <div class="glossary-count" id="glossaryCount"></div>
         <div class="glossary-list" id="glossaryList"></div>
+    </div>
+
+    <!-- Glossary-only search modal -->
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-modal" role="dialog" aria-modal="true" aria-label="Search the philosophy glossary">
+            <div class="search-header">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search glossary vocabulary…" autocomplete="off">
+                <button class="search-close" onclick="closeSearch()" aria-label="Close search">✕</button>
+            </div>
+            <div class="search-results" id="searchResults">
+                <p class="search-hint">Search all 100 glossary terms by vocabulary name.</p>
+            </div>
+            <div class="search-footer">
+                <span>↑↓ navigate</span><span>⏎ open</span><span>Esc close</span>
+            </div>
+        </div>
     </div>
 
     <footer class="footer">
@@ -135,83 +170,231 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="seeds.js"></script>
     <script src="page-script.js"></script>
-    <script src="search.js"></script>
     <script>
-        const glossaryTerms = [
-            { term:'A Priori', def:'Knowledge that is independent of experience — known through reason alone. Contrast with a posteriori.' },
-            { term:'Absurdism', def:'The philosophy of Albert Camus: the conflict between humanity\'s search for meaning and the universe\'s silent indifference.' },
-            { term:'Categorical Imperative', def:'Kant\'s supreme moral principle: act only on that maxim which you can will to become a universal law.' },
-            { term:'Cogito Ergo Sum', def:'"I think, therefore I am" — Descartes\' foundational certainty after doubting everything else.' },
-            { term:'Dao (Tao)', def:'The ineffable Way that underlies all of reality in Daoist philosophy. Cannot be named, only lived.' },
-            { term:'Deontology', def:'Ethics based on duty and rules rather than consequences. Associated with Kant.' },
-            { term:'Determinism', def:'The view that all events, including human choices, are causally determined by prior states.' },
-            { term:'Dialectic', def:'Hegel\'s process of thesis-antithesis-synthesis through which ideas and history evolve.' },
-            { term:'Dualism', def:'The view that mind and body are fundamentally distinct substances. Associated with Descartes.' },
-            { term:'Empiricism', def:'The theory that all knowledge comes from sensory experience. Key figures: Locke, Hume, Berkeley.' },
-            { term:'Epistemology', def:'The branch of philosophy concerned with knowledge — what it is, how we get it, and its limits.' },
-            { term:'Eudaimonia', def:'Aristotle\'s concept of the good life: flourishing, well-being, living in accordance with virtue.' },
-            { term:'Existentialism', def:'Philosophy emphasizing individual freedom, choice, and the creation of meaning in an absurd universe.' },
-            { term:'Golden Mean', def:'Aristotle\'s idea that virtue lies at a midpoint between excess and deficiency.' },
-            { term:'Hedonism', def:'The ethical view that pleasure is the highest good. Often misunderstood; Epicurus taught modest pleasures.' },
-            { term:'Idealism', def:'The metaphysical view that reality is fundamentally mental or idea-based (as opposed to material).' },
-            { term:'Materialism', def:'The view that only matter exists and all phenomena (including consciousness) are physical.' },
-            { term:'Metaphysics', def:'The branch of philosophy concerned with the nature of reality: being, existence, time, causation.' },
-            { term:'Nihilism', def:'The rejection of all moral, religious, and metaphysical beliefs, often accompanied by a sense of meaninglessness.' },
-            { term:'Ontology', def:'The study of being and existence — what kinds of things exist and what it means to exist.' },
-            { term:'Phenomenology', def:'The study of conscious experience from the first-person perspective. Associated with Husserl, Heidegger, Merleau-Ponty.' },
-            { term:'Rationalism', def:'The view that reason, not sensory experience, is the primary source of knowledge. Key figures: Descartes, Spinoza, Leibniz.' },
-            { term:'Skepticism', def:'The philosophical attitude of doubting knowledge claims. Can be global (everything) or local (specific domains).' },
-            { term:'Stoicism', def:'Hellenistic philosophy teaching virtue, self-control, and acceptance of what we cannot change.' },
-            { term:'Tabula Rasa', def:'"Blank slate" — Locke\'s idea that the mind at birth has no innate ideas; all knowledge comes from experience.' },
-            { term:'Teleology', def:'The explanation of things in terms of their purpose or end goal. Aristotle\'s final cause.' },
-            { term:'Übermensch', def:'Nietzsche\'s "Overman" — the ideal human who creates their own values beyond good and evil.' },
-            { term:'Utilitarianism', def:'Ethical theory that the right action maximizes overall happiness. Key figures: Bentham, Mill.' },
-            { term:'Veil of Ignorance', def:'Rawls\' thought experiment: design a just society without knowing your own social position.' },
-            { term:'Wu Wei', def:'Daoist principle of "effortless action" — acting in harmony with the Dao without forcing or striving.' }
+        const glossaryEntries = [
+            { term:'A Posteriori', def:'Knowledge justified through observation or experience.' },
+            { term:'A Priori', def:'Knowledge justified independently of particular experiences.' },
+            { term:'Absurdism', def:'The view that our search for meaning confronts an indifferent universe.' },
+            { term:'Aesthetics', def:'The philosophical study of beauty, art, taste, and artistic value.' },
+            { term:'Akrasia', def:'Acting against one\'s better judgment through weakness of will.' },
+            { term:'Analytic Philosophy', def:'A tradition emphasizing clarity, argument, logic, and careful language analysis.' },
+            { term:'Anarchism', def:'The view that coercive political authority requires justification or abolition.' },
+            { term:'Antinomy', def:'A contradiction between two apparently reasonable conclusions.' },
+            { term:'Appearance', def:'How something presents itself, which may differ from what it is.' },
+            { term:'Arete', def:'Ancient Greek excellence or virtue in fulfilling one\'s characteristic function.' },
+            { term:'Atomism', def:'The view that reality is composed of indivisible fundamental units.' },
+            { term:'Being', def:'Existence considered in its most general and fundamental sense.' },
+            { term:'Categorical Imperative', def:'Kant\'s command to act only on principles fit for universal law.' },
+            { term:'Causation', def:'The relation through which one event or condition produces another.' },
+            { term:'Cogito Ergo Sum', def:'Descartes\' claim “I think, therefore I am” as foundational certainty.' },
+            { term:'Compatibilism', def:'The view that free will can coexist with causal determinism.' },
+            { term:'Concept', def:'A general idea used to classify, understand, or reason about things.' },
+            { term:'Consequentialism', def:'The view that actions are morally judged by their outcomes.' },
+            { term:'Constructivism', def:'The view that some truths or norms arise through rational construction.' },
+            { term:'Contingency', def:'The condition of being possible but not necessary.' },
+            { term:'Contradiction', def:'A pair of claims that cannot both be true in the same respect.' },
+            { term:'Dao (Tao)', def:'The ineffable Way or order underlying reality in Daoist philosophy.' },
+            { term:'Deconstruction', def:'A reading practice that exposes tensions and unstable oppositions within texts.' },
+            { term:'Deduction', def:'Reasoning in which true premises guarantee the conclusion.' },
+            { term:'Deontology', def:'Ethics that grounds right action in duties, rules, or principles.' },
+            { term:'Determinism', def:'The view that every event follows necessarily from prior conditions.' },
+            { term:'Dialectic', def:'Reasoning that develops ideas through opposition, tension, and resolution.' },
+            { term:'Dualism', def:'The view that reality contains two fundamentally different kinds of substance.' },
+            { term:'Egoism', def:'The view that self-interest grounds or should guide human action.' },
+            { term:'Empiricism', def:'The view that sensory experience is the primary source of knowledge.' },
+            { term:'Enlightenment', def:'A movement championing reason, liberty, inquiry, and criticism of authority.' },
+            { term:'Epiphenomenalism', def:'The view that mental events are caused physically but cause nothing physical.' },
+            { term:'Epistemology', def:'The branch of philosophy that studies knowledge, evidence, and justification.' },
+            { term:'Epoché', def:'Phenomenology\'s suspension of ordinary judgments about external reality.' },
+            { term:'Essentialism', def:'The view that things possess defining properties essential to what they are.' },
+            { term:'Ethics', def:'The philosophical study of right action, good character, and valuable lives.' },
+            { term:'Eudaimonia', def:'Aristotle\'s ideal of human flourishing through excellent activity and virtue.' },
+            { term:'Existential Angst', def:'Anxiety arising from freedom, responsibility, uncertainty, and mortality.' },
+            { term:'Existentialism', def:'A tradition emphasizing freedom, responsibility, authenticity, and created meaning.' },
+            { term:'Fallacy', def:'A recurring error in reasoning that weakens an argument.' },
+            { term:'Falsifiability', def:'The capacity of a claim to be tested and potentially proven false.' },
+            { term:'Fatalism', def:'The belief that certain outcomes will occur regardless of human action.' },
+            { term:'Form', def:'For Plato, an eternal intelligible pattern of which particulars are instances.' },
+            { term:'Free Will', def:'The capacity to choose or act with meaningful control over one\'s conduct.' },
+            { term:'Golden Mean', def:'Aristotle\'s idea that virtue balances excess and deficiency.' },
+            { term:'Hedonism', def:'The view that pleasure is the sole or highest intrinsic good.' },
+            { term:'Hermeneutics', def:'The theory and practice of interpretation, especially of texts and meaning.' },
+            { term:'Idealism', def:'The view that reality is fundamentally mental, experiential, or idea-like.' },
+            { term:'Identity', def:'The relation by which something remains the same thing over time.' },
+            { term:'Immanence', def:'The presence of a principle or reality within the world itself.' },
+            { term:'Induction', def:'Reasoning from observed cases toward a broader probable conclusion.' },
+            { term:'Intentionality', def:'The mind\'s characteristic of being directed toward objects or contents.' },
+            { term:'Justice', def:'The fair ordering of rights, duties, benefits, and burdens.' },
+            { term:'Knowledge', def:'A cognitive achievement traditionally analyzed as justified true belief.' },
+            { term:'Language Game', def:'Wittgenstein\'s idea that meaning arises from rule-governed social use.' },
+            { term:'Logic', def:'The study of valid inference and the structure of good reasoning.' },
+            { term:'Materialism', def:'The view that everything that exists is ultimately material.' },
+            { term:'Metaethics', def:'The study of what moral claims mean and whether moral facts exist.' },
+            { term:'Metaphysics', def:'The study of reality\'s basic structure, including being, time, and causation.' },
+            { term:'Mind–Body Problem', def:'The problem of explaining how mental and physical phenomena relate.' },
+            { term:'Monism', def:'The view that reality is ultimately composed of one fundamental kind.' },
+            { term:'Moral Realism', def:'The view that at least some moral claims are objectively true.' },
+            { term:'Natural Law', def:'The view that moral principles can be derived from rational human nature.' },
+            { term:'Necessary Being', def:'A being whose nonexistence is impossible and whose existence needs no cause.' },
+            { term:'Nihilism', def:'The rejection of objective meaning, value, truth, or moral authority.' },
+            { term:'Nominalism', def:'The view that universals are names or concepts rather than real entities.' },
+            { term:'Noumenon', def:'Kant\'s thing as it is independently of human experience.' },
+            { term:'Ontology', def:'The study of what exists and the categories of being.' },
+            { term:'Panpsychism', def:'The view that mentality is a fundamental and widespread feature of reality.' },
+            { term:'Paradox', def:'A claim or argument that yields a surprising apparent contradiction.' },
+            { term:'Particular', def:'An individual entity rather than a universal property or kind.' },
+            { term:'Phenomenology', def:'The disciplined study of experience as it appears from the first person.' },
+            { term:'Physicalism', def:'The view that everything is physical or wholly dependent on the physical.' },
+            { term:'Pluralism', def:'The view that reality or value cannot be reduced to one principle.' },
+            { term:'Pragmatism', def:'A tradition testing ideas through their practical consequences and use.' },
+            { term:'Predicate', def:'An expression that attributes a property or relation to a subject.' },
+            { term:'Premise', def:'A statement offered as support for an argument\'s conclusion.' },
+            { term:'Qualia', def:'The subjective felt qualities of experiences, such as redness or pain.' },
+            { term:'Rationalism', def:'The view that reason is a primary source of substantive knowledge.' },
+            { term:'Reductionism', def:'Explaining complex phenomena entirely through simpler underlying components.' },
+            { term:'Relativism', def:'The view that truth or value depends on a framework or perspective.' },
+            { term:'Skepticism', def:'Systematic doubt about whether knowledge or justification is attainable.' },
+            { term:'Social Contract', def:'An account of political authority based on actual or hypothetical agreement.' },
+            { term:'Solipsism', def:'The view that only one\'s own mind is certain to exist.' },
+            { term:'Stoicism', def:'A philosophy teaching virtue and wise acceptance of what lies beyond control.' },
+            { term:'Substance', def:'A fundamental entity that exists in itself and bears properties.' },
+            { term:'Syllogism', def:'A deductive argument with two premises and a conclusion.' },
+            { term:'Tabula Rasa', def:'Locke\'s image of the mind as a blank slate at birth.' },
+            { term:'Teleology', def:'Explanation by reference to purposes, ends, or goals.' },
+            { term:'Theodicy', def:'An attempt to reconcile divine goodness with the existence of evil.' },
+            { term:'Transcendence', def:'Going beyond ordinary limits, experience, or the immanent world.' },
+            { term:'Truth', def:'The property of accurately representing how things are.' },
+            { term:'Übermensch', def:'Nietzsche\'s ideal of a person who creates and affirms new values.' },
+            { term:'Universal', def:'A repeatable property or kind that can apply to many particulars.' },
+            { term:'Utilitarianism', def:'The view that right action maximizes overall well-being.' },
+            { term:'Validity', def:'The property of an argument whose premises guarantee its conclusion.' },
+            { term:'Veil of Ignorance', def:'Rawls\' device for choosing justice without knowing one\'s social position.' },
+            { term:'Virtue Ethics', def:'Ethics centered on excellent character and human flourishing.' },
+            { term:'Voluntarism', def:'The view that will or choice has priority over intellect or reason.' },
+            { term:'Wu Wei', def:'Daoist effortless action that works with rather than against the natural way.' }
         ];
 
-        function renderGlossary(filter, openTerm) {
+        function escapeGlossaryHtml(value) {
+            return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        }
+
+        function renderGlossary(openTerm) {
             const list = document.getElementById('glossaryList');
             const count = document.getElementById('glossaryCount');
-            const q = (filter || '').toLowerCase().trim();
-            const filtered = q ? glossaryTerms.filter(g => g.term.toLowerCase().includes(q) || g.def.toLowerCase().includes(q)) : glossaryTerms;
-            count.textContent = `${filtered.length} term${filtered.length === 1 ? '' : 's'}`;
-            list.innerHTML = filtered.map(g =>
-                `<div class="glossary-item${openTerm && g.term === openTerm ? ' open' : ''}" data-term="${g.term.replace(/"/g, '&quot;')}" onclick="this.classList.toggle('open')">
-                    <div class="glossary-term">${g.term}</div>
-                    <div class="glossary-def">${g.def}</div>
-                </div>`
-            ).join('') || '<div class="empty-state">No matching terms.</div>';
+            count.textContent = `${glossaryEntries.length} terms · click any term to reveal its definition`;
+            list.innerHTML = glossaryEntries.map(g => {
+                const isOpen = openTerm === g.term;
+                return `<button type="button" class="glossary-item${isOpen ? ' open' : ''}" data-term="${encodeURIComponent(g.term)}" aria-expanded="${isOpen}" onclick="toggleGlossaryItem(this)">
+                    <span class="glossary-term">${escapeGlossaryHtml(g.term)}</span>
+                    <span class="glossary-def">${escapeGlossaryHtml(g.def)}</span>
+                </button>`;
+            }).join('');
         }
-        function filterGlossary() { renderGlossary(document.getElementById('glossarySearch').value); }
+
+        function toggleGlossaryItem(item) {
+            const willOpen = !item.classList.contains('open');
+            item.classList.toggle('open', willOpen);
+            item.setAttribute('aria-expanded', String(willOpen));
+        }
+
+        function openGlossaryTerm(term) {
+            closeSearch();
+            const item = Array.from(document.querySelectorAll('.glossary-item')).find(el => decodeURIComponent(el.dataset.term) === term);
+            if (!item) return;
+            item.classList.add('open');
+            item.setAttribute('aria-expanded', 'true');
+            setTimeout(() => item.scrollIntoView({ behavior:'smooth', block:'center' }), 50);
+        }
+
+        let glossarySearchResults = [];
+        let activeGlossarySearchIndex = -1;
+
+        function openSearch() {
+            const overlay = document.getElementById('searchOverlay');
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            activeGlossarySearchIndex = -1;
+            document.getElementById('searchResults').innerHTML = '<p class="search-hint">Search all 100 glossary terms by vocabulary name.</p>';
+            setTimeout(() => input.focus(), 60);
+        }
+
+        function closeSearch() {
+            document.getElementById('searchOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+            activeGlossarySearchIndex = -1;
+        }
+
+        function renderGlossarySearch(query) {
+            const q = query.trim().toLowerCase();
+            const container = document.getElementById('searchResults');
+            if (!q) {
+                glossarySearchResults = [];
+                activeGlossarySearchIndex = -1;
+                container.innerHTML = '<p class="search-hint">Search all 100 glossary terms by vocabulary name.</p>';
+                return;
+            }
+            glossarySearchResults = glossaryEntries
+                .filter(entry => entry.term.toLowerCase().includes(q))
+                .slice(0, 15);
+            activeGlossarySearchIndex = glossarySearchResults.length ? 0 : -1;
+            if (!glossarySearchResults.length) {
+                container.innerHTML = `<p class="search-no-results">No glossary term matches “${escapeGlossaryHtml(query)}”.</p>`;
+                return;
+            }
+            container.innerHTML = glossarySearchResults.map((entry, index) =>
+                `<button type="button" class="search-result-item${index === activeGlossarySearchIndex ? ' active' : ''}" data-index="${index}" onclick="selectGlossarySearchResult(${index})">
+                    <span class="search-result-icon">⌘</span>
+                    <span class="search-result-text"><span class="search-result-title">${escapeGlossaryHtml(entry.term)}</span><span class="search-result-sub">${escapeGlossaryHtml(entry.def)}</span></span>
+                </button>`
+            ).join('');
+        }
+
+        function selectGlossarySearchResult(index) {
+            const entry = glossarySearchResults[index];
+            if (entry) openGlossaryTerm(entry.term);
+        }
+
+        function updateGlossarySearchSelection() {
+            document.querySelectorAll('#searchResults .search-result-item').forEach((item, index) => item.classList.toggle('active', index === activeGlossarySearchIndex));
+        }
 
         const urlTerm = new URLSearchParams(window.location.search).get('term');
-        renderGlossary('', urlTerm);
+        renderGlossary(urlTerm);
         if (urlTerm) {
             setTimeout(() => {
                 document.querySelectorAll('.glossary-item').forEach(el => {
-                    if (el.getAttribute('data-term') === urlTerm) {
+                    if (decodeURIComponent(el.dataset.term) === urlTerm) {
                         el.scrollIntoView({ behavior:'smooth', block:'center' });
                     }
                 });
             }, 300);
         }
+
+        const glossarySearchInput = document.getElementById('searchInput');
+        glossarySearchInput.addEventListener('input', event => renderGlossarySearch(event.target.value));
+        glossarySearchInput.addEventListener('keydown', event => {
+            if (event.key === 'ArrowDown' && glossarySearchResults.length) {
+                event.preventDefault();
+                activeGlossarySearchIndex = (activeGlossarySearchIndex + 1) % glossarySearchResults.length;
+                updateGlossarySearchSelection();
+            } else if (event.key === 'ArrowUp' && glossarySearchResults.length) {
+                event.preventDefault();
+                activeGlossarySearchIndex = (activeGlossarySearchIndex - 1 + glossarySearchResults.length) % glossarySearchResults.length;
+                updateGlossarySearchSelection();
+            } else if (event.key === 'Enter' && activeGlossarySearchIndex >= 0) {
+                event.preventDefault();
+                selectGlossarySearchResult(activeGlossarySearchIndex);
+            } else if (event.key === 'Escape') closeSearch();
+        });
+        document.getElementById('searchOverlay').addEventListener('click', event => { if (event.target === event.currentTarget) closeSearch(); });
+        document.addEventListener('keydown', event => {
+            if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openSearch(); }
+            if (event.key === '/' && document.activeElement === document.body) { event.preventDefault(); openSearch(); }
+            if (event.key === 'Escape' && document.getElementById('searchOverlay').classList.contains('open')) closeSearch();
+        });
     </script>
 
-<!-- Search Modal -->
-<div class="search-overlay" id="searchOverlay">
-    <div class="search-modal">
-        <div class="search-header">
-            <input type="text" class="search-input" id="searchInput" placeholder="Search thinkers, thought seeds, glossary terms..." autocomplete="off">
-            <button class="search-close" onclick="closeSearch()" aria-label="Close search">✕</button>
-        </div>
-        <div class="search-results" id="searchResults">
-            <p class="search-hint">Type to search thinkers, thought seeds, and glossary terms by title.</p>
-        </div>
-        <div class="search-footer">
-            <span>↑↓ navigate</span><span>⏎ open</span><span>Esc close</span>
-        </div>
-    </div>
-</div>
 </body>
 </html>
