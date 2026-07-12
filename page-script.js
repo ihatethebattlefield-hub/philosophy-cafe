@@ -14,16 +14,21 @@
         p.className = 'particle';
         p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
         const radius = 14 + Math.random() * 13;
+        const direction = Math.random() * Math.PI * 2;
+        const speed = 22 + Math.random() * 30;
         p.style.setProperty('--particle-size', `${radius * 2}px`);
         container.appendChild(p);
         bodies.push({
             el: p, radius, mass: radius * radius,
             x: radius + Math.random() * Math.max(1, innerWidth - radius * 2),
             y: radius + Math.random() * Math.max(1, innerHeight - radius * 2),
-            vx: (Math.random() - 0.5) * 25,
-            vy: (Math.random() - 0.5) * 25,
+            vx: Math.cos(direction) * speed,
+            vy: Math.sin(direction) * speed,
             angle: Math.random() * 360,
-            spin: (Math.random() - 0.5) * 9
+            spin: (Math.random() - 0.5) * 16,
+            driftPhase: Math.random() * Math.PI * 2,
+            driftRate: 0.18 + Math.random() * 0.28,
+            driftForce: 1.2 + Math.random() * 1.8
         });
     }
 
@@ -63,6 +68,12 @@
         previous = now;
         if (!reducedMotion.matches) {
             bodies.forEach(body => {
+                // A faint, continuously changing current prevents repetitive straight paths.
+                body.driftPhase += body.driftRate * dt;
+                body.vx += Math.cos(body.driftPhase) * body.driftForce * dt;
+                body.vy += Math.sin(body.driftPhase * 0.83) * body.driftForce * dt;
+                const speed = Math.hypot(body.vx, body.vy);
+                if (speed > 58) { body.vx *= 58 / speed; body.vy *= 58 / speed; }
                 body.x += body.vx * dt; body.y += body.vy * dt; body.angle += body.spin * dt;
                 if (body.x < body.radius) { body.x = body.radius; body.vx = Math.abs(body.vx) * 0.94; }
                 if (body.x > innerWidth - body.radius) { body.x = innerWidth - body.radius; body.vx = -Math.abs(body.vx) * 0.94; }
