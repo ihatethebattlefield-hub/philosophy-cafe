@@ -5,7 +5,10 @@
     const MAX_USER_CHARS = 1000;
     const MAX_HISTORY_MESSAGES = 12;
     const PANEL_SIZE_STORAGE_KEY = 'philosophyTutorPanelSize';
-    const PANEL_SIZES = ['compact', 'standard', 'large'];
+    const DEFAULT_PANEL_SIZE = { width: 420, height: 660 };
+    const MIN_PANEL_WIDTH = 320;
+    const MIN_PANEL_HEIGHT = 360;
+    const MINIMAL_PANEL_HEIGHT = 480;
     const conversation = [];
     let isSending = false;
 
@@ -50,6 +53,11 @@
 
             <section class="pt-panel" id="ptPanel" role="dialog" aria-modal="false"
                      aria-labelledby="ptTitle" aria-hidden="true">
+                <div class="pt-resize-edge pt-resize-top" data-resize-axis="height" aria-hidden="true"></div>
+                <div class="pt-resize-edge pt-resize-left" data-resize-axis="width" aria-hidden="true"></div>
+                <button class="pt-resize-corner" data-resize-axis="both" type="button"
+                        title="Drag to resize · 拖动调整大小"
+                        aria-label="Drag to resize the tutor window"></button>
                 <header class="pt-header">
                     <div class="pt-guide-mark" aria-hidden="true">Φ</div>
                     <div class="pt-heading">
@@ -72,11 +80,6 @@
                         <option value="intermediate" selected>Intermediate · 中级</option>
                         <option value="advanced">Advanced · 高级</option>
                     </select>
-                    <button class="pt-size-button" id="ptSize" type="button"
-                            title="Change window size · 调整窗口大小"
-                            aria-label="Change tutor window size">
-                        <span id="ptSizeLabel" aria-hidden="true">M</span>
-                    </button>
                 </div>
 
                 <div class="pt-messages" id="ptMessages" role="log" aria-live="polite" aria-relevant="additions">
@@ -110,7 +113,7 @@
         if (savedLevel && ['beginner', 'intermediate', 'advanced'].includes(savedLevel)) {
             document.getElementById('ptLevel').value = savedLevel;
         }
-        applySavedPanelSize();
+        restorePanelSize();
     }
 
     function bindEvents() {
@@ -121,7 +124,6 @@
         const form = document.getElementById('ptForm');
         const input = document.getElementById('ptInput');
         const level = document.getElementById('ptLevel');
-        const sizeButton = document.getElementById('ptSize');
 
         launcher.addEventListener('click', () => {
             const shouldOpen = panel.getAttribute('aria-hidden') === 'true';
@@ -140,41 +142,106 @@
             }
         });
         level.addEventListener('change', () => localStorage.setItem('philosophyTutorLevel', level.value));
-        sizeButton.addEventListener('click', cyclePanelSize);
+        panel.querySelectorAll('[data-resize-axis]').forEach(handle => {
+            handle.addEventListener('pointerdown', startPanelResize);
+        });
+        panel.querySelector('.pt-resize-corner').addEventListener('keydown', resizePanelWithKeyboard);
+        window.addEventListener('resize', restorePanelSize);
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape' && panel.getAttribute('aria-hidden') === 'false') setOpen(false);
         });
     }
 
-    function applySavedPanelSize() {
-        const saved = localStorage.getItem(PANEL_SIZE_STORAGE_KEY);
-        setPanelSize(PANEL_SIZES.includes(saved) ? saved : 'standard', false);
+    function isMobilePanel() {
+        return window.matchMedia('(max-width: 540px)').matches;
     }
 
-    function cyclePanelSize() {
-        const panel = document.getElementById('ptPanel');
-        const currentIndex = PANEL_SIZES.indexOf(panel.dataset.size || 'standard');
-        const nextSize = PANEL_SIZES[(currentIndex + 1) % PANEL_SIZES.length];
-        setPanelSize(nextSize, true);
+    function getPanelLimits() {
+        const maxWidth = Math.max(280, window.innerWidth - 32);
+        const maxHeight = Math.max(300, window.innerHeight - 112);
+        return {
+            minWidth: Math.min(MIN_PANEL_WIDTH, maxWidth),
+            minHeight: Math.min(MIN_PANEL_HEIGHT, maxHeight),
+            maxWidth,
+            maxHeight
+        };
     }
 
-    function setPanelSize(size, save) {
+    function restorePanelSize() {
         const panel = document.getElementById('ptPanel');
-        const button = document.getElementById('ptSize');
-        const label = document.getElementById('ptSizeLabel');
-        if (!panel || !button || !label) return;
+        if (!panel) return;
+        if (isMobilePanel()) {
+            panel.style.removeProperty('width');
+            panel.style.removeProperty('height');
+            panel.classList.remove('is-minimal');
+            return;
+        }
 
-        const details = {
-            compact: { letter: 'S', english: 'Small', chinese: '小' },
-            standard: { letter: 'M', english: 'Medium', chinese: '中' },
-            large: { letter: 'L', english: 'Large', chinese: '大' }
-        }[size] || { letter: 'M', english: 'Medium', chinese: '中' };
+        let saved = DEFAULT_PANEL_SIZE;
+        try {
+            const parsed = JSON.parse(localStorage.getItem(PANEL_SIZE_STORAGE_KEY));
+            if (Number.isFinite(parsed?.width) && Number.isFinite(parsed?.height)) saved = parsed;
+        } catch (_) {}
+        setPanelDimensions(saved.width, saved.height, false);
+    }
 
-        panel.dataset.size = size;
-        label.textContent = details.letter;
-        button.title = `Window size: ${details.english} · 窗口大小：${details.chinese}`;
-        button.setAttribute('aria-label', `Tutor window size ${details.english}. Click to change.`);
-        if (save) localStorage.setItem(PANEL_SIZE_STORAGE_KEY, size);
+    function setPanelDimensions(width, height, save) {
+        const panel = document.getElementById('ptPanel');
+        if (!panel || isMobilePanel()) return;
+        const limits = getPanelLimits();
+        const nextWidth = Math.round(Math.min(limits.maxWidth, Math.max(limits.minWidth, width)));
+        const nextHeight = Math.round(Math.min(limits.maxHeight, Math.max(limits.minHeight, height)));
+        panel.style.width = `${nextWidth}px`;
+        panel.style.height = `${nextHeight}px`;
+        panel.classList.toggle('is-minimal', nextHeight < MINIMAL_PANEL_HEIGHT);
+        if (save) {
+            localStorage.setItem(PANEL_SIZE_STORAGE_KEY, JSON.stringify({ width: nextWidth, height: nextHeight }));
+        }
+    }
+
+    function startPanelResize(event) {
+        if (isMobilePanel() || (event.button !== undefined && event.button !== 0)) return;
+        event.preventDefault();
+
+        const panel = document.getElementById('ptPanel');
+        const axis = event.currentTarget.dataset.resizeAxis;
+        const startRect = panel.getBoundingClientRect();
+        const startX = event.clientX;
+        const startY = event.clientY;
+
+        panel.classList.add('is-resizing');
+        document.body.classList.add('pt-resize-active');
+
+        const onMove = moveEvent => {
+            const width = axis === 'height' ? startRect.width : startRect.width + startX - moveEvent.clientX;
+            const height = axis === 'width' ? startRect.height : startRect.height + startY - moveEvent.clientY;
+            setPanelDimensions(width, height, false);
+        };
+
+        const onEnd = () => {
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onEnd);
+            window.removeEventListener('pointercancel', onEnd);
+            panel.classList.remove('is-resizing');
+            document.body.classList.remove('pt-resize-active');
+            const finalRect = panel.getBoundingClientRect();
+            setPanelDimensions(finalRect.width, finalRect.height, true);
+        };
+
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onEnd, { once: true });
+        window.addEventListener('pointercancel', onEnd, { once: true });
+    }
+
+    function resizePanelWithKeyboard(event) {
+        if (isMobilePanel() || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+        event.preventDefault();
+        const panel = document.getElementById('ptPanel');
+        const rect = panel.getBoundingClientRect();
+        const step = event.shiftKey ? 40 : 20;
+        const width = rect.width + (event.key === 'ArrowLeft' ? step : event.key === 'ArrowRight' ? -step : 0);
+        const height = rect.height + (event.key === 'ArrowUp' ? step : event.key === 'ArrowDown' ? -step : 0);
+        setPanelDimensions(width, height, true);
     }
 
     function setOpen(open) {
