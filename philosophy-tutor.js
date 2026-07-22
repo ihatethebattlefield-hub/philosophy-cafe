@@ -4,6 +4,8 @@
 
     const MAX_USER_CHARS = 1000;
     const MAX_HISTORY_MESSAGES = 12;
+    const PANEL_SIZE_STORAGE_KEY = 'philosophyTutorPanelSize';
+    const PANEL_SIZES = ['compact', 'standard', 'large'];
     const conversation = [];
     let isSending = false;
 
@@ -52,10 +54,15 @@
                     <div class="pt-guide-mark" aria-hidden="true">Φ</div>
                     <div class="pt-heading">
                         <h2 id="ptTitle">The Philosophy Guide</h2>
-                        <p>Learn philosophy through English · 英文哲学导师</p>
+                        <p>
+                            <span>Learn philosophy through English</span>
+                            <span lang="zh-CN">英文哲学导师</span>
+                        </p>
                     </div>
-                    <button class="pt-icon-button" id="ptReset" type="button" title="Start a new conversation" aria-label="Start a new conversation">↺</button>
-                    <button class="pt-icon-button" id="ptClose" type="button" title="Close tutor" aria-label="Close tutor">×</button>
+                    <div class="pt-header-actions">
+                        <button class="pt-icon-button" id="ptReset" type="button" title="Start a new conversation" aria-label="Start a new conversation">↺</button>
+                        <button class="pt-icon-button" id="ptClose" type="button" title="Close tutor" aria-label="Close tutor">×</button>
+                    </div>
                 </header>
 
                 <div class="pt-settings">
@@ -65,6 +72,11 @@
                         <option value="intermediate" selected>Intermediate · 中级</option>
                         <option value="advanced">Advanced · 高级</option>
                     </select>
+                    <button class="pt-size-button" id="ptSize" type="button"
+                            title="Change window size · 调整窗口大小"
+                            aria-label="Change tutor window size">
+                        <span id="ptSizeLabel" aria-hidden="true">M</span>
+                    </button>
                 </div>
 
                 <div class="pt-messages" id="ptMessages" role="log" aria-live="polite" aria-relevant="additions">
@@ -98,6 +110,7 @@
         if (savedLevel && ['beginner', 'intermediate', 'advanced'].includes(savedLevel)) {
             document.getElementById('ptLevel').value = savedLevel;
         }
+        applySavedPanelSize();
     }
 
     function bindEvents() {
@@ -108,6 +121,7 @@
         const form = document.getElementById('ptForm');
         const input = document.getElementById('ptInput');
         const level = document.getElementById('ptLevel');
+        const sizeButton = document.getElementById('ptSize');
 
         launcher.addEventListener('click', () => {
             const shouldOpen = panel.getAttribute('aria-hidden') === 'true';
@@ -126,9 +140,41 @@
             }
         });
         level.addEventListener('change', () => localStorage.setItem('philosophyTutorLevel', level.value));
+        sizeButton.addEventListener('click', cyclePanelSize);
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape' && panel.getAttribute('aria-hidden') === 'false') setOpen(false);
         });
+    }
+
+    function applySavedPanelSize() {
+        const saved = localStorage.getItem(PANEL_SIZE_STORAGE_KEY);
+        setPanelSize(PANEL_SIZES.includes(saved) ? saved : 'standard', false);
+    }
+
+    function cyclePanelSize() {
+        const panel = document.getElementById('ptPanel');
+        const currentIndex = PANEL_SIZES.indexOf(panel.dataset.size || 'standard');
+        const nextSize = PANEL_SIZES[(currentIndex + 1) % PANEL_SIZES.length];
+        setPanelSize(nextSize, true);
+    }
+
+    function setPanelSize(size, save) {
+        const panel = document.getElementById('ptPanel');
+        const button = document.getElementById('ptSize');
+        const label = document.getElementById('ptSizeLabel');
+        if (!panel || !button || !label) return;
+
+        const details = {
+            compact: { letter: 'S', english: 'Small', chinese: '小' },
+            standard: { letter: 'M', english: 'Medium', chinese: '中' },
+            large: { letter: 'L', english: 'Large', chinese: '大' }
+        }[size] || { letter: 'M', english: 'Medium', chinese: '中' };
+
+        panel.dataset.size = size;
+        label.textContent = details.letter;
+        button.title = `Window size: ${details.english} · 窗口大小：${details.chinese}`;
+        button.setAttribute('aria-label', `Tutor window size ${details.english}. Click to change.`);
+        if (save) localStorage.setItem(PANEL_SIZE_STORAGE_KEY, size);
     }
 
     function setOpen(open) {
@@ -183,7 +229,7 @@
         conversation.push({ role: 'user', content: text });
         trimConversation();
         setSending(true);
-        setStatus('The Guide is thinking… · 正在思考…');
+        setStatus('The Guide is thinking…\n正在思考…');
         const thinking = addThinkingMessage();
 
         try {
@@ -215,7 +261,7 @@
             thinking.remove();
             const message = error && error.message ? error.message : 'The Guide is temporarily unavailable.';
             addMessage('error', message);
-            setStatus('Please try again in a moment. · 请稍后重试', true);
+            setStatus('Please try again in a moment.\n请稍后重试', true);
         } finally {
             setSending(false);
             input.focus();

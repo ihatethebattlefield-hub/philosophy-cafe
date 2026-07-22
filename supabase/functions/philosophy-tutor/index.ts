@@ -40,7 +40,8 @@ function normalizeMessages(input: unknown): TutorMessage[] | null {
     const content = (item as Record<string, unknown>).content;
     if ((role !== "user" && role !== "assistant") || typeof content !== "string") return null;
     const clean = content.trim();
-    if (!clean || clean.length > 1800) return null;
+    const maxLength = role === "assistant" ? 6000 : 1800;
+    if (!clean || clean.length > maxLength) return null;
     messages.push({ role, content: clean });
   }
   return messages.at(-1)?.role === "user" ? messages : null;
