@@ -14,6 +14,42 @@ var supabase = window.supabase && window.supabase.createClient(
         }
     }
 );
+
+// Emergency network guard: the retired online-presence feature must never
+// reach Supabase, even if a browser reuses an older cached page-script.js.
+if (supabase) {
+    const originalSupabaseFrom = supabase.from.bind(supabase);
+    const originalSupabaseChannel = supabase.channel.bind(supabase);
+
+    function disabledOnlineUsersQuery() {
+        const response = { data: null, error: null, count: 0, status: 204, statusText: 'Disabled' };
+        let builder;
+        builder = new Proxy({}, {
+            get(_target, property) {
+                if (property === 'then') return (resolve, reject) => Promise.resolve(response).then(resolve, reject);
+                if (property === 'catch') return reject => Promise.resolve(response).catch(reject);
+                if (property === 'finally') return callback => Promise.resolve(response).finally(callback);
+                return () => builder;
+            }
+        });
+        return builder;
+    }
+
+    supabase.from = function guardedSupabaseFrom(table) {
+        if (table === 'online_users') return disabledOnlineUsersQuery();
+        return originalSupabaseFrom(table);
+    };
+
+    supabase.channel = function guardedSupabaseChannel(name, options) {
+        if (name !== 'online-presence') return originalSupabaseChannel(name, options);
+        const disabledChannel = {
+            on() { return disabledChannel; },
+            subscribe() { return disabledChannel; },
+            unsubscribe() { return Promise.resolve('ok'); }
+        };
+        return disabledChannel;
+    };
+}
 var siteUserId = (function() {
     let id = localStorage.getItem('siteUserId');
     if (!id) { id = 'anon_' + crypto.randomUUID(); localStorage.setItem('siteUserId', id); }
