@@ -1,0 +1,234 @@
+/* Shared AI Philosophy Guide */
+.philosophy-tutor {
+    --pt-ink: var(--ink, #2c2416);
+    --pt-ink-light: var(--ink-light, #5a4e3c);
+    --pt-gold: var(--gold, #b8860b);
+    --pt-gold-pale: var(--gold-pale, #f0e4c8);
+    --pt-wine: var(--wine, #722f37);
+    --pt-cream: var(--cream, #faf7f0);
+    --pt-parchment: var(--parchment, #f5f0e8);
+    --pt-border: var(--border-subtle, #e0d8c8);
+    position: fixed;
+    right: 24px;
+    bottom: 22px;
+    z-index: 1400;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+.pt-launcher {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-height: 54px;
+    padding: 7px 17px 7px 8px;
+    color: var(--pt-cream);
+    background: linear-gradient(135deg, var(--pt-ink), #4a3b24);
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 30px;
+    box-shadow: 0 10px 32px rgba(44,36,22,.28);
+    cursor: pointer;
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+.pt-launcher:hover { transform: translateY(-2px); box-shadow: 0 14px 38px rgba(44,36,22,.34); }
+.pt-launcher:focus-visible, .pt-panel :focus-visible { outline: 2px solid var(--pt-gold); outline-offset: 3px; }
+.pt-launcher-symbol {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--pt-gold);
+    color: white;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 20px;
+}
+.pt-launcher-copy { display: grid; text-align: left; line-height: 1.2; }
+.pt-launcher-copy strong { font-family: 'Cinzel', Georgia, serif; font-size: 11px; letter-spacing: .7px; }
+.pt-launcher-copy small { margin-top: 3px; color: rgba(255,255,255,.68); font-size: 10px; }
+
+.pt-panel {
+    position: absolute;
+    right: 0;
+    bottom: 68px;
+    display: grid;
+    grid-template-rows: auto auto minmax(180px, 1fr) auto auto auto auto;
+    width: min(420px, calc(100vw - 32px));
+    height: min(660px, calc(100vh - 112px));
+    overflow: hidden;
+    color: var(--pt-ink);
+    background: var(--pt-cream);
+    border: 1px solid var(--pt-border);
+    border-radius: 18px;
+    box-shadow: 0 24px 70px rgba(44,36,22,.28);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px) scale(.98);
+    transform-origin: bottom right;
+    transition: opacity .22s ease, transform .22s ease, visibility .22s;
+}
+.pt-panel[aria-hidden="false"] { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+
+.pt-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 14px;
+    color: var(--pt-cream);
+    background: linear-gradient(135deg, var(--pt-ink), #493a24);
+}
+.pt-guide-mark {
+    display: grid;
+    place-items: center;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    color: white;
+    background: var(--pt-gold);
+    border-radius: 50%;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 18px;
+}
+.pt-heading { flex: 1; min-width: 0; }
+.pt-heading h2 { margin: 0; color: inherit; font-family: 'Cinzel', Georgia, serif; font-size: 14px; letter-spacing: .8px; }
+.pt-heading p { margin: 2px 0 0; color: rgba(255,255,255,.65); font-family: 'Inter', sans-serif; font-size: 10px; line-height: 1.35; }
+.pt-icon-button {
+    display: grid;
+    place-items: center;
+    flex: 0 0 31px;
+    width: 31px;
+    height: 31px;
+    padding: 0;
+    color: rgba(255,255,255,.78);
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 50%;
+    font-size: 19px;
+    cursor: pointer;
+}
+.pt-icon-button:hover { color: white; background: rgba(255,255,255,.1); }
+
+.pt-settings {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 14px;
+    background: var(--pt-gold-pale);
+    border-bottom: 1px solid var(--pt-border);
+}
+.pt-settings label { color: var(--pt-ink-light); font-size: 10px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+.pt-settings select {
+    max-width: 190px;
+    padding: 5px 28px 5px 9px;
+    color: var(--pt-ink);
+    background: rgba(255,255,255,.7);
+    border: 1px solid var(--pt-border);
+    border-radius: 14px;
+    font: 11px 'Inter', sans-serif;
+}
+
+.pt-messages { overflow-y: auto; padding: 16px 14px 8px; scroll-behavior: smooth; }
+.pt-message { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 13px; }
+.pt-message.pt-user { flex-direction: row-reverse; }
+.pt-avatar {
+    display: grid;
+    place-items: center;
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    color: var(--pt-gold);
+    background: var(--pt-gold-pale);
+    border: 1px solid rgba(184,134,11,.24);
+    border-radius: 50%;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 10px;
+}
+.pt-user .pt-avatar { color: white; background: var(--pt-wine); border-color: transparent; font: 8px 'Inter', sans-serif; }
+.pt-bubble {
+    max-width: calc(100% - 44px);
+    padding: 10px 12px;
+    color: var(--pt-ink);
+    background: white;
+    border: 1px solid var(--pt-border);
+    border-radius: 5px 14px 14px 14px;
+    font: 13px/1.62 'Inter', sans-serif;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.pt-bubble p { margin: 0 0 7px; }
+.pt-bubble p:last-child { margin-bottom: 0; }
+.pt-welcome-bubble { white-space: normal; }
+.pt-user .pt-bubble { color: white; background: var(--pt-wine); border-color: var(--pt-wine); border-radius: 14px 5px 14px 14px; }
+.pt-error .pt-avatar { color: white; background: #a33a3a; border: none; }
+.pt-error .pt-bubble { color: #772525; background: #fff2f0; border-color: #efc6c0; }
+.pt-translation { color: var(--pt-ink-light); font-size: 11px; }
+
+.pt-starters { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; padding: 8px 14px 10px; }
+.pt-starters[hidden] { display: none; }
+.pt-starter {
+    display: grid;
+    gap: 2px;
+    padding: 8px 10px;
+    text-align: left;
+    color: var(--pt-ink);
+    background: var(--pt-parchment);
+    border: 1px solid var(--pt-border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+}
+.pt-starter:hover { background: var(--pt-gold-pale); border-color: var(--pt-gold); }
+.pt-starter span { font: 600 10px/1.35 'Inter', sans-serif; }
+.pt-starter small { color: var(--pt-ink-light); font: 9px/1.3 'Inter', sans-serif; }
+
+.pt-composer { display: flex; align-items: flex-end; gap: 8px; padding: 10px 12px 6px; border-top: 1px solid var(--pt-border); }
+.pt-composer textarea {
+    flex: 1;
+    min-height: 42px;
+    max-height: 110px;
+    resize: vertical;
+    padding: 10px 11px;
+    color: var(--pt-ink);
+    background: white;
+    border: 1px solid var(--pt-border);
+    border-radius: 11px;
+    font: 13px/1.45 'Inter', sans-serif;
+}
+.pt-composer textarea::placeholder { color: #8a8173; }
+.pt-send {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    color: white;
+    background: var(--pt-gold);
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+}
+.pt-send:hover { filter: brightness(.93); }
+.pt-send:disabled, .pt-starter:disabled { cursor: wait; opacity: .55; }
+.pt-status { min-height: 18px; padding: 0 14px; color: var(--pt-ink-light); font: 10px/1.5 'Inter', sans-serif; }
+.pt-status.is-error { color: #9a3030; }
+.pt-note { margin: 0; padding: 0 14px 10px; color: #81786a; font: 9px/1.4 'Inter', sans-serif; text-align: center; }
+
+.pt-thinking { display: inline-flex; align-items: center; gap: 4px; min-height: 18px; }
+.pt-thinking i { width: 5px; height: 5px; background: var(--pt-gold); border-radius: 50%; animation: pt-bounce 1s infinite ease-in-out; }
+.pt-thinking i:nth-child(2) { animation-delay: .14s; }
+.pt-thinking i:nth-child(3) { animation-delay: .28s; }
+@keyframes pt-bounce { 0%, 60%, 100% { transform: translateY(0); opacity: .35; } 30% { transform: translateY(-4px); opacity: 1; } }
+
+.pt-sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+@media (max-width: 540px) {
+    .philosophy-tutor { right: 12px; bottom: 12px; }
+    .pt-panel { position: fixed; inset: 10px 10px 78px; width: auto; height: auto; transform-origin: bottom center; }
+    .philosophy-tutor.is-open .pt-launcher-copy { display: none; }
+    .philosophy-tutor.is-open .pt-launcher { min-height: 48px; padding: 4px; }
+    .philosophy-tutor.is-open .pt-launcher-symbol { width: 40px; height: 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pt-panel, .pt-launcher { transition: none; }
+    .pt-thinking i { animation: none; }
+}

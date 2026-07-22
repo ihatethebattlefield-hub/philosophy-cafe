@@ -163,3 +163,24 @@
     }
     initOnlinePresence();
 })();
+
+// Load the shared AI philosophy tutor on every Café page. Resolving assets from
+// this script's own URL keeps the widget working on both root and nested pages.
+(function loadPhilosophyTutor() {
+    if (document.getElementById('philosophyTutorScript')) return;
+    const loaderScript = document.currentScript;
+    if (!loaderScript || !loaderScript.src) return;
+    const assetRoot = new URL('.', loaderScript.src);
+
+    const stylesheet = document.createElement('link');
+    stylesheet.id = 'philosophyTutorStyles';
+    stylesheet.rel = 'stylesheet';
+    stylesheet.href = new URL('philosophy-tutor.css?v=20260722-1', assetRoot).href;
+    document.head.appendChild(stylesheet);
+
+    const tutorScript = document.createElement('script');
+    tutorScript.id = 'philosophyTutorScript';
+    tutorScript.src = new URL('philosophy-tutor.js?v=20260722-1', assetRoot).href;
+    tutorScript.defer = true;
+    document.head.appendChild(tutorScript);
+})();

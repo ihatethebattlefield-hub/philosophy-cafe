@@ -1,5 +1,7 @@
 # φιλοσοφία (philosophía) — The Philosophy Café · Publish Guide
 
+> **AI Philosophy Guide:** The shared English philosophy tutor is configured separately with Alibaba Cloud Model Studio and a Supabase Edge Function. Follow [`QWEN_TUTOR_SETUP.md`](QWEN_TUTOR_SETUP.md) after the normal website setup below.
+
 All website files now live in the **`philosophy-cafe/`** folder. This guide shows
 how to put it online so **anyone** can visit, post a comment (by signing in with
 GitHub), and **everyone** can read each other's comments — including you, the
