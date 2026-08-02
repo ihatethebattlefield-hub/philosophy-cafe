@@ -121,12 +121,12 @@
     const stylesheet = document.createElement('link');
     stylesheet.id = 'philosophyTutorStyles';
     stylesheet.rel = 'stylesheet';
-    stylesheet.href = new URL('philosophy-tutor.css?v=20260722-3', assetRoot).href;
+    stylesheet.href = new URL('philosophy-tutor.css?v=20260802-1', assetRoot).href;
     document.head.appendChild(stylesheet);
 
     const tutorScript = document.createElement('script');
     tutorScript.id = 'philosophyTutorScript';
-    tutorScript.src = new URL('philosophy-tutor.js?v=20260722-3', assetRoot).href;
+    tutorScript.src = new URL('philosophy-tutor.js?v=20260802-1', assetRoot).href;
     tutorScript.defer = true;
     document.head.appendChild(tutorScript);
 })();

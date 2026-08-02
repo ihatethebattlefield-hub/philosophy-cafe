@@ -53,15 +53,16 @@
     display: grid;
     grid-template-areas:
         "header"
+        "modes"
         "settings"
         "messages"
         "starters"
         "composer"
         "status"
         "note";
-    grid-template-rows: auto auto minmax(180px, 1fr) auto auto auto auto;
-    width: min(420px, calc(100vw - 32px));
-    height: min(660px, calc(100vh - 112px));
+    grid-template-rows: auto auto auto minmax(180px, 1fr) auto auto auto auto;
+    width: min(460px, calc(100vw - 32px));
+    height: min(700px, calc(100vh - 112px));
     overflow: hidden;
     color: var(--pt-ink);
     background: var(--pt-cream);
@@ -77,7 +78,7 @@
 .pt-panel[aria-hidden="false"] { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
 .pt-panel.is-resizing { transition: none; }
 .pt-panel.is-minimal {
-    grid-template-rows: auto 0 minmax(0, 1fr) 0 auto auto 0;
+    grid-template-rows: auto auto 0 minmax(0, 1fr) 0 auto auto 0;
 }
 .pt-panel.is-minimal .pt-settings,
 .pt-panel.is-minimal .pt-starters,
@@ -169,6 +170,37 @@
     cursor: pointer;
 }
 .pt-icon-button:hover { color: white; background: rgba(255,255,255,.1); }
+
+.pt-mode-switch {
+    grid-area: modes;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    padding: 7px;
+    background: #eee5d6;
+    border-bottom: 1px solid var(--pt-border);
+}
+.pt-mode-switch button {
+    display: grid;
+    gap: 1px;
+    min-width: 0;
+    padding: 7px 9px;
+    color: var(--pt-ink-light);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.pt-mode-switch button:hover { color: var(--pt-ink); background: rgba(255,255,255,.52); }
+.pt-mode-switch button.is-active {
+    color: var(--pt-ink);
+    background: white;
+    border-color: var(--pt-border);
+    box-shadow: 0 2px 8px rgba(44,36,22,.07);
+}
+.pt-mode-switch span { overflow: hidden; font: 600 10px/1.25 'Inter', sans-serif; text-overflow: ellipsis; white-space: nowrap; }
+.pt-mode-switch small { color: #887e6e; font: 8px/1.25 'Inter', sans-serif; }
+.pt-mode-switch button:disabled { cursor: wait; opacity: .55; }
 
 .pt-settings {
     grid-area: settings;
@@ -284,6 +316,231 @@
     text-align: center;
 }
 
+/* Socratic Standoff */
+.philosophy-tutor.is-standoff .pt-guide-only { display: none !important; }
+.pt-standoff-view {
+    grid-row: 3 / -1;
+    grid-column: 1;
+    min-height: 0;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 15% 4%, rgba(184,134,11,.09), transparent 26%),
+        var(--pt-cream);
+}
+.pt-standoff-view[hidden],
+.pt-standoff-setup[hidden],
+.pt-standoff-arena[hidden] { display: none; }
+.pt-standoff-setup {
+    height: 100%;
+    overflow-y: auto;
+    padding: 17px 16px 24px;
+    overscroll-behavior: contain;
+}
+.pt-standoff-intro { margin-bottom: 15px; }
+.pt-eyebrow {
+    margin: 0 0 5px;
+    color: var(--pt-wine);
+    font: 700 9px/1.4 'Inter', sans-serif;
+    letter-spacing: .9px;
+    text-transform: uppercase;
+}
+.pt-standoff-intro h3 { margin: 0; font: 600 18px/1.25 'Cinzel', Georgia, serif; letter-spacing: .2px; }
+.pt-standoff-intro > p:last-child { margin: 7px 0 0; color: var(--pt-ink-light); font: 10px/1.55 'Inter', sans-serif; }
+
+.pt-contenders {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: stretch;
+    gap: 7px;
+    margin-bottom: 14px;
+}
+.pt-contender-slot {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    min-height: 74px;
+    padding: 9px 10px;
+    background: rgba(255,255,255,.64);
+    border: 1px dashed #c9beaa;
+    border-radius: 12px;
+}
+.pt-contender-slot.has-selection { background: white; border: 1px solid var(--pt-gold); box-shadow: inset 0 3px 0 rgba(184,134,11,.16); }
+.pt-contender-slot small { color: #8b806f; font: 700 8px/1.3 'Inter', sans-serif; letter-spacing: .6px; text-transform: uppercase; }
+.pt-contender-slot strong { margin-top: 4px; overflow: hidden; font: 600 11px/1.35 'Inter', sans-serif; text-overflow: ellipsis; }
+.pt-contender-slot span { margin-top: 2px; color: var(--pt-ink-light); font: 8px/1.35 'Inter', sans-serif; }
+.pt-versus { align-self: center; color: var(--pt-wine); font: 700 9px 'Cinzel', Georgia, serif; }
+
+.pt-philosopher-groups { display: grid; gap: 6px; }
+.pt-philosopher-group { overflow: hidden; background: rgba(255,255,255,.66); border: 1px solid var(--pt-border); border-radius: 11px; }
+.pt-philosopher-group summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 11px;
+    color: var(--pt-ink);
+    cursor: pointer;
+    list-style: none;
+    font: 600 10px/1.35 'Inter', sans-serif;
+}
+.pt-philosopher-group summary::-webkit-details-marker { display: none; }
+.pt-philosopher-group summary::before { content: '+'; flex: 0 0 14px; color: var(--pt-gold); font-size: 14px; }
+.pt-philosopher-group[open] summary::before { content: '−'; }
+.pt-philosopher-group summary span { flex: 1; }
+.pt-philosopher-group summary small { color: #8d8374; font: 8px 'Inter', sans-serif; }
+.pt-philosopher-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 0 8px 8px; }
+.pt-philosopher-choice {
+    position: relative;
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+    padding: 8px 25px 8px 9px;
+    text-align: left;
+    color: var(--pt-ink);
+    background: var(--pt-parchment);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.pt-philosopher-choice:hover { border-color: #cbbd9f; }
+.pt-philosopher-choice.is-selected { background: var(--pt-gold-pale); border-color: var(--pt-gold); }
+.pt-philosopher-choice strong { overflow: hidden; font: 600 9px/1.3 'Inter', sans-serif; text-overflow: ellipsis; white-space: nowrap; }
+.pt-philosopher-choice small { color: var(--pt-ink-light); font: 7px/1.35 'Inter', sans-serif; }
+.pt-choice-side {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    color: white;
+    background: var(--pt-wine);
+    border-radius: 50%;
+    font: 700 8px 'Inter', sans-serif;
+}
+.pt-choice-side:empty { display: none; }
+.pt-philosopher-choice:disabled { cursor: wait; opacity: .6; }
+
+.pt-standoff-form { display: grid; gap: 8px; margin-top: 15px; padding-top: 14px; border-top: 1px solid var(--pt-border); }
+.pt-standoff-form > label { color: var(--pt-ink); font: 600 10px/1.35 'Inter', sans-serif; }
+.pt-standoff-form textarea {
+    width: 100%;
+    min-height: 76px;
+    box-sizing: border-box;
+    resize: vertical;
+    padding: 10px 11px;
+    color: var(--pt-ink);
+    background: white;
+    border: 1px solid var(--pt-border);
+    border-radius: 10px;
+    font: 11px/1.5 'Inter', sans-serif;
+}
+.pt-topic-suggestions { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 2px; }
+.pt-topic-suggestions button {
+    flex: 0 0 auto;
+    padding: 5px 8px;
+    color: var(--pt-ink-light);
+    background: transparent;
+    border: 1px solid var(--pt-border);
+    border-radius: 12px;
+    font: 8px 'Inter', sans-serif;
+    cursor: pointer;
+}
+.pt-topic-suggestions button:hover { color: var(--pt-wine); border-color: var(--pt-wine); }
+.pt-start-standoff {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 42px;
+    color: white;
+    background: linear-gradient(135deg, var(--pt-wine), #4d2027);
+    border: 0;
+    border-radius: 11px;
+    font: 600 10px 'Inter', sans-serif;
+    cursor: pointer;
+}
+.pt-start-standoff:disabled { cursor: not-allowed; opacity: .42; }
+.pt-form-hint { min-height: 14px; margin: 0; color: #81786a; font: 8px/1.45 'Inter', sans-serif; }
+
+.pt-standoff-arena { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.pt-arena-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 13px;
+    background: var(--pt-gold-pale);
+    border-bottom: 1px solid var(--pt-border);
+}
+.pt-arena-topline > div { display: grid; gap: 2px; min-width: 0; }
+.pt-arena-topline small { color: var(--pt-wine); font: 700 8px 'Inter', sans-serif; letter-spacing: .5px; text-transform: uppercase; }
+.pt-arena-topline strong { overflow: hidden; font: 600 11px 'Cinzel', Georgia, serif; text-overflow: ellipsis; white-space: nowrap; }
+.pt-arena-topline button {
+    flex: 0 0 auto;
+    padding: 6px 8px;
+    color: var(--pt-ink);
+    background: rgba(255,255,255,.62);
+    border: 1px solid var(--pt-border);
+    border-radius: 9px;
+    font: 8px 'Inter', sans-serif;
+    cursor: pointer;
+}
+.pt-arena-topline button:disabled { cursor: wait; opacity: .45; }
+.pt-debate-feed { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 13px; scroll-behavior: smooth; overscroll-behavior: contain; }
+.pt-debate-turn { margin-bottom: 14px; animation: pt-turn-in .35s ease both; }
+.pt-debate-turn header { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+.pt-debate-turn header > div { display: grid; gap: 1px; }
+.pt-debate-turn header small { color: #887e6e; font: 700 7px 'Inter', sans-serif; letter-spacing: .5px; text-transform: uppercase; }
+.pt-debate-turn header strong { font: 600 10px 'Inter', sans-serif; }
+.pt-debate-avatar {
+    display: grid;
+    place-items: center;
+    width: 25px;
+    height: 25px;
+    color: white;
+    background: var(--pt-wine);
+    border-radius: 50%;
+    font: 700 8px 'Cinzel', Georgia, serif;
+}
+.pt-side-b .pt-debate-avatar { color: var(--pt-ink); background: var(--pt-gold-pale); border: 1px solid rgba(184,134,11,.38); }
+.pt-debate-argument {
+    padding: 10px 11px;
+    color: var(--pt-ink);
+    background: white;
+    border: 1px solid var(--pt-border);
+    border-left: 3px solid var(--pt-wine);
+    border-radius: 4px 11px 11px 11px;
+    font: 11px/1.58 'Inter', sans-serif;
+    white-space: pre-wrap;
+}
+.pt-side-b .pt-debate-argument { border-left-color: var(--pt-gold); }
+.pt-judgment {
+    margin: 5px 0 10px;
+    padding: 12px;
+    background: linear-gradient(145deg, #332818, #4a3921);
+    border: 1px solid rgba(184,134,11,.55);
+    border-radius: 13px;
+    color: var(--pt-cream);
+    animation: pt-turn-in .4s ease both;
+}
+.pt-judgment header { display: flex; align-items: center; gap: 9px; }
+.pt-judgment header > span { display: grid; place-items: center; width: 29px; height: 29px; background: var(--pt-gold); border-radius: 50%; font-size: 14px; }
+.pt-judgment header > div { display: grid; gap: 2px; }
+.pt-judgment header small { color: rgba(255,255,255,.6); font: 7px 'Inter', sans-serif; text-transform: uppercase; letter-spacing: .5px; }
+.pt-judgment header strong { font: 600 11px 'Cinzel', Georgia, serif; }
+.pt-scoreboard { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0; }
+.pt-scoreboard span { display: flex; justify-content: space-between; gap: 6px; padding: 7px; background: rgba(255,255,255,.08); border-radius: 7px; font: 8px 'Inter', sans-serif; }
+.pt-scoreboard b { color: #e3bc55; }
+.pt-judge-reasoning { color: rgba(255,255,255,.85); font: 10px/1.55 'Inter', sans-serif; white-space: pre-wrap; }
+.pt-debate-progress { min-height: 34px; padding: 7px 13px; color: var(--pt-ink-light); background: #f1eadf; border-top: 1px solid var(--pt-border); font: 8px/1.45 'Inter', sans-serif; white-space: pre-line; }
+.pt-debate-progress.is-error { color: #9a3030; }
+.pt-debate-note { margin: 0; padding: 6px 12px 8px; color: #81786a; background: #f1eadf; font: 7px/1.4 'Inter', sans-serif; text-align: center; }
+.pt-debate-error { margin: 12px 0; padding: 11px; color: #772525; background: #fff2f0; border: 1px solid #efc6c0; border-radius: 10px; font: 10px/1.5 'Inter', sans-serif; }
+@keyframes pt-turn-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+
 .pt-thinking { display: inline-flex; align-items: center; gap: 4px; min-height: 18px; }
 .pt-thinking i { width: 5px; height: 5px; background: var(--pt-gold); border-radius: 50%; animation: pt-bounce 1s infinite ease-in-out; }
 .pt-thinking i:nth-child(2) { animation-delay: .14s; }
@@ -306,6 +563,8 @@
     .philosophy-tutor.is-open .pt-launcher-symbol { width: 40px; height: 40px; }
     .pt-resize-edge, .pt-resize-corner { display: none; }
     .pt-settings select { max-width: 210px; }
+    .pt-philosopher-list { grid-template-columns: 1fr; }
+    .pt-standoff-setup { padding-right: 12px; padding-left: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
