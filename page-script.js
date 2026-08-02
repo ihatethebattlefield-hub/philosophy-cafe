@@ -126,7 +126,7 @@
 
     const tutorScript = document.createElement('script');
     tutorScript.id = 'philosophyTutorScript';
-    tutorScript.src = new URL('philosophy-tutor.js?v=20260802-1', assetRoot).href;
+    tutorScript.src = new URL('philosophy-tutor.js?v=20260802-3', assetRoot).href;
     tutorScript.defer = true;
     document.head.appendChild(tutorScript);
 })();

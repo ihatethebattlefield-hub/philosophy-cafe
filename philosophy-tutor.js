@@ -186,7 +186,7 @@
                         <div class="pt-standoff-intro">
                             <p class="pt-eyebrow">Socratic Standoff · 苏格拉底式对决</p>
                             <h3 id="ptStandoffHeading">Choose two minds. Test one question.</h3>
-                            <p>Each philosopher forms an opening, studies the opponent, answers directly, and closes. A separate AI judge decides the stronger case.</p>
+                            <p>Five fast rounds. Short attacks, heated defenses, sharp counterstrikes—and an independent AI judge decides who survives the clash.</p>
                         </div>
 
                         <div class="pt-contenders" aria-label="Selected philosophers">
@@ -416,12 +416,16 @@
             const phaseLabel = turn.phase || `Round ${index + 1}`;
             setDebateProgress(`${turn.speakerName} is presenting ${phaseLabel.toLowerCase()}…`, phaseLabel);
             addDebateTurn(turn, debate);
-            await delay(index === debate.turns.length - 1 ? 350 : 700);
+            await delay(index === debate.turns.length - 1 ? 300 : 480);
         }
         setDebateProgress('The independent judge is weighing accuracy, direct engagement, reasoning, and clarity…\n独立裁判正在评估准确性、回应力度、论证与表达…', 'Judgment');
         await delay(700);
         addJudgment(debate.judgment, debate);
         setDebateProgress('Standoff complete. Change the philosophers or topic to create a different argument. · 对决结束。更换哲学家或辩题可生成全新辩论。', 'Decision rendered');
+        // A completed match never carries its contenders into the next setup.
+        // The transcript stays visible until the learner chooses “New match”.
+        selectedPhilosophers = [];
+        updateStandoffControls();
     }
 
     function addDebateTurn(turn, debate) {
