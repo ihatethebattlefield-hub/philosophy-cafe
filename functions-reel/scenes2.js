@@ -717,7 +717,7 @@ function sRecap(x, t) {
   bg(x);
   x.save(); x.translate(W / 2, H / 2); x.scale(s, s); x.drawImage(bufR.c, -W / 2, -H / 2); x.restore();
   // a controlled glitch accent on the first frame of a cut: two thin slices, kept off the formula columns
-  if (t - tc < 1 / FPS - 1e-6) {
+  if (t - tc < 1 / (FPS * SPEED) - 1e-6) { // first real frame of the cut
     for (let i = 0; i < 2; i++) {
       const y = 620 + hash2(k, i) * 300, h = 6 + hash2(k, i + 7) * 10, dx = (hash2(k, i + 3) - 0.5) * 70;
       x.drawImage(x.canvas, 0, y, W, h, dx, y, W, h);
@@ -770,7 +770,7 @@ function sLogo(x, t) {
   if (ring < 1) { x.save(); x.strokeStyle = C.line; x.globalAlpha = 0.5 * (1 - ring); x.lineWidth = 2; x.beginPath(); x.arc(L.bx, LOGO.base, 30 + 900 * E.outCubic(ring), 0, TAU); x.stroke(); x.restore(); }
   const sl = 1 + 0.06 * (1 - E.outExpo(clamp(lt / 0.3)));
   x.save();
-  x.globalAlpha = clamp(lt * FPS / 2 + 0.5);
+  x.globalAlpha = clamp(lt * FPS * SPEED / 2 + 0.5);
   x.translate(L.left + L.tw / 2, LOGO.base); x.scale(sl, sl);
   x.font = font(800, LOGO.size); x.textAlign = 'center'; x.textBaseline = 'alphabetic'; x.fillStyle = C.line;
   x.fillText('FUNCTIONS', 0, 0);

@@ -4,6 +4,8 @@ window.TL = {
   "bpm": 120,
   "fps": 30,
   "duration": 60,
+  "speed": 2,
+  "_speed": "story time below is played back `speed` times slower: real seconds = story seconds × speed",
   "chapters": [
     {"id": "origin",      "t0": 0,    "t1": 2,    "en": "Origin",                "cn": "起点 · 一颗球，一条线"},
     {"id": "basic",       "t0": 2,    "t1": 6,    "en": "Basic Functions",       "cn": "基本函数"},

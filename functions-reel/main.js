@@ -80,13 +80,14 @@ function content(x, t) {
 const MB = [[0.25, 1.05, 5], [1.6, 1.75, 6], [1.75, 2.25, 10], [2.25, 2.45, 6], [17.7, 17.85, 6], [17.85, 18.15, 12], [18.15, 18.35, 6], [23.85, 24.25, 10], [39.6, 40.4, 4], [43.6, 44.1, 6],
   [44.5, 46.0, 3], [47.0, 48.0, 5], [48.0, 49.5, 4], [57.75, 58.05, 5], [58.05, 58.6, 3]];
 function mbSamples(t) { const w = MB.find(([a, b]) => t >= a && t < b); return w ? w[2] : 1; }
-function renderFrame(t) {
+function renderFrame(tr) { // tr: real seconds into the film
+  const t = tr / SPEED;
   const K = mbSamples(t);
   if (K === 1) content(ctx, t);
   else {
     // running mean: sample i blends in at 1/(i+1). Unlike summing K images at
     // alpha 1/K, this doesn't truncate each 8-bit channel K times (no colour cast).
-    const shutter = 0.5 / FPS, ax = bufAcc.x;
+    const shutter = 0.5 / (FPS * SPEED), ax = bufAcc.x; // half a real frame, in story time
     ax.globalCompositeOperation = 'source-over';
     for (let i = 0; i < K; i++) {
       content(bufM.x, t + (i / (K - 1) - 0.5) * shutter);
@@ -96,8 +97,8 @@ function renderFrame(t) {
     ax.globalAlpha = 1;
     ctx.drawImage(bufAcc.c, 0, 0);
   }
-  drawHUD(ctx, t);
-  drawGrain(ctx, t);
+  drawHUD(ctx, t, tr);
+  drawGrain(ctx, tr);
 }
 
 async function init() {
@@ -112,8 +113,8 @@ async function init() {
     audio.play().catch(() => null);
     const loop = () => {
       const t = audio.currentTime > 0 ? audio.currentTime : (performance.now() - t0) / 1000;
-      renderFrame(Math.min(DURATION - 1 / FPS, t));
-      if (t < DURATION) requestAnimationFrame(loop);
+      renderFrame(Math.min(REAL_DURATION - 1 / FPS, t));
+      if (t < REAL_DURATION) requestAnimationFrame(loop);
     };
     loop();
   } else {

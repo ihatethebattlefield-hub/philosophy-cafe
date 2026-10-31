@@ -1,9 +1,14 @@
 """numpy-only synthesis toolkit shared by the score: oscillators, drums,
 filters, reverb. No samples — every sound starts as a sine, saw or noise."""
+import json
+import os
+
 import numpy as np
 
 SR = 48000
-DUR = 60.0
+_tl = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'timeline.js'), encoding='utf-8').read()
+_tl = json.loads(_tl[_tl.index('{'):_tl.rindex('}') + 1])
+DUR = float(_tl['duration'] * _tl.get('speed', 1))  # real length of the film in seconds
 N = int(SR * DUR)
 BEAT = 0.5
 BAR = 2.0

@@ -5,6 +5,8 @@
  * argument; the only module-level state is caches of pure data (text layouts).
  */
 const W = 1920, H = 1080, FPS = 30, BEAT = 0.5, DURATION = 60;
+// All scene times are story time; the film plays SPEED× slower (real = story × SPEED).
+const SPEED = TL.speed || 1, REAL_DURATION = DURATION * SPEED;
 const TAU = Math.PI * 2;
 const C = {
   bg: '#0c0d11', panel: '#14161d', line: '#f3ece0', blue: '#3d7bff', coral: '#ff6b4a', yellow: '#ffd23f',
@@ -467,7 +469,7 @@ function chip(x, s, px, py, color, a = 1, o = {}) {
 
 // -------------------------------------------------------------- HUD + grain
 function chapterAt(t) { return TL.chapters.findIndex(c => t >= c.t0 && t < c.t1); }
-function drawHUD(x, t) {
+function drawHUD(x, t, tr = t) { // t: story time (chapters), tr: real time (clock, beat)
   const ci = chapterAt(t);
   if (ci < 0 || ci >= 14) return;
   const ch = TL.chapters[ci], lt = t - ch.t0;
@@ -486,9 +488,9 @@ function drawHUD(x, t) {
   x.font = `400 19px ${CJK}`; x.fillStyle = rgba(C.line, 0.5); x.fillText(ch.cn, 104 + tw + 16, 75);
   x.restore();
   tag(x, 'FUNCTIONS IN MOTION', W - 64, 76, { align: 'right', size: 14, w: 600, ls: '3px', color: rgba(C.line, 0.55) });
-  const f = Math.round(t * FPS);
+  const f = Math.round(tr * FPS);
   tag(x, `${String(Math.floor(f / FPS)).padStart(2, '0')}:${String(f % FPS).padStart(2, '0')}`, W - 64, H - 58, { align: 'right', mono: true, size: 15, color: rgba(C.line, 0.45) });
-  const beat = Math.floor(t / BEAT + 1e-6) % 4, bp = Math.exp(-mod(t, BEAT) * 9);
+  const beat = Math.floor(tr / BEAT + 1e-6) % 4, bp = Math.exp(-mod(tr, BEAT) * 9);
   for (let b = 0; b < 4; b++) {
     const on = b === beat;
     x.fillStyle = on ? C.coral : rgba(C.line, 0.22);
@@ -515,10 +517,10 @@ function initGrain() {
   v.x.fillStyle = g; v.x.fillRect(0, 0, W, H);
   GRAIN.vig = v.c;
 }
-function drawGrain(x, t) {
+function drawGrain(x, tr) {
   x.save();
   x.globalCompositeOperation = 'overlay'; x.globalAlpha = 0.045;
-  x.drawImage(GRAIN[Math.round(t * FPS) % 4], 0, 0, W, H);
+  x.drawImage(GRAIN[Math.round(tr * FPS) % 4], 0, 0, W, H);
   x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1;
   x.drawImage(GRAIN.vig, 0, 0);
   x.restore();

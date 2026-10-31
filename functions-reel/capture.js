@@ -8,7 +8,10 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 
-const FPS = 30, DURATION = 60, TOTAL = FPS * DURATION;
+// Length comes from the timeline: story duration × playback speed.
+const TLsrc = fs.readFileSync(path.join(__dirname, 'timeline.js'), 'utf8');
+const TLj = JSON.parse(TLsrc.slice(TLsrc.indexOf('{'), TLsrc.lastIndexOf('}') + 1));
+const FPS = TLj.fps, DURATION = TLj.duration * (TLj.speed || 1), TOTAL = Math.round(FPS * DURATION);
 const args = process.argv.slice(2);
 const opt = (name, def) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : def; };
 const outDir = path.resolve(opt('out', path.join(__dirname, 'out', 'frames')));
