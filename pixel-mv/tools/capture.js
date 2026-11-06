@@ -1,5 +1,5 @@
 // Renders frames with headless Chromium: frame f is t = f / 30 of the song.
-//   node tools/capture.js --out out/frames [--scale 3] [--workers 4] [--from 0 --to N | --frames 10,20]
+//   node tools/capture.js --out out/frames [--scale 4] [--workers 4] [--from 0 --to N | --frames 10,20]
 // Frames are independent (every frame is a function of t), so workers split them freely.
 const { chromium } = require('playwright');
 const fs = require('fs');
@@ -11,7 +11,7 @@ global.window = {};
 require(path.join(__dirname, '..', 'data', 'song.js'));
 const FPS = 30, TOTAL = Math.round(window.SONG.duration * FPS);
 const outDir = path.resolve(opt('out', path.join(__dirname, '..', 'out', 'frames')));
-const scale = opt('scale', '3'), workers = parseInt(opt('workers', '4'), 10);
+const scale = opt('scale', '4'), workers = parseInt(opt('workers', '4'), 10);
 const frames = opt('frames') ? opt('frames').split(',').map(Number)
   : Array.from({ length: (+opt('to', TOTAL)) - (+opt('from', 0)) }, (_, i) => i + (+opt('from', 0)));
 
@@ -22,7 +22,7 @@ const frames = opt('frames') ? opt('frames').split(',').map(Number)
   let done = 0;
   const t0 = Date.now();
   await Promise.all(Array.from({ length: Math.min(workers, frames.length) }, async (_, w) => {
-    const page = await browser.newPage({ viewport: { width: 360 * scale, height: 640 * scale } });
+    const page = await browser.newPage({ viewport: { width: 270 * scale, height: 480 * scale } });
     page.on('pageerror', e => { console.error('page error:', e.message); process.exitCode = 1; });
     await page.goto(url);
     await page.waitForFunction(() => window.__ready === true, null, { timeout: 60000 });

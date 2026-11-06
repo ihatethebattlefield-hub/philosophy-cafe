@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 多远都要在一起 · 双人存档 — render pipeline.
-#   tools/build.sh preview   → out/preview-360x640.mp4   (logical resolution, quick check)
-#   tools/build.sh final     → out/mv-1080x1920.mp4      (×3 nearest-neighbour, delivery)
+#   tools/build.sh preview   → out/preview-270x480.mp4   (logical resolution, quick check)
+#   tools/build.sh final     → out/mv-1080x1920.mp4      (×4 nearest-neighbour, delivery)
 # Length = length of audio/song.mp3. Frame f is t = f / 30 s of the song, so
 # picture and sound cannot drift whatever the render speed.
 set -euo pipefail
@@ -10,7 +10,7 @@ mode="${1:-preview}"
 [ -f audio/song.mp3 ] || { echo "audio/song.mp3 missing"; exit 1; }
 [ -f data/lyrics.js ] || node tools/lyrics.js data/lyrics.lrc
 
-if [ "$mode" = final ]; then scale=3; out=out/mv-1080x1920.mp4; crf=16; else scale=1; out=out/preview-360x640.mp4; crf=18; fi
+if [ "$mode" = final ]; then scale=4; out=out/mv-1080x1920.mp4; crf=16; else scale=1; out=out/preview-270x480.mp4; crf=18; fi
 frames="out/frames-x$scale"
 rm -rf "$frames"
 node tools/capture.js --out "$frames" --scale "$scale" --workers "${WORKERS:-4}"

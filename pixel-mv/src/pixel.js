@@ -1,12 +1,13 @@
 'use strict';
 /*
  * 双人存档 — pixel core.
- * Everything is drawn on a 360×640 logical canvas with integer coordinates and
- * scaled ×3 (nearest neighbour) to 1080×1920 at the very end. No smoothing, no
- * sub-pixel positions, no gradients: light and shadow are palette steps and
- * ordered dithering. Every function here is pure of time except where t is passed.
+ * Everything is drawn on a 270×480 logical canvas with integer coordinates and
+ * scaled ×4 (nearest neighbour) to 1080×1920 at the very end. ×4 matters: the
+ * 4×4 blocks line up with H.264's 2×2 colour sampling (yuv420p), so pixel edges
+ * stay clean after encoding. Light is drawn as a few hard-edged translucent
+ * steps, not dither noise. Every function here is pure of time except where t is passed.
  */
-const LW = 360, LH = 640, SCALE = 3, FPS = 30;
+const LW = 270, LH = 480, SCALE = 4, FPS = 30;
 
 // ------------------------------------------------------------- palette
 // Low-saturation blue-violet nights, warm amber interiors, coral accents.
@@ -32,6 +33,7 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const inv = (a, b, v) => clamp((v - a) / (b - a));
 const mod = (a, n) => ((a % n) + n) % n;
 const ri = Math.round;
+const TAU = Math.PI * 2;
 const E = {
   inOut: x => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2,
   out: x => 1 - (1 - x) * (1 - x),
@@ -102,17 +104,27 @@ function dither(x, px, py, w, h, col, level) {
   px = ri(px); py = ri(py);
   for (let y = 0; y < h; y++) for (let xx = 0; xx < w; xx++) if (BAYER[((py + y) & 3) * 4 + ((px + xx) & 3)] < level) x.fillRect(px + xx, py + y, 1, 1);
 }
-// Radial light pool in dithered rings — the pixel-art way to draw a lamp's glow.
-function glow(x, cx, cy, rx, ry, col, strength = 0.5) {
-  const x0 = ri(cx - rx), y0 = ri(cy - ry);
+// Pixel ellipse filled row by row (no anti-aliasing).
+function ellipse(x, cx, cy, rx, ry, col) {
   x.fillStyle = col;
-  for (let y = 0; y <= 2 * ry; y++) for (let xx = 0; xx <= 2 * rx; xx++) {
-    const dx = (x0 + xx - cx) / rx, dy = (y0 + y - cy) / ry, d = dx * dx + dy * dy;
-    if (d >= 1) continue;
-    const lv = strength * (1 - d);
-    if (BAYER[((y0 + y) & 3) * 4 + ((x0 + xx) & 3)] < lv) x.fillRect(x0 + xx, y0 + y, 1, 1);
+  for (let y = -ry; y <= ry; y++) {
+    const w = Math.floor(rx * Math.sqrt(Math.max(0, 1 - (y * y) / (ry * ry + 0.0001))) + 0.3);
+    if (w >= 0) x.fillRect(ri(cx - w), ri(cy + y), 2 * w + 1, 1);
   }
 }
+// Light pool: three nested hard-edged ellipses of translucent light, the way
+// lamplight is usually painted in pixel art — clean bands instead of noise.
+function glow(x, cx, cy, rx, ry, col, strength = 0.5) {
+  if (strength <= 0) return;
+  x.save();
+  for (const [k, a] of [[1, 0.28], [0.68, 0.32], [0.4, 0.4]]) {
+    x.globalAlpha = a * strength;
+    ellipse(x, cx, cy, Math.max(1, ri(rx * k)), Math.max(1, ri(ry * k)), col);
+  }
+  x.restore();
+}
+// Translucent flat overlay (time-of-day grading, shadows) — whole pixels, one alpha.
+function shade(x, px, py, w, h, col, a) { if (a <= 0) return; x.save(); x.globalAlpha = a; rect(x, px, py, w, h, col); x.restore(); }
 
 // ------------------------------------------------------------- sprites
 // A sprite is an ASCII pixel map plus a key → colour table. Maps are parsed once
@@ -158,12 +170,15 @@ function tinted(name, map) {
 function hexRgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
 
 // ------------------------------------------------------------- pixel text
-// Chinese text is rendered from bitmap-capable fonts at their native pixel size,
-// then thresholded to one colour, so every glyph is made of whole, crisp pixels.
+// Chinese text uses Fusion Pixel (OFL), a true bitmap font with 8/10/12 px
+// designs; glyphs are rendered at their design size (or an exact integer
+// multiple for titles) and thresholded, so every glyph is whole, crisp pixels.
 const FONT = {
-  ui: { family: '"WenQuanYi Zen Hei Sharp"', size: 12, ascent: 10 },
-  big: { family: 'Unifont', size: 16, ascent: 13 },
-  small: { family: '"WenQuanYi Zen Hei Sharp"', size: 10, ascent: 9 },
+  tiny: { family: 'FP8', size: 8 },
+  small: { family: 'FP10', size: 10 },
+  ui: { family: 'FP12', size: 12 },
+  big: { family: 'FP10', size: 20 },    // the 10 px design at exactly 2×
+  title: { family: 'FP12', size: 24 },  // the 12 px design at exactly 2×
 };
 const GLYPH = new Map();
 const MEAS = canvas(64, 32);
@@ -174,8 +189,8 @@ function glyph(ch, f) {
   MEAS.x.font = `${f.size}px ${f.family}`;
   const w = Math.max(1, Math.ceil(MEAS.x.measureText(ch).width));
   const c = canvas(w + 2, f.size + 4);
-  c.x.font = `${f.size}px ${f.family}`; c.x.fillStyle = '#000'; c.x.textBaseline = 'alphabetic';
-  c.x.fillText(ch, 1, f.ascent + 1);
+  c.x.font = `${f.size}px ${f.family}`; c.x.fillStyle = '#000'; c.x.textBaseline = 'top';
+  c.x.fillText(ch, 1, 1);
   const img = c.x.getImageData(0, 0, c.w, c.h), D = img.data;
   for (let i = 0; i < D.length; i += 4) { const on = D[i + 3] >= 110; D[i] = D[i + 1] = D[i + 2] = 255; D[i + 3] = on ? 255 : 0; }
   c.x.putImageData(img, 0, 0);
