@@ -1,0 +1,10 @@
+out/
+out.*.log
+audio/
+# copyrighted lyric text and everything derived from it stays local
+data/lyrics.txt
+data/lyrics.lrc
+data/lyrics.js
+data/lyrics.align-report.txt
+data/align.log
+data/*.asr-*.json
