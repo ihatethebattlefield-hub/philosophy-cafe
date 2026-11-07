@@ -1,0 +1,11 @@
+out/
+audio/
+out.*.log
+data/lyrics.txt
+data/lyrics.lrc
+data/lyrics.srt
+data/lyrics.js
+data/lyrics.align-report.txt
+data/asr-*.json
+data/analysis.json
+data/*.asr-*.json
